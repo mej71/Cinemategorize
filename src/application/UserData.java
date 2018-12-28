@@ -293,7 +293,9 @@ public class UserData implements Serializable {
 				maxYear = tempDat.maxYear;
 			} 
 			return;
-		} catch (IOException | ClassNotFoundException e1) {}		
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}		
 	}
 	
 	final String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
@@ -608,6 +610,8 @@ public class UserData implements Serializable {
 			break;
 		case RELEASE_DATE_DESC:
 			Collections.sort(workingCollection, (o1, o2) -> ((JFXMediaRippler)o2).linkedItem.getReleaseDate().compareTo(((JFXMediaRippler)o1).linkedItem.getReleaseDate()));
+			break;
+		default:
 			break;
 		}
 		ControllerMaster.mainController.tilePane.getChildren().setAll(workingCollection);

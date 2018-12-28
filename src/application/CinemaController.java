@@ -8,9 +8,6 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.dropsnorz.showcasefx.Showcase;
-import com.dropsnorz.showcasefx.layers.ShowcaseLayerShape;
-import com.dropsnorz.showcasefx.layouts.AutoShowcaseLayout;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
@@ -22,7 +19,6 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
-import info.movito.themoviedbapi.model.core.ResultsPage;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -30,7 +26,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -43,8 +38,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 
 public class CinemaController implements Initializable {
 
@@ -73,7 +66,6 @@ public class CinemaController implements Initializable {
 	// local content initialized outside of the fxml
 	TilePane tilePane;
 	
-	private Showcase showcase;
 	MovieScrollPane scrollPane;
 	public HamburgerBackArrowBasicTransition burgerTask;
 	// other variables
@@ -107,25 +99,6 @@ public class CinemaController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		ControllerMaster.mainController = this;
-		showcase = new Showcase(backgroundStackPane);
-		showcase.setDefaultLayout(new AutoShowcaseLayout());
-		showcase.setDefaultLayer(new ShowcaseLayerShape() {
-			@Override
-			public Shape generate(Bounds targetBounds, double parentWidth, double parentHeight) {
-				
-				int offset = 15;
-				Rectangle rectangle = new Rectangle(targetBounds.getMinX() - offset, 
-						targetBounds.getMinY() - offset, 
-						targetBounds.getWidth() + 2*offset, 
-						targetBounds.getHeight() + 2*offset);
-				
-				rectangle.setArcHeight(10);
-				rectangle.setArcWidth(10);
-				
-				return rectangle;
-			}
-			
-		});
 		
 		sortCombo.setItems(FXCollections.observableArrayList( SortTypes.values()));
 		sortCombo.setValue(SortTypes.NAME_ASC);
@@ -159,7 +132,7 @@ public class CinemaController implements Initializable {
         			n.setMaxHeight(208*ControllerMaster.userData.getScaleFactor());
         			n.resize(139*ControllerMaster.userData.getScaleFactor(), 208*ControllerMaster.userData.getScaleFactor());
         		}
-            	scaleLabel.textProperty().setValue("Scale: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
+            	scaleLabel.textProperty().setValue("Image Size: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
             } 
         });
 		
@@ -274,7 +247,7 @@ public class CinemaController implements Initializable {
 			selectionView.prefWidthProperty().bind(mainPane.widthProperty().divide(1.15));
 			selectionView.prefHeightProperty().bind(mainPane.heightProperty().divide(1.3));
 			loader = new FXMLLoader(getClass().getResource("ManualLookupContent.fxml"));
-			manualLookupView = loader.load();;
+			manualLookupView = loader.load();
 			manualLookupController = loader.getController();
 			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
 					JFXDialog.DialogTransition.CENTER);
@@ -344,14 +317,6 @@ public class CinemaController implements Initializable {
 	    endYearComboBox.setItems(
 	    		FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
 	    ); 
-	}
-	
-	private void takeATour() {
-		showcase.createStep(searchField, "Search here for movies, actors, and more");
-		showcase.createStep(sortCombo, "Sort the movies by name, release date, etc");
-		showcase.createStep(startYearComboBox, "Choose a date range of movies here..");
-		showcase.createStep(endYearComboBox, "and here");
-		showcase.start();
 	}
 
 	//make sure everything is loaded, then if the media list is empty force the player to add at least one item

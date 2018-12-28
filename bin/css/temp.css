@@ -23,7 +23,7 @@
 
 .label:focused {
     -fx-background-color: transparent ;
-    -fx-background-insets: 0px ;
+    -fx-background-insets: 0;
 }
 
 .header {
@@ -95,12 +95,12 @@
 .jfx-text-field .error-label, .jfx-password-field .error-label, .jfx-text-area .error-label {
     -fx-text-fill: #ff565c;
     -fx-font-size: 0.75em;
-    -fx-padding: 0px 20px 0px 30px;
+    -fx-padding: 0 20px 0 30px;
 }
 
 jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .error-icon {
     -fx-text-fill: #ff565c;
-    -fx-padding: 20px 50px 0px 0px;
+    -fx-padding: 20px 50px 0 0;
 }
 
 
@@ -217,45 +217,6 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
  * Date Picker																   *
  *                                                                             *
  ******************************************************************************/
- 
-.jfx-date-picker{
-    -jfx-default-color: #103E50;
-    
-}
-
-.jfx-date-picker,
-.jfx-date-picker:focused,
-.jfx-date-picker:focused:editable {
-    -fx-background-color: TRANSPARENT, TRANSPARENT, TRANSPARENT, TRANSPARENT;
-}
-
-
-.jfx-date-picker > .arrow-button > .jfx-svg-glyph {
-    -fx-background-color: #89c4f4;
-}
-
-.date-picker-popup > * > .spinner {
-    -fx-alignment: CENTER;
-    -fx-fill-height: false;
-    -fx-background-color: transparent;
-}
-
-.date-picker-popup > * > .spinner > .label {
-    -fx-alignment: CENTER;
-     -fx-prompt-text-fill: #c5eff7;
-}
-
-.jfx-date-picker > .arrow-button,
-.jfx-date-picker:editable > .arrow-button,
-.jfx-date-picker:focused > .arrow-button,
-.jfx-date-picker:editable:focused > .arrow-button {
-    -fx-background-color: TRANSPARENT;
-}
-
-.jfx-date-picker .jfx-button{ 
-	-fx-background-color: TRANSPARENT;
-	-fx-padding: 0 0 0 30px;
-}
 
 .person_pane {
 	-fx-background-color: linear-gradient(from 50% 25% to 100% 100%, #103E50, #022735);
@@ -285,7 +246,7 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 	-fx-text-fill: #89c4f4 !important;
 }
 .popover {
-	-fx-border-width: 0px;
+	-fx-border-width: 0;
 }
 
 
@@ -317,32 +278,16 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 
 /*******************************************************************************
  *                                                                             *
- * Showcase				                                                       *
- *                                                                             *
- ******************************************************************************/ 
-
-.showcase  .label {
-	-fx-text-fill:white !important;
-	-fx-font-size: 20px;
-	-fx-font-weight: bold;
-}
-
-.showcase-layer{
-	-fx-fill: rgba(137,196,244, 0.8);
-}
-
-/*******************************************************************************
- *                                                                             *
  * Slider				                                                       *
  *                                                                             *
  ******************************************************************************/ 
 
 .jfx-slider > .colored-track {
-     -fx-background-color: #5fdd9d;
+     -fx-background-color: #89c4f4;
 }
 
 .jfx-slider > .thumb {
-     -fx-background-color: #5fdd9d;
+     -fx-background-color: #89c4f4;
 }
 
 .jfx-slider .animated-thumb{
@@ -356,7 +301,7 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 
 .slider .axis .axis-tick-mark, .slider .axis .axis-minor-tick-mark {
     -fx-fill: null;
-    -fx-stroke: #5fdd9d;
+    -fx-stroke: #89c4f4;
 }
 
 
@@ -374,7 +319,7 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 }
 
 .list-cell {
-	-fx-background-color: #364950;
+	-fx-background-color: #103E50;
 	-fx-cursor: hand;
 }
 
@@ -450,7 +395,7 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 }
 
 .genre-chip-label {
-	-fx-text-fill: #364950;
+	-fx-text-fill: #001828;
 }
 
 .tag-chip-hbox {
@@ -465,7 +410,7 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 }
 
 .tag-chip-label {
-	-fx-text-fill: #364950;
+	-fx-text-fill: #001828;
 }
 
 

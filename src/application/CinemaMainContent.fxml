@@ -110,7 +110,7 @@
                      <Insets top="5.0" />
                   </GridPane.margin>
                </JFXSlider>
-               <Label fx:id="scaleLabel" alignment="CENTER" text="Scale: 1.0" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <Label fx:id="scaleLabel" alignment="CENTER" text="Poster Scale: 1.0" textAlignment="CENTER" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                   <GridPane.margin>
                      <Insets bottom="35.0" />
                   </GridPane.margin>

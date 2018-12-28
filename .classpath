@@ -11,7 +11,6 @@
 	<classpathentry exported="true" kind="lib" path="E:/Programming/Jackson/jackson-core-2.9.6.jar" sourcepath="E:/Programming/Jackson/jackson-core-2.9.6-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="E:/Programming/ControlsFX/controlsfx-8.40.14.jar"/>
 	<classpathentry kind="lib" path="E:/Programming/JFoenix-master/jfoenix-8.0.7.jar"/>
-	<classpathentry kind="lib" path="E:/Programming/showcase-fx.jar"/>
 	<classpathentry kind="lib" path="E:/Programming/Apache/commons-lang3-3.7/commons-lang3-3.7.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/E:/Programming/Apache/commons-lang3-3.7/commons-lang3-3.7-javadoc.jar!/"/>
