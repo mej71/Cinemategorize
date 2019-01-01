@@ -28,4 +28,4 @@ images/
 *.ttf
 #hides the api keys
 *.xml
-*.prefs
+*.prefsbin/
