@@ -34,6 +34,9 @@ import javafx.util.Duration;
 //A modified version of JFXAutoCompletePopupSkin that allows me to assign properties to list items
 @SuppressWarnings("rawtypes")
 public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
+	
+	//not style-able, for some reason
+	private final int imageHeight = 32;
 
 	MovieAutoCompletePopup control;
 	ListView<SearchItem> suggestionList;
@@ -88,10 +91,10 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 						year.getStyleClass().add(YEAR_CLASS);
 						mediaName.getStyleClass().add(NAME_CLASS);
 						Label reference = new Label(null, new TextFlow(mediaName, year));
-						ImageView imageView = MediaSearchHandler.getItemPoster((MediaItem)c.getItem(), 92);
-						imageView.setFitWidth(46);
-						imageView.setFitHeight(46);
-						setHeight(46);
+						ImageView imageView = MediaSearchHandler.getItemPoster((MediaItem)c.getItem(), 185);
+						imageView.getStyleClass().add("autocomplete-imageview");
+						imageView.setFitWidth(imageHeight);
+						imageView.setFitHeight(imageHeight);
 						gPane.add(imageView, 0, 0, 1, 3);
 						gPane.add(reference, 1, 0, 3, 3);
 						reference.setAlignment(Pos.CENTER);
@@ -128,8 +131,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 						director.getStyleClass().add(NAME_CLASS);
 						Label reference = new Label(null, new TextFlow(dirText, director));
 						ImageView imageView = MediaSearchHandler.getProfilePicture((PersonCrew)c.getItem());
-						imageView.setFitWidth(30);
-						imageView.setFitHeight(45);
+						imageView.setFitWidth(imageHeight);
+						imageView.setFitHeight(imageHeight);
 						gPane.add(imageView, 3, 0, 1, 3);
 						gPane.add(reference, 0, 0, 3, 3);
 						reference.setAlignment(Pos.CENTER);
@@ -144,8 +147,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 						actorName.getStyleClass().add(NAME_CLASS);
 						Label reference = new Label(null, new TextFlow(dirText, actorName));						
 						ImageView imageView = MediaSearchHandler.getProfilePicture((PersonCast)c.getItem());
-						imageView.setFitWidth(30);
-						imageView.setFitHeight(45);
+						imageView.setFitWidth(imageHeight);
+						imageView.setFitHeight(imageHeight);
 						gPane.add(imageView, 3, 0, 1, 3);
 						gPane.add(reference, 0, 0, 3, 3);
 						reference.setAlignment(Pos.CENTER);
@@ -160,8 +163,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 						writerName.getStyleClass().add(NAME_CLASS);
 						Label reference = new Label(null, new TextFlow(dirText, writerName));
 						ImageView imageView = MediaSearchHandler.getProfilePicture((PersonCrew)c.getItem());
-						imageView.setFitWidth(30);
-						imageView.setFitHeight(45);
+						imageView.setFitWidth(imageHeight);
+						imageView.setFitHeight(imageHeight);
 						gPane.add(imageView, 3, 0, 1, 3);
 						gPane.add(reference, 0, 0, 3, 3);
 						reference.setAlignment(Pos.CENTER);
@@ -258,10 +261,11 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 				suggestionList.getSelectionModel().select(0);
 				item = suggestionList.getSelectionModel().getSelectedItem();
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		if (item != null) {
-			control.getSelectionHandler().handle(new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTED,
+			control.getSelectionHandler().handle(new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION,
 					suggestionList.getSelectionModel().getSelectedItem()));
 		}
 	}

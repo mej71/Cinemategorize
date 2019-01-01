@@ -372,13 +372,13 @@ public class UserData implements Serializable {
 		String[] movieParsedInfo = MediaSearchHandler.parseMovieName(file.getName());
 		Integer movieDistance = 100;
 		CustomMovieDb cm = null;
-		if (!movieParsedInfo[0].isEmpty()) {
-			if (!movieParsedInfo[1].isEmpty()) {
+		if (movieParsedInfo[0] != null && !movieParsedInfo[0].isEmpty()) {
+			if (movieParsedInfo[1] != null && !movieParsedInfo[1].isEmpty()) {
 				cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0],
 						Integer.parseInt(movieParsedInfo[1]));
 				if (cm != null) {
-					movieDistance =  StringTools.getLevenshteinDistance(cm.movie.getTitle(), movieParsedInfo[0]);
-					if (movieDistance == cm.movie.getTitle().length()) {
+					movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
+					if (movieDistance == cm.getTitle().length()) {
 						movieDistance = 100;
 					}
 					mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
@@ -388,8 +388,8 @@ public class UserData implements Serializable {
 			if (cm == null) {
 				cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0], 0);
 				if (cm != null) {
-					movieDistance =  StringTools.getLevenshteinDistance(cm.movie.getTitle(), movieParsedInfo[0]);
-					if (movieDistance == cm.movie.getTitle().length()) {
+					movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
+					if (movieDistance == cm.getTitle().length()) {
 						movieDistance = 100;
 					}
 					mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
@@ -397,7 +397,6 @@ public class UserData implements Serializable {
 				}
 			}
 		}
-		
 		// if both results are really far off, we probably failed
 		if (series == null &&  cm==null) { 		
 			for (MediaItem m: tempManualItems.keySet()) {
@@ -427,13 +426,14 @@ public class UserData implements Serializable {
 					return false;
 				}
 			}
+			
 			if (tvParsedInfo[1].isEmpty()) {
 				tvParsedInfo[1] = "1";
 			}
 			if (tvParsedInfo[2].isEmpty()) {
 				tvParsedInfo[2] = "2";
 			}
-			tempManualItems.put(new MediaItem(series, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(tRes, Integer.parseInt(tvParsedInfo[1]), Integer.parseInt(tvParsedInfo[2])));
+			tempManualItems.put(new MediaItem(series, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(tRes));
 			return false;
 			
 		} else if (cm!=null) {
@@ -515,9 +515,9 @@ public class UserData implements Serializable {
 					personList.put(crew.getId(), MediaSearchHandler.getPersonPeople(crew.getId()));
 					if (isMovie) {
 						if (writersMovieList.containsKey(crew)) {
-							writersMovieList.get(crew).add(m.movie.getId());
+							writersMovieList.get(crew).add(m.getId());
 						} else {
-							writersMovieList.put(crew, new ArrayList<>(Arrays.asList(m.movie.getId())));
+							writersMovieList.put(crew, new ArrayList<>(Arrays.asList(m.getId())));
 						}					
 					} else {
 						if (writersTvList.containsKey(crew)) {
@@ -536,9 +536,9 @@ public class UserData implements Serializable {
 				personList.put(actor.getId(), MediaSearchHandler.getPersonPeople(actor.getId()));
 				if (isMovie) {
 					if (actorsMovieList.containsKey(actor)) {
-						actorsMovieList.get(actor).add(m.movie.getId());
+						actorsMovieList.get(actor).add(m.getId());
 					} else {
-						actorsMovieList.put(actor, new ArrayList<>(Arrays.asList(m.movie.getId())));
+						actorsMovieList.put(actor, new ArrayList<>(Arrays.asList(m.getId())));
 					}
 				} else {
 					if (actorsTvList.containsKey(actor)) {

@@ -3,6 +3,7 @@ package application;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListCell;
 
@@ -52,8 +53,8 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 	        for (int i = 0; i < numCols; i++) {
 	            ColumnConstraints colConst = new ColumnConstraints();
 	            if (i<2) {
-	            	colConst.setPrefWidth(93);
-	            	colConst.setMaxWidth(93);
+	            	colConst.setPrefWidth(50);
+	            	colConst.setMaxWidth(50);
 	            } else {
 	            	colConst.setPercentWidth(100.0 / numCols);
 	            }
@@ -77,14 +78,17 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 			gridPane.setPrefWidth(1);
 			iView.setImage(MediaSearchHandler.getItemPoster(item, 185).getImage());
 			iView.setFitHeight(139);
+			iView.setFitWidth(93);
 			gridPane.setPrefHeight(139);
 			gridPane.setMaxHeight(139);
 			titleLabel.setText(item.getTitle());
 			episodeBox.setVisible(false);
 			if (!item.isMovie()) {
+				
 				seasonBox.setItems(
-					FXCollections.observableArrayList(IntStream.rangeClosed(1,item.getNumSeasons()).boxed().collect(Collectors.toList()))
+						FXCollections.observableArrayList(IntStream.rangeClosed(1,item.getNumSeasons()).boxed().collect(Collectors.toList()))
 				);
+				
 				seasonBox.valueProperty().addListener(new ChangeListener<Integer>() {
 
 					@Override
@@ -94,6 +98,7 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 					}
 					
 				});
+				
 				//episode box shouldn't be visible unless items have been filled
 				
 				episodeBox.itemsProperty().addListener(new ChangeListener<ObservableList<Integer>>() {
@@ -128,6 +133,11 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 				gridPane.add(seasonBox, 2, 4);
 				gridPane.add(episodeBox, 3, 4);
 				seasonBox.setVisible(true);
+				if (item.getFirstAvailableEpisode() != null) {
+					seasonBox.getSelectionModel().select(item.getFirstAvailableEpisode().getSeasonNumber()-1);
+					episodeBox.getSelectionModel().select(item.getFirstAvailableEpisode().getEpisodeNumber());
+				}
+				
 			} else {
 				seasonBox.setVisible(false);
 			}
@@ -135,7 +145,7 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 			descLabel.setText(item.getOverview());
 			gridPane.add(iView, 0, 0, 2, 5);
 			gridPane.add(titleLabel, 2, 0, 3, 1);
-			gridPane.add(descLabel, 2, 1, 3, 3);			
+			gridPane.add(descLabel, 2, 1, 3, 3);	
 			GridPane.setValignment(descLabel, VPos.TOP);
 			gridPane.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
 				updateSelected(true);

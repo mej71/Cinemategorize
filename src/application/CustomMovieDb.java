@@ -1,8 +1,15 @@
 package application;
 
 import java.io.Serializable;
+import java.util.List;
 
+import info.movito.themoviedbapi.model.Collection;
+import info.movito.themoviedbapi.model.Credits;
+import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.MovieDb;
+import info.movito.themoviedbapi.model.keywords.Keyword;
+import info.movito.themoviedbapi.model.people.PersonCast;
+import info.movito.themoviedbapi.model.people.PersonCrew;
 
 public class CustomMovieDb implements Serializable {
 
@@ -12,5 +19,54 @@ public class CustomMovieDb implements Serializable {
 	public CustomMovieDb(MovieDb m) {
 		movie = m;
 	}
+	
+	public int getId() {
+		return movie.getId();
+	}
+
+	public String getTitle() {
+		return movie.getTitle();
+	}
+
+	public String getOverview() {
+		return movie.getOverview();
+	}
+	
+	public List<Genre> getGenres() {
+		return movie.getGenres();
+	}
+
+	public List<PersonCast> getCast() {
+		return movie.getCast();
+	}
+
+	public List<PersonCrew> getCrew() {
+		return movie.getCrew();
+	}
+	
+	public Credits getCredits() {
+		return movie.getCredits();
+	}
+
+	public List<Keyword> getKeywords() {
+		return movie.getKeywords();
+	}
+	
+
+	public int getRuntime() {
+		return movie.getRuntime();
+	}
+
+	public Collection getBelongsToCollection() {
+		return movie.getBelongsToCollection();
+	}
+
+	public String getReleaseDate() {
+		return movie.getReleaseDate();
+	}
+
+	
+
+	
 	
 }

@@ -42,7 +42,6 @@ public class MovieAutoCompleteEvent<T> extends Event {
 		return object;
 	}
 
-	//TODO: more events to be added
 	@SuppressWarnings("rawtypes")
-	public static final EventType<MovieAutoCompleteEvent> SELECTED =	new EventType<MovieAutoCompleteEvent>(Event.ANY, "POPUP_CLOSED");
+	public static final EventType<MovieAutoCompleteEvent> SELECTION  =	new EventType<MovieAutoCompleteEvent>(Event.ANY, "JFX_AUTOCOMPLETE_SELECTION");
 }

@@ -160,7 +160,6 @@ public class CinemaController implements Initializable {
 		
 		autoCompletePopup = new MovieAutoCompletePopup();
 		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty());
-		autoCompletePopup.setFixedCellSize(50);
 		autoCompletePopup.setCellLimit(7);
 	    autoCompletePopup.setMovieSelectionHandler(e -> {
 	    	autoEvent = (MovieAutoCompleteEvent<SearchItem>)e;

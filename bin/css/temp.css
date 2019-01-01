@@ -95,12 +95,6 @@
 .jfx-text-field .error-label, .jfx-password-field .error-label, .jfx-text-area .error-label {
     -fx-text-fill: #ff565c;
     -fx-font-size: 0.75em;
-    -fx-padding: 0 20px 0 30px;
-}
-
-jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .error-icon {
-    -fx-text-fill: #ff565c;
-    -fx-padding: 20px 50px 0 0;
 }
 
 
@@ -177,14 +171,55 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 
 /*******************************************************************************
  *                                                                             *
- * Combo Box		                                                       *
+ * ListView			                                                    	   *
+ *                                                                             *
+ ******************************************************************************/ 
+.list-view .jfx-list-cell .jfx-rippler {
+    -jfx-rippler-fill: #89c4f4;
+}
+ 
+.list-view {
+    -fx-background-color: rgba(0.8, 15.3, 20.8, 0.8);
+    -fx-background-radius: 5px;
+}
+
+
+.list-cell{
+	-fx-text-fill: #89c4f4;
+	-fx-background-color: #010f15;
+}
+
+.list-cell:owned-media {
+	-fx-background-color: #c5eff7;
+}
+
+.list-cell:owned-media .label{
+	-fx-text-fill: #001828;
+}
+
+.list-cell:hover{
+    -fx-text-fill: #103E50;
+	-fx-background-color: #487687;
+}
+
+.list-cell:selected {
+	-fx-background-color: #89c4f4;
+}
+
+.list-cell:selected .label{
+	-fx-text-fill: #103E50;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Combo Box		                                                     	   *
  *                                                                             *
  ******************************************************************************/
 
 
 .jfx-combo-box{
 	-fx-border-width: 0 0 0 0;
-    -fx-background-color: rgb(0.8, 15.3, 20.8);
+    -fx-background-color: #010f15;
     -fx-background-insets: 0 0 -1 0, 0, 1, 2;
     -fx-background-radius: 3px, 3px, 2px, 1px;
     -fx-prompt-text-fill: #103E50;
@@ -194,23 +229,28 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
 
 .jfx-combo-box .list-cell{
 	-fx-text-fill: #89c4f4;
-	-fx-background-color: rgb(0.8, 15.3, 20.8);
-}
-
-.combo-box-popup .list-view .list-cell {
-    -fx-text-fill: #89c4f4;
-	-fx-background-color: rgb(0.8, 15.3, 20.8);
+	-fx-background-color: #010f15;
 }
 
 .combo-box-popup .list-view .list-cell:selected {
-    -fx-text-fill: #89c4f4;
-	-fx-background-color: #103E50;
+    -fx-text-fill: #001828;
+	-fx-background-color: #89c4f4;
 }
 
 .combo-box-popup .list-view .list-cell:hover {
-    -fx-text-fill: #89c4f4;
-	-fx-background-color: #103E50;
+    -fx-text-fill: #103E50;
+	-fx-background-color: #487687;
 }
+
+/*******************************************************************************
+ *                                                                             *
+ * Autocomplete		                                                     	   *
+ *                                                                             *
+ ******************************************************************************/
+.autocomplete-list{
+    -fx-fixed-cell-size: 35;
+}
+
 
 /*******************************************************************************
  *                                                                             *
@@ -304,41 +344,6 @@ jfx-text-field .error-icon, .jfx-password-field .error-icon, .jfx-text-area .err
     -fx-stroke: #89c4f4;
 }
 
-
-/*******************************************************************************
- *                                                                             *
- * ListView			                                                    	   *
- *                                                                             *
- ******************************************************************************/ 
- .list-view .jfx-list-cell .jfx-rippler {
-    -jfx-rippler-fill: #89c4f4;
-}
- 
-.list-view {
-    -fx-background-color: rgba(0.8, 15.3, 20.8, 0.9);
-}
-
-.list-cell {
-	-fx-background-color: #103E50;
-	-fx-cursor: hand;
-}
-
-.list-cell:odd {
-    -fx-background-color: rgb(0.8, 15.3, 20.8);
-}
-
-.list-cell:selected {
-	-fx-background-color: #103E50;
-	-fx-cursor: hand;
-}
-
-.list-cell:owned-media {
-	-fx-background-color: #5fdd9d;
-}
-
-.list-cell:owned-media .label{
-	-fx-text-fill: #364950;
-}
 
 /*******************************************************************************
  *                                                                             *

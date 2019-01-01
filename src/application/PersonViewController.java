@@ -16,6 +16,7 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
 
+import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCredit;
 import info.movito.themoviedbapi.model.people.PersonCrew;
@@ -107,16 +108,8 @@ public class PersonViewController implements Initializable {
 		personImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		bioScrollPane.maxHeightProperty().bind(mainGrid.heightProperty().multiply(0.35));
 	}
-
 	
-	public void showCast(JFXDialog d, PersonCast pc, MediaItem mi) {
-		personImageView.setImage(MediaSearchHandler.getProfilePicture(pc).getImage());
-		person = ControllerMaster.userData.getPerson(pc.getId());
-		showPerson(d);
-			
-	}
-	
-	public void showCrew(JFXDialog d, PersonCrew pc, MediaItem mi) {
+	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
 		personImageView.setImage(MediaSearchHandler.getProfilePicture(pc).getImage());
 		person = ControllerMaster.userData.getPerson(pc.getId());
 		showPerson(d);

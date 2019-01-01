@@ -7,7 +7,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import info.movito.themoviedbapi.model.Credits;
+import info.movito.themoviedbapi.model.Genre;
+import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
+import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
 public class CustomTvDb implements Serializable {
@@ -24,7 +28,7 @@ public class CustomTvDb implements Serializable {
 		dateAdded = LocalDateTime.now();
 	}
 	
-	public List<Integer> getSeasons() {
+	public List<Integer> getSeasonNumbers() {
 		List<Integer> seasons = new ArrayList<Integer>();
 		for (Integer k : episodeList.keySet()) {
 			seasons.add(k);
@@ -43,7 +47,21 @@ public class CustomTvDb implements Serializable {
 	}
 	
 	public TvEpisode getEpisode(int seasonNum, int epNum) {
-		return episodeList.get(seasonNum).get(epNum);
+		if (series.getSeasons().get(seasonNum-1).getEpisodes() == null) {
+			
+			//cache seasons, because they are not stored
+			List<TvSeason> seasons = new ArrayList<TvSeason>();
+			for (int i = 1; i <= series.getNumberOfSeasons(); ++i) {
+				seasons.add(MediaSearchHandler.getSeasonInfo(getId(), i));
+			}
+			series.setSeasons(seasons);
+		}
+		if ( seasonNum > series.getNumberOfSeasons()) {
+			return null;
+		} else if (epNum > series.getSeasons().get(seasonNum-1).getEpisodes().size()) {
+			return null;
+		}
+		return series.getSeasons().get(seasonNum-1).getEpisodes().get(epNum-1);
 	}
 	
 	public void addEpisode(TvEpisode episode) {
@@ -74,6 +92,38 @@ public class CustomTvDb implements Serializable {
 	
 	public String getEpisodeDescription(int season, int ep) {
 		return episodeList.get(season).get(ep).getOverview();
+	}
+	
+	public String getPosterPath() {
+		return series.getPosterPath();
+	}
+
+	public Credits getCredits() {
+		return series.getCredits();
+	}
+
+	public List<Genre> getGenres() {
+		return series.getGenres();
+	}
+
+	public List<Keyword> getKeywords() {
+		return series.getKeywords();
+	}
+
+	public String getLastAirDate() {
+		return series.getLastAirDate();
+	}
+
+	public int getNumberOfSeasons() {
+		return series.getNumberOfSeasons();
+	}
+	
+	public List<TvSeason> getSeasons() {
+		return series.getSeasons();
+	}
+
+	public void setSeasons(List<TvSeason> seasons) {
+		series.setSeasons(seasons);
 	}
 
 }

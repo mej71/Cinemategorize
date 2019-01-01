@@ -13,10 +13,8 @@ public class MediaResultsPage {
 	private int tempSeason = 0;
 	private int tempEpisode = 0;
 	
-	public MediaResultsPage(TvResultsPage tvResults, int tempSeason, int tempEpisode) {
-		this.tvResults = tvResults;
-		this.tempSeason = tempSeason;
-		this.tempEpisode = tempEpisode;		
+	public MediaResultsPage(TvResultsPage tvResults) {
+		this.tvResults = tvResults;	
 	}
 	
 	public MediaResultsPage(MovieResultsPage m) {
@@ -28,7 +26,7 @@ public class MediaResultsPage {
 		List<ResultsMediaItem> results = new ArrayList<ResultsMediaItem>();
 		if (tvResults != null) {
 			for (int i = 0; i < tvResults.getResults().size(); ++i) {
-				results.add(new ResultsMediaItem(MediaSearchHandler.getTvInfoById(tvResults.getResults().get(i).getId()).tvShow, tempSeason, tempEpisode));
+				results.add(new ResultsMediaItem(MediaSearchHandler.getTvInfoById(tvResults.getResults().get(i).getId()).tvShow));
 			}
 			return results;
 		} else {
@@ -37,5 +35,13 @@ public class MediaResultsPage {
 			}
 			return results;
 		}
+	}
+
+	//copies results values
+	public void setResults(MediaResultsPage mRes) {
+		this.movieResults = mRes.movieResults;
+		this.tvResults = mRes.tvResults;
+		this.tempSeason = mRes.tempSeason;
+		this.tempEpisode = mRes.tempEpisode;			
 	}
 }

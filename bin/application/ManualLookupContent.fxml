@@ -40,7 +40,7 @@
                   <Insets left="5.0" right="5.0" />
                </padding>
                <GridPane.margin>
-                  <Insets top="-20.0" />
+                  <Insets />
                </GridPane.margin>
             </JFXTextField>
             <Label text="Double click your correct item, or search for..." GridPane.columnSpan="4" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="TOP" />
@@ -49,7 +49,7 @@
                   <Insets left="3.0" right="3.0" />
                </padding>
                <GridPane.margin>
-                  <Insets top="-20.0" />
+                  <Insets />
                </GridPane.margin>
             </JFXNumberTextField>
             <JFXButton fx:id="searchButton" alignment="CENTER" buttonType="RAISED" onAction="#searchSuggestion" text="Search" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
@@ -60,24 +60,20 @@
                   <Insets />
                </GridPane.margin>
             </JFXButton>
-            <JFXComboBox fx:id="mediaTypeComboBox" onAction="#comboChange" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="TOP">
+            <JFXComboBox fx:id="mediaTypeComboBox" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="TOP">
                <GridPane.margin>
                   <Insets right="5.0" />
                </GridPane.margin>
             </JFXComboBox>
-            <JFXNumberTextField fx:id="seasonField" alignment="CENTER" maxWidth="-Infinity" promptText="Season number" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+            <JFXListView fx:id="resultsListView" GridPane.columnSpan="4" GridPane.rowSpan="4">
                <GridPane.margin>
-                  <Insets bottom="20.0" />
-               </GridPane.margin>
-            </JFXNumberTextField>
-            <JFXNumberTextField fx:id="episodeField" alignment="CENTER" maxWidth="-Infinity" promptText="Episode number" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
-               <GridPane.margin>
-                  <Insets bottom="20.0" />
-               </GridPane.margin>
-            </JFXNumberTextField>
-            <JFXListView fx:id="resultsListView" GridPane.columnSpan="4" GridPane.rowSpan="4" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </GridPane.margin></JFXListView>
          </children>
       </GridPane>
-      <JFXListView fx:id="fileListView" />
+      <JFXListView fx:id="fileListView">
+         <GridPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </GridPane.margin></JFXListView>
    </children>
 </GridPane>

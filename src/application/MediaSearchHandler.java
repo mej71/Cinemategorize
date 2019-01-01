@@ -26,9 +26,8 @@ import info.movito.themoviedbapi.model.Collection;
 import info.movito.themoviedbapi.model.CollectionInfo;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
-import info.movito.themoviedbapi.model.people.PersonCast;
+import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCredits;
-import info.movito.themoviedbapi.model.people.PersonCrew;
 import info.movito.themoviedbapi.model.people.PersonPeople;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
@@ -226,46 +225,34 @@ public  class MediaSearchHandler {
 	
 	public static ImageView getItemPoster(MediaItem mi) {
 		if (mi.isMovie()) {
-			return getItemPoster(mi.cMovie.movie, null, false, 500);
+			return getItemPoster(mi.cMovie.movie, null, 500);
 		} else {
-			return getItemPoster(null, mi.tvShow, false, 500);
+			return getItemPoster(null, mi.tvShow, 500);
 		}
 	}
 	
 	
 	public static ImageView getItemPoster(MediaItem mi, int size) {
 		if (mi.isMovie()) {
-			return getItemPoster(mi.cMovie.movie, null, false, size);
+			return getItemPoster(mi.cMovie.movie, null, size);
 		} else {
-			return getItemPoster(null, mi.tvShow, false, size);
-		}
-	}
-	
-	public static ImageView getItemPoster(MediaItem mi, boolean temp) {
-		if (mi.isMovie()) {
-			return getItemPoster(mi.cMovie.movie, null, temp, 500);
-		} else {
-			return getItemPoster(null, mi.tvShow, temp, 500);
+			return getItemPoster(null, mi.tvShow, size);
 		}
 	}
 	
 	//dedicated method to get item posters with size variants
 	//temp files don't get saved
-	public static ImageView getItemPoster(MovieDb m, CustomTvDb tv, boolean temp, int size) {
+	public static ImageView getItemPoster(MovieDb m, CustomTvDb tv, int size) {
 		ImageView iView = new ImageView();
 		if (m != null && m.getPosterPath() != null) {
-			if (!temp) {
-				getPosterFromFilePath(iView, size, moviePosterDir, String.valueOf(m.getId()));
-			}
+			getPosterFromFilePath(iView, size, moviePosterDir, String.valueOf(m.getId()));
 			if (iView.getImage()==null && m.getPosterPath()!=null && !m.getPosterPath().isEmpty()) {
-				getPosterFromURL(iView, size, m.getPosterPath(), moviePosterDir, String.valueOf(m.getId()), temp);
+				getPosterFromURL(iView, size, m.getPosterPath(), moviePosterDir, String.valueOf(m.getId()));
 			}
-		} else {
-			if (tv != null) {
-				getPosterFromFilePath(iView, size, tvPosterDir, String.valueOf(tv.getId()));
-			}
-			if (iView.getImage()==null && tv.series.getPosterPath() != null) {
-				getPosterFromURL(iView, size, tv.series.getPosterPath(), tvPosterDir, String.valueOf(tv.getId()), temp);
+		} else if (tv != null && tv.series != null){
+			getPosterFromFilePath(iView, size, tvPosterDir, String.valueOf(tv.getId()));
+			if (iView.getImage()==null && tv.getPosterPath() != null) {
+				getPosterFromURL(iView, size, tv.getPosterPath(), tvPosterDir, String.valueOf(tv.getId()));
 			}
 		}	
 		//if all failed, use default poster
@@ -299,7 +286,7 @@ public  class MediaSearchHandler {
 	}
 	
 	//save image after retrieval for faster access next time
-	public static void getPosterFromURL(ImageView iView, int size, String url, String basePath, String id, boolean temp) {
+	public static void getPosterFromURL(ImageView iView, int size, String url, String basePath, String id) {
 		try {
 			InputStream in;
 			if (size>0) {
@@ -309,12 +296,10 @@ public  class MediaSearchHandler {
 			}
 			if (in!=null) {
 				iView.setImage(new Image(in));
-				if (!temp) {
-					new File(basePath).mkdir();
-					File file = new File(basePath + "/" + id + "_" + size + ".jpg");	
-					BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
-					ImageIO.write(b, "jpg", file);
-				}
+				new File(basePath).mkdir();
+				File file = new File(basePath + "/" + id + "_" + size + ".jpg");	
+				BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
+				ImageIO.write(b, "jpg", file);
 			}
 			in.close();
 			return;
@@ -323,28 +308,7 @@ public  class MediaSearchHandler {
 		}
 	}
 	
-	
-	public static ImageView getProfilePicture(PersonCast p) {
-		ImageView iView = new ImageView();
-		getProfilePictureFromFile(iView, p.getId());
-		if (iView.getImage()==null) {
-			getProfilePictureFromURL(iView, p.getId());
-		}
-		if (iView.getImage()==null) {
-			URL url = MediaSearchHandler.class.getResource("/images/unknown_poster.png");
-			try {
-				File file = new File(personProfileDir + "/" + p.getId()+ ".jpg");	
-				BufferedImage image = ImageIO.read(url);
-				iView.setImage(SwingFXUtils.toFXImage(image, null));
-				ImageIO.write(image, "jpg", file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}	
-		}
-		return iView;
-	}
-	
-	public static ImageView getProfilePicture(PersonCrew p) {
+	public static <T extends Person> ImageView getProfilePicture(T p) {
 		ImageView iView = new ImageView();
 		getProfilePictureFromFile(iView, p.getId());
 		if (iView.getImage()==null) {

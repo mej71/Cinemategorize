@@ -195,14 +195,14 @@ public class SelectionViewController implements Initializable {
 			for (int i = 0; i < movie.getCrew().size(); ++i) {
 				pCrew = movie.getCrew().get(i);
 				if (pCrew.getJob().equalsIgnoreCase("Director")) {
-					directorTiles.get(dirCount).setPersonCrew(pCrew, mediaItem);
+					directorTiles.get(dirCount).setPerson(pCrew, mediaItem);
 					workingDirectorCollection.add(directorTiles.get(dirCount));
 					++dirCount;
 				} else if (pCrew.getJob().equalsIgnoreCase("Screenplay") || 
 						pCrew.getJob().equalsIgnoreCase("Writer") || pCrew.getJob().equalsIgnoreCase("Story") || 
 						pCrew.getJob().equalsIgnoreCase("Author")) {
 					if (writCount<numWritersAllowed && !writerIds.contains(pCrew.getId())) {
-						writerTiles.get(writCount).setPersonCrew(pCrew, mediaItem);
+						writerTiles.get(writCount).setPerson(pCrew, mediaItem);
 						workingWriterCollection.add(writerTiles.get(writCount));
 						writerIds.add(pCrew.getId());
 					} 
@@ -213,7 +213,7 @@ public class SelectionViewController implements Initializable {
 			PersonCast pCast;
 			for (int i = 0; i < movie.getCast().size() && i<13; ++i) {
 				pCast = movie.getCast().get(i);
-				actorTiles.get(i).setPersonCast(pCast, mediaItem);
+				actorTiles.get(i).setPerson(pCast, mediaItem);
 				workingActorCollection.add(actorTiles.get(i));				
 			}
 			directorFlowPane.getChildren().setAll(workingDirectorCollection);
