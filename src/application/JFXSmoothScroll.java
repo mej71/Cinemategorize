@@ -34,13 +34,13 @@ public class JFXSmoothScroll  {
 		smoothScrollingListView(listView, speed, Orientation.VERTICAL, bounds -> bounds.getHeight());
 	}
 	
-	public static void smoothScrolling(MovieScrollPane scrollPane) {
-        customScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
-	}
-	
 	public static void smoothHScrollingListView(ListView<?> listView, double speed) {
 		smoothScrollingListView(listView, speed, Orientation.HORIZONTAL, bounds -> bounds.getHeight());
-	}	
+	}
+	
+	public static void smoothScrolling(MovieScrollPane scrollPane) {
+        customScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
+	}		
 	
 	public static void smoothHScrolling(MovieScrollPane scrollPane) {
 	        customScrolling(scrollPane, scrollPane.hvalueProperty(), bounds -> bounds.getWidth());
@@ -70,21 +70,8 @@ public class JFXSmoothScroll  {
                 event.consume();
             }
         };
+        addHandlers(scrollPane.getContent(), dragHandler, scrollHandler);
         
-        if (scrollPane.getContent().getParent() != null) {
-            scrollPane.getContent().getParent().addEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
-            scrollPane.getContent().getParent().addEventHandler(ScrollEvent.ANY, scrollHandler);
-        }
-        scrollPane.getContent().parentProperty().addListener((o,oldVal, newVal)->{
-            if (oldVal != null) {
-                oldVal.removeEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
-                oldVal.removeEventHandler(ScrollEvent.ANY, scrollHandler);
-            }
-            if (newVal != null) {
-                newVal.addEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
-                newVal.addEventHandler(ScrollEvent.ANY, scrollHandler);
-            }
-        });
         timeline.getKeyFrames().add(new KeyFrame(Duration.millis(3), (event) -> {
             for (int i = 0; i < derivatives.length; i++) {
                 derivatives[i] *= frictions[i];
@@ -132,20 +119,7 @@ public class JFXSmoothScroll  {
             }
             
         };
-        if (scrollBar.getParent() != null) {
-        	scrollBar.getParent().addEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
-        	scrollBar.getParent().addEventHandler(ScrollEvent.ANY, scrollHandler);
-        }
-        scrollBar.parentProperty().addListener((o,oldVal, newVal)->{
-            if (oldVal != null) {
-                oldVal.removeEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
-                oldVal.removeEventHandler(ScrollEvent.ANY, scrollHandler);
-            }
-            if (newVal != null) {
-                newVal.addEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
-                newVal.addEventHandler(ScrollEvent.ANY, scrollHandler);
-            }
-        });
+        addHandlers(scrollBar, dragHandler, scrollHandler);
         
 		timeline.getKeyFrames().add(new KeyFrame(Duration.millis(3), (event) -> {
 			for (int i = 0; i < derivatives.length; i++) {
@@ -165,6 +139,23 @@ public class JFXSmoothScroll  {
 			} 
 		}));
 		timeline.setCycleCount(Animation.INDEFINITE);	    
+	}
+	
+	private static void addHandlers(Node node, EventHandler<MouseEvent> dragHandler, EventHandler<ScrollEvent> scrollHandler) {
+		if (node.getParent() != null) {
+			node.getParent().addEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
+			node.getParent().addEventHandler(ScrollEvent.ANY, scrollHandler);
+        }
+		node.parentProperty().addListener((o,oldVal, newVal)->{
+            if (oldVal != null) {
+                oldVal.removeEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
+                oldVal.removeEventHandler(ScrollEvent.ANY, scrollHandler);
+            }
+            if (newVal != null) {
+                newVal.addEventHandler(MouseEvent.DRAG_DETECTED, dragHandler);
+                newVal.addEventHandler(ScrollEvent.ANY, scrollHandler);
+            }
+        });
 	}
 	 
 }
