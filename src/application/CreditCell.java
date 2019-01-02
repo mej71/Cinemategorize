@@ -46,12 +46,11 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
            gridPane.getRowConstraints().add(rowConst);         
         }
         popTitle = new Label();
-        popTitle.getStyleClass().add("pop_title");
+        popTitle.setId("pop-title");
         popDesc = new Label();
         popDesc.setMaxWidth(450);
         popDesc.setMaxHeight(-1);
-        popDesc.setWrapText(true);
-        popDesc.getStyleClass().add("popup_descript");
+        popDesc.setId("pop-descript");
         
         gridPane.add(popTitle, 0, 0, 5, 1);
 		GridPane.setHalignment(popTitle, HPos.CENTER);
@@ -122,7 +121,7 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
 		setText(null);
 		if (item!=null) {
 			label.setText(getCellString(item));
-			label.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
+			this.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
 				popTitle.setText(getCellString(item));
 				if (!item.getOverview().isEmpty()) {
 					popDesc.setText(item.getOverview());
@@ -137,7 +136,7 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
 				}
 				
 			});
-			label.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
+			this.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
 				pOver.hide();
 				if (hasEntered) {
 					timer.cancel();
@@ -147,7 +146,7 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
 			});
 			if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
 				pseudoClassStateChanged(PseudoClass.getPseudoClass("owned-media"), true);
-				label.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
+				this.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
 					ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getId()) );
 				});
 			} else {

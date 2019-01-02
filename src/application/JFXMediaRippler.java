@@ -58,19 +58,17 @@ public class JFXMediaRippler extends JFXRippler {
             gridPane.getRowConstraints().add(rowConst);         
         }
         titleLabel = new Label();
-        titleLabel.getStyleClass().add("popup_descript");
+        titleLabel.setId("pop-title");
         descLabel = new Label();
         descLabel.setMaxWidth(250);
         descLabel.setMaxHeight(-1);
-        descLabel.setWrapText(true);
-        descLabel.getStyleClass().add("popup_descript");
+        descLabel.setId("pop-descript");
         directorsLabel = new Label();
         directorsLabel.setMaxWidth(250);
-        directorsLabel.getStyleClass().add("popup_info");
+        directorsLabel.setId("pop-info");
         actorsLabel = new Label();
-        actorsLabel.getStyleClass().add("popup_info");
+        actorsLabel.setId("pop-info");
         actorsLabel.setMaxWidth(250);
-        actorsLabel.setWrapText(true);
         gridPane.add(titleLabel, 0, 0, 5, 1);
 		GridPane.setHalignment(titleLabel, HPos.CENTER);
 		gridPane.add(descLabel, 0, 1, 5, 7);

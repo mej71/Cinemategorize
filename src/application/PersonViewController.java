@@ -17,14 +17,11 @@ import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
 
 import info.movito.themoviedbapi.model.people.Person;
-import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCredit;
-import info.movito.themoviedbapi.model.people.PersonCrew;
 import info.movito.themoviedbapi.model.people.PersonPeople;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -70,7 +67,6 @@ public class PersonViewController implements Initializable {
     private Comparator<PersonCredit> knownComprator;
     private List<JFXMediaRippler> knownForRipplers;
     private boolean isSmoothScrolling = false;
-    private Task<?> loadTask;
     
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -110,7 +106,6 @@ public class PersonViewController implements Initializable {
 	}
 	
 	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
-		personImageView.setImage(MediaSearchHandler.getProfilePicture(pc).getImage());
 		person = ControllerMaster.userData.getPerson(pc.getId());
 		showPerson(d);
 	}
@@ -135,20 +130,9 @@ public class PersonViewController implements Initializable {
 		writList.getItems().clear();
 		actList.getItems().clear();
 		prodList.getItems().clear();
-		
-		loadTask = new Task() {
-
-			@Override
-			protected Object call() throws Exception {
-				loadInfo();
-				return null;
-			}
-		
-		
-		
-		};
-		loadTask.run();
 		dLink.show();
+		loadInfo();
+		personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
 		dLink.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 		    if (event.getCode().equals(KeyCode.ESCAPE)) {
 		        dLink.close();
@@ -182,6 +166,7 @@ public class PersonViewController implements Initializable {
 		actorTab.setDisable( (actList.getItems().size() == 0)? true : false);
 		
 		switch (person.getKnownForDepartment()) {
+			default:
 			case "Acting":
 				tabPane.getSelectionModel().select(actorTab);
 				break;

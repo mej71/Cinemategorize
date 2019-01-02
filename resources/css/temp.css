@@ -276,31 +276,31 @@
  * Pop Over		                                                       *
  *                                                                             *
  ******************************************************************************/ 
-.pop_title {
-	-fx-text-fill: #89c4f4 !important;
+#pop-title {
+	-fx-text-fill: #89c4f4;
 }
 
 
-.popup_descript {
+#pop-descript {
 	-fx-text-alignment: center;
-	-fx-text-fill: #89c4f4 !important;
+	-fx-text-fill: #89c4f4;
+	-fx-wrap-text: true;
 }
+
+#pop-info {
+	-fx-text-alignment: left;
+	-fx-text-fill: #89c4f4;
+	-fx-wrap-text: true;
+}
+
 .popover {
 	-fx-border-width: 0;
 }
 
-
 .popover > .content {
     -fx-padding: 2px;
-    -fx-background-color: #103E50 !important; 
-    -fx-text-fill: #89c4f4 !important;
+    -fx-background-color: #103E50; 
     
-}
-
-.popover > .border  {
-    -fx-border-style: none;
-    -fx-padding: 0;
-    -fx-fill: #89c4f4 !important;
 }
 
 .pop_over_left {
@@ -309,11 +309,6 @@
 
 .pop_over_right {
 	-fx-border-style: solid hidden solid solid;
-}
-
-.tooltip {
-	-fx-text-fill: #89c4f4 !important;
-	-fx-background-color: #103E50 !important; 
 }
 
 /*******************************************************************************
