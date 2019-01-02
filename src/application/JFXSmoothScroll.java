@@ -31,14 +31,14 @@ public class JFXSmoothScroll  {
 	}	
 	
 	public static void smoothScrolling(MovieScrollPane scrollPane) {
-        customScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
+		smoothScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
 	}		
 	
 	public static void smoothHScrolling(MovieScrollPane scrollPane) {
-	        customScrolling(scrollPane, scrollPane.hvalueProperty(), bounds -> bounds.getWidth());
+		smoothScrolling(scrollPane, scrollPane.hvalueProperty(), bounds -> bounds.getWidth());
 	}
 
-	private static void customScrolling(MovieScrollPane scrollPane, DoubleProperty scrollDriection, Function<Bounds, Double> sizeFunc) {
+	private static void smoothScrolling(MovieScrollPane scrollPane, DoubleProperty scrollDriection, Function<Bounds, Double> sizeFunc) {
         final double[] frictions = {0.99, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01, 0.04, 0.01, 0.008, 0.008, 0.008, 0.008, 0.0006, 0.0005, 0.00003, 0.00001};
         final double[] pushes = {1};
         final double[] derivatives = new double[frictions.length];
@@ -86,12 +86,12 @@ public class JFXSmoothScroll  {
         timeline.setCycleCount(Animation.INDEFINITE);
 	}
 	
-	public static void smoothScrollingListView(ListView<?> listView, double speed) {
-		smoothScrollingListView(listView, speed, Orientation.VERTICAL, bounds -> bounds.getHeight());
-	}
-	
 	public static void smoothHScrollingListView(ListView<?> listView, double speed) {
 		smoothScrollingListView(listView, speed, Orientation.HORIZONTAL, bounds -> bounds.getHeight());
+	}
+	
+	public static void smoothScrollingListView(ListView<?> listView, double speed) {
+		smoothScrollingListView(listView, speed, Orientation.VERTICAL, bounds -> bounds.getHeight());
 	}
 	
 	private  static void smoothScrollingListView(ListView<?> listView, double speed, Orientation orientation, Function<Bounds, Double> sizeFunc) {

@@ -46,6 +46,16 @@ public class CustomTvDb implements Serializable {
 		return episodes;
 	}
 	
+	public List<TvEpisode> getEpisodes() {
+		List<TvEpisode> episodes = new ArrayList<TvEpisode>();
+		for (Integer k : episodeList.keySet()) {
+			for (Integer n : episodeList.get(k).keySet()) {
+				episodes.add(episodeList.get(k).get(n));
+			}
+		}
+		return episodes;
+	}
+	
 	public TvEpisode getEpisode(int seasonNum, int epNum) {
 		if (series.getSeasons().get(seasonNum-1).getEpisodes() == null) {
 			

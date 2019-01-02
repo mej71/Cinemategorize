@@ -12,18 +12,12 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.validation.RequiredFieldValidator;
 
+import info.movito.themoviedbapi.model.tv.TvEpisode;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 
 
 public class ManualLookupController implements Initializable {
@@ -75,19 +69,6 @@ public class ManualLookupController implements Initializable {
         });
        
         yearField.setMaxChars(4);
-        
-        //double click on a result to select it
-        resultsListView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(event.getButton() == MouseButton.PRIMARY &&
-                   (event.getTarget() instanceof Text || event.getTarget() instanceof Label || 
-                		   (event.getTarget() instanceof GridPane && (((GridPane) event.getTarget()).getChildren().size() > 0)))) {
-
-                   //confirm choice     
-                 }    
-            }
-        });
 	}
 	
 	public void setData(LinkedHashMap<MediaItem, MediaResultsPage> mList) {
@@ -130,28 +111,47 @@ public class ManualLookupController implements Initializable {
 	
 	@FXML
 	public void confirmMediaItem() {
+		//set choice to proper media result
+		if (resultsListView.getSelectionModel().getSelectedItem().isMovie()) {
+			fileListView.getSelectionModel().getSelectedItem().cMovie = resultsListView.getSelectionModel().getSelectedItem().cMovie;
+		} else {
+			fileListView.getSelectionModel().getSelectedItem().tvShow = resultsListView.getSelectionModel().getSelectedItem().tvShow;
+		}
+		
+		//add file to master list
 		MediaItem item = fileListView.getSelectionModel().getSelectedItem();
 		if (item.isMovie()) {
-			ControllerMaster.userData.addMovie((CustomMovieDb)item.getItem(), new File(item.fullFilePath) );
-			for (MediaItem mi : ControllerMaster.userData.tempManualItems.keySet()) {
-				if (mi.fullFilePath.equals(item.fullFilePath)) {
-					ControllerMaster.userData.tempManualItems.remove(mi);
-					break;
-				}
-			}
-		} //else add tv when supported
+			ControllerMaster.userData.addMovie( item.cMovie, new File(item.fullFilePath) );
+		} else {
+			TvEpisode episode = MediaSearchHandler.getEpisodeInfo(item.getId(), resultsListView.getSelectionModel().getSelectedItem().getTempSeasonNum(), 
+					resultsListView.getSelectionModel().getSelectedItem().getTempEpisodeNum());
+			ControllerMaster.userData.addTvShow(item.tvShow, episode, new File(item.fullFilePath));
+		}
 		
-		fileListView.getItems().remove(item);
+		//cleanup
+		for (MediaItem mi : ControllerMaster.userData.tempManualItems.keySet()) {
+			if (mi.fullFilePath.equals(item.fullFilePath)) {
+				ControllerMaster.userData.tempManualItems.remove(mi);
+				break;
+			}
+		}
+		fileListView.getItems().remove(fileListView.getSelectionModel().getSelectedItem());
+		
+		//refresh master view with new file
 		if (!ControllerMaster.mainController.searchField.getText().isEmpty() && ControllerMaster.mainController.autoEvent!=null ) {
 			ControllerMaster.userData.refreshViewingList(ControllerMaster.mainController.autoEvent.getObject().getTargetIDs(), false);			
 		} else {
 			ControllerMaster.userData.refreshViewingList(null, true);
 		}
+		
+		//close manual dialog if empty
 		if (fileListView.getItems().size()==0) {
 			dialogLink.close();
 			if (addMovieDialog!=null) {
 				addMovieDialog.close();
 			}
+		} else {
+			fileListView.getSelectionModel().select(0);
 		}
 	}
 	

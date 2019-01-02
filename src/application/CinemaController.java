@@ -80,19 +80,15 @@ public class CinemaController implements Initializable {
 	
 	private FXMLLoader loader;
 	private GridPane selectionView;
-	private SelectionViewController selectionViewController;
 	private JFXDialog selectionViewWindow;
 	
 	private GridPane manualLookupView;
-	private ManualLookupController manualLookupController;
 	private JFXDialog manualLookupWindow;
 	
 	private JFXDialogLayout addMovieDialogView;
-	private AddMoviesDialogController addMovieDialogController;
 	private JFXDialog addMovieWindow;
 	
 	private GridPane sidePanelView;
-	private SidePanelController sidePanelController;
 	
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -240,38 +236,38 @@ public class CinemaController implements Initializable {
 		try {
 			loader = new FXMLLoader(getClass().getResource("SelectionViewContent.fxml"));
 			selectionView = loader.load();
-			selectionViewController = loader.getController();
+			ControllerMaster.selectionViewController = loader.getController();
 			selectionViewWindow = new JFXDialog(getBackgroundStackPane(), selectionView,
 					JFXDialog.DialogTransition.CENTER);
 			selectionView.prefWidthProperty().bind(mainPane.widthProperty().divide(1.15));
 			selectionView.prefHeightProperty().bind(mainPane.heightProperty().divide(1.3));
 			loader = new FXMLLoader(getClass().getResource("ManualLookupContent.fxml"));
 			manualLookupView = loader.load();
-			manualLookupController = loader.getController();
+			ControllerMaster.manualController = loader.getController();			
 			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
 					JFXDialog.DialogTransition.CENTER);
 			manualLookupView.prefWidthProperty().bind(mainPane.widthProperty().divide(1.15));
 			manualLookupView.prefHeightProperty().bind(mainPane.heightProperty().divide(1.15));
 			loader = new FXMLLoader(getClass().getResource("AddMoviesDialogContent.fxml"));
 			addMovieDialogView = loader.load();
-			addMovieDialogController = loader.getController();
+			ControllerMaster.addMovieDialogController = loader.getController();
 			addMovieWindow = new JFXDialog(getBackgroundStackPane(), addMovieDialogView,
 					JFXDialog.DialogTransition.CENTER);
 			loader = new FXMLLoader(getClass().getResource("MainSidePanelContent.fxml"));
 			sidePanelView = loader.load();
-			sidePanelController = loader.getController();
+			ControllerMaster.sidePanelController = loader.getController();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 		// create the drawer and add to scene
 		drawerMenu.setSidePane(sidePanelView);
 		drawerMenu.minHeightProperty().bind(backgroundStackPane.heightProperty());
-		sidePanelController.setDrawer(drawerMenu);
+		ControllerMaster.sidePanelController.setDrawer(drawerMenu);
 		drawerMenu.setOnDrawerClosed(e -> {
 			burgerTask.setRate(-1);
 			burgerTask.play();
 			drawerMenu.setVisible(false);
-			sidePanelController.mainMenuListView.getSelectionModel().clearSelection();	
+			ControllerMaster.sidePanelController.mainMenuListView.getSelectionModel().clearSelection();	
 	    });
 		drawerMenu.setOnDrawerOpening(e -> {
 			drawerMenu.setVisible(true);
@@ -328,7 +324,7 @@ public class CinemaController implements Initializable {
 						// if no directories to search, user must select at least one
 						// opens InitialChooseDialogContent, and waits for user to add one to selection
 						if (ControllerMaster.userData.numMediaItems() == 0) {
-							addMovieDialogController.openDialogMenu(addMovieWindow, true);
+							ControllerMaster.addMovieDialogController.openDialogMenu(addMovieWindow, true);
 						} 
 					}
 				});
@@ -337,19 +333,18 @@ public class CinemaController implements Initializable {
 	}
 	
 	public void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList, JFXDialog aLink) {
-		manualLookupController.setData(mediaList);
-		manualLookupController.openDialog(manualLookupWindow, aLink);
+		ControllerMaster.manualController.setData(mediaList);
+		ControllerMaster.manualController.openDialog(manualLookupWindow, aLink);
 		manualLookupView.requestFocus();
 	}
 	
 	public void showAddMovieDialog() {
-		addMovieDialogController.openDialogMenu(addMovieWindow, false);
+		ControllerMaster.addMovieDialogController.openDialogMenu(addMovieWindow, false);
 		addMovieDialogView.requestFocus();
 	}
 		
 	public void showSelectionDialog(MediaItem mi) {
-		
-		selectionViewController.showMediaItem(selectionViewWindow, mi);
+		ControllerMaster.selectionViewController .showMediaItem(selectionViewWindow, mi);
 		selectionView.requestFocus();
 	}
 	
@@ -393,10 +388,6 @@ public class CinemaController implements Initializable {
 			node = node.getParent();
 		}
 		return false;
-	}
-	
-	public AddMoviesDialogController getAddMovieDialogController() {
-		return addMovieDialogController;
 	}
 
 	public StackPane getBackgroundStackPane() {

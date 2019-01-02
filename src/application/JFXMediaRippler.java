@@ -156,7 +156,7 @@ public class JFXMediaRippler extends JFXRippler {
 			}
 			MediaItem mi = rippler.linkedItem;
         	String lastDate = "";
-        	if (!mi.isMovie()) {
+        	if (mi.isTvShow()) {
         		lastDate = " - " + mi.getLastAirDate();
         		JFXMediaRippler.directorsLabel.setText(mi.getNumSeasons() + " seasons");
         	} else {

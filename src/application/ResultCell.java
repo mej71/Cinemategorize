@@ -11,13 +11,16 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.text.Text;
 
 public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsMediaItem> {
 	
@@ -41,6 +44,21 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 		super.updateItem(item, empty);
 		setText("");
 		if (!empty && item!=null) {
+			this.setOnMouseClicked(new EventHandler<MouseEvent>() {
+	            @Override
+	            public void handle(MouseEvent event) {
+	            	//must select season & episode for tv
+                	if (item.isTvShow()) {
+                		if (seasonBox.getValue() != null && seasonBox.getValue() > 0 &&
+                				episodeBox.getValue() != null && episodeBox.getValue() > 0 ) {
+                			item.setTvEp(seasonBox.getValue(), episodeBox.getValue());
+                			ControllerMaster.manualController.confirmMediaItem();
+                		} else {
+                			return;
+                		}
+                	}  
+	            }
+			});
 			gridPane = new GridPane();
 			seasonBox = new JFXComboBox<Integer>();
 			seasonBox.setPromptText("Season");
@@ -83,7 +101,7 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
 			gridPane.setMaxHeight(139);
 			titleLabel.setText(item.getTitle());
 			episodeBox.setVisible(false);
-			if (!item.isMovie()) {
+			if (item.isTvShow()) {
 				
 				seasonBox.setItems(
 						FXCollections.observableArrayList(IntStream.rangeClosed(1,item.getNumSeasons()).boxed().collect(Collectors.toList()))

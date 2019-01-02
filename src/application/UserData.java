@@ -214,8 +214,22 @@ public class UserData implements Serializable {
 	
 	public boolean ownsShow(int iD) {
 		for (int i = 0; i < allMedia.size(); ++i) {
-			if (!allMedia.get(i).isMovie() && allMedia.get(i).getId()==iD) {
+			if (allMedia.get(i).isTvShow() && allMedia.get(i).getId()==iD) {
 				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean ownsEpisode(int iD, TvEpisode episode) {
+		for (int i = 0; i < allMedia.size(); ++i) {
+			if (allMedia.get(i).isTvShow() && allMedia.get(i).getId()==iD) {
+				List<TvEpisode> episodes = allMedia.get(i).getEpisodes();
+				for (TvEpisode ep : episodes) {
+					if (ep.getId() == episode.getId()) {
+						return true;
+					}
+				}
 			}
 		}
 		return false;
@@ -223,7 +237,7 @@ public class UserData implements Serializable {
 	
 	public MediaItem getTvById(int iD) {
 		for (int i = 0; i < allMedia.size(); ++i) {
-			if (!allMedia.get(i).isMovie() && allMedia.get(i).getId()==iD) {
+			if (allMedia.get(i).isTvShow() && allMedia.get(i).getId()==iD) {
 				return allMedia.get(i);
 			}
 		}
@@ -464,6 +478,12 @@ public class UserData implements Serializable {
 	public void addMedia(CustomTvDb t, TvEpisode episode, CustomMovieDb m, File file) {
 		boolean isMovie = (m != null)? true : false;
 		MediaItem mi;
+		//ignore duplicates
+		if (isMovie && ControllerMaster.userData.ownsMovie(m.getId())) {
+			return;
+		} else if (!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), episode)) {
+			return;
+		}
 		if (!isMovie && ControllerMaster.userData.ownsShow(t.getId())) {
 			mi = ControllerMaster.userData.getTvById(t.getId());
 			mi.tvShow.addEpisode(episode);
@@ -584,7 +604,7 @@ public class UserData implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 	public void removeMovie(MovieDb m) {
 

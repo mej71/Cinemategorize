@@ -87,6 +87,13 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		return displayType == MediaListDisplayType.MOVIES;
 	}
 	
+	public boolean isTvShow() {
+		if (isUnknown) {
+			return false;
+		}
+		return displayType == MediaListDisplayType.TVSHOWS;
+	}
+	
 	public boolean isKnown() {
 		return !isUnknown;
 	}
@@ -303,6 +310,14 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 			return null;
 		} else {
 			return tvShow.getEpisode(seasonNum, epNum);
+		}
+	}
+	
+	public List<TvEpisode> getEpisodes() {
+		if (isMovie()) {
+			return null;
+		} else {
+			return tvShow.getEpisodes();
 		}
 	}
 	

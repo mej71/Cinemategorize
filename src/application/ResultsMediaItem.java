@@ -3,8 +3,8 @@ package application;
 public class ResultsMediaItem extends MediaItem {
 	
 	private static final long serialVersionUID = 1L;
-	private int seasonNum = 0;
-	private int epNum = 0;
+	private int tempSeasonNum = 0;
+	private int tempEpNum = 0;
 	
 	
 	public ResultsMediaItem(CustomMovieDb m) {
@@ -14,6 +14,19 @@ public class ResultsMediaItem extends MediaItem {
 	
 	public ResultsMediaItem(CustomTvDb tv) {
 		super(tv);
+	}
+	
+	public void setTvEp(int tempSeasonNum, int tempEpNum) {
+		this.tempSeasonNum = tempSeasonNum;
+		this.tempEpNum = tempEpNum;
+	}
+	
+	public int getTempSeasonNum() {
+		return tempSeasonNum;
+	}
+	
+	public int getTempEpisodeNum() {
+		return tempEpNum;
 	}
 	
 	
