@@ -295,20 +295,13 @@
 
 .popover {
 	-fx-border-width: 0;
+	-fx-border-style: solid solid solid hidden;
 }
 
 .popover > .content {
     -fx-padding: 2px;
     -fx-background-color: #103E50; 
     
-}
-
-.pop_over_left {
-	-fx-border-style: solid solid solid hidden;
-}
-
-.pop_over_right {
-	-fx-border-style: solid hidden solid solid;
 }
 
 /*******************************************************************************
@@ -452,5 +445,10 @@
 
 .jfx-tab-pane .tab:disabled .tab-label{
     -fx-text-fill: grey;
+}
+
+#overlayPane {
+	-fx-background-color: rgba(0.8, 15.3, 20.8, 0.7);
+	-fx-background-radius: 5px;
 }
 

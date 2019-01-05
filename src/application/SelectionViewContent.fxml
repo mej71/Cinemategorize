@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXHamburger?>
+<?import com.jfoenix.controls.JFXProgressBar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
@@ -168,7 +169,7 @@
                         <Insets bottom="5.0" />
                      </padding>
                   </Label>
-                  <Label styleClass="dialog-subtitle" text="Directed by:" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                  <Label fx:id="dirLabel" styleClass="dialog-subtitle" text="Directed by:" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                      <GridPane.margin>
                         <Insets left="10.0" top="15.0" />
                      </GridPane.margin>
@@ -248,6 +249,11 @@
             <Insets bottom="5.0" left="70.0" />
          </GridPane.margin>
       </Label>
+      <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="6">
+         <children>
+            <JFXProgressBar fx:id="progressBar" GridPane.columnSpan="6" GridPane.halignment="CENTER" GridPane.rowSpan="6" GridPane.valignment="CENTER" />
+         </children>
+      </StackPane>      
    </children>
    <padding>
       <Insets right="20.0" />

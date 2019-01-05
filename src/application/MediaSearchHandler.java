@@ -110,7 +110,8 @@ public  class MediaSearchHandler {
 		if (ControllerMaster.userData.getTvById(tvId) != null) {
 			return ControllerMaster.userData.getTvById(tvId);
 		}
-		TvSeries result = UserData.apiLinker.getTvSeries().getSeries(tvId, null, TvMethod.images, TvMethod.credits, TvMethod.videos, TvMethod.keywords);
+		TvSeries result = UserData.apiLinker.getTvSeries().getSeries(tvId, null, TvMethod.images, TvMethod.credits, TvMethod.videos, 
+				TvMethod.keywords, TvMethod.content_ratings);
 		if (result == null) { 
 			return null;
 		}
@@ -122,7 +123,7 @@ public  class MediaSearchHandler {
 		TvResultsPage tvPage = UserData.apiLinker.getSearch().searchTv(seriesName, null, 1);
 		if (tvPage.getResults().size()>0) {
 			TvSeries result = UserData.apiLinker.getTvSeries().getSeries(tvPage.getResults().get(0).getId(), null, TvMethod.images, 
-					TvMethod.credits, TvMethod.videos, TvMethod.keywords);
+					TvMethod.credits, TvMethod.videos, TvMethod.keywords, TvMethod.content_ratings);
 			if (result == null) { 
 				return null;
 			}
@@ -350,8 +351,13 @@ public  class MediaSearchHandler {
 		if (a==null) {
 			return;
 		}
+		InputStream in;
 		try {
-			InputStream in = new URL("https://image.tmdb.org/t/p/h632/" + a.getFilePath()).openStream();
+			URL url = new URL("https://image.tmdb.org/t/p/h632/" + a.getFilePath());
+			if (url == null) {
+				url = new URL("https://image.tmdb.org/t/p/original/" + a.getFilePath());
+			}
+			in = url.openStream();
 			if (in!=null) {
 				iView.setImage(new Image(in));
 				File file = new File(personProfileDir + "/" + id+ ".jpg");	

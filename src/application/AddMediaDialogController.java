@@ -21,7 +21,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class AddMoviesDialogController implements Initializable {
+public class AddMediaDialogController implements Initializable {
 	
 	@FXML private JFXDialogLayout dialogLayout;
 	@FXML private GridPane dialogGrid;
@@ -60,7 +60,9 @@ public class AddMoviesDialogController implements Initializable {
 		dialogLink = d;
 		dialogLink.setOverlayClose(!initial);
 		updateLayout();
+		dialogLink.setCacheContainer(true);
 		dialogLink.show(); 
+
 		extFilter = new FileChooser.ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
 	}
 

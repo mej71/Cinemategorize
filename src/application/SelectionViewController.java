@@ -14,13 +14,13 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXHamburger;
+import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXScrollPane;
+import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
-import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
-import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,6 +63,7 @@ public class SelectionViewController implements Initializable {
     @FXML private GridPane movieTitleGridPane;
     @FXML private Label movieTitleLabel;
     @FXML private StackPane youtubeStackPane;
+    @FXML private Label dirLabel;
     @FXML private Label genreLabel;
     @FXML private Label writtenLabel;
     @FXML private Label runTimeLabel;
@@ -75,10 +76,11 @@ public class SelectionViewController implements Initializable {
     @FXML private FlowPane genreFlowPane;
     @FXML private FlowPane tagsFlowPane;
     @FXML private Label ratingLabel;
+    @FXML private StackPane overlayPane;
+    @FXML private Label progressLabel;
+    @FXML private JFXProgressBar progressBar;
     //other variables
     private MediaItem mediaItem;
-    private CustomMovieDb showingCm;
-    private TvSeries showingSeries;
     private JFXDialog dLink;
     private String videoLink;
     private FXMLLoader loader;
@@ -114,7 +116,7 @@ public class SelectionViewController implements Initializable {
 
 			@Override
 			public void handle(MouseEvent event) {
-				if (showingCm!=null) {
+				if (mediaItem!=null) {
 					mediaItem.rating = rating.getRating();
 		    		if (!rating.getStyleClass().contains("loaded")) {
 						rating.getStyleClass().add("loaded");
@@ -131,6 +133,8 @@ public class SelectionViewController implements Initializable {
 		genreFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		tagsFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
+		overlayPane.prefHeightProperty().bind(mainGrid.heightProperty());
+		overlayPane.prefWidthProperty().bind(mainGrid.widthProperty());
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
@@ -150,104 +154,73 @@ public class SelectionViewController implements Initializable {
 				e.printStackTrace();
 			}
 		}
-		dLink.show();
+		Task<Object> loadTask = new Task<Object>() {
+
+			@Override
+			protected Object call() throws Exception {
+				fillMainInfo();
+				fillInfo();	
+				overlayPane.setVisible(false);
+				overlayPane.setDisable(true);
+				return null;
+			}
+		};
+		dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
+
+			@Override
+			public void handle(JFXDialogEvent event) {
+				loadTask.run();				
+				event.consume();
+			}
+			
+		});
+		overlayPane.setDisable(false);
+		overlayPane.setVisible(true);
+		progressBar.setProgress(JFXProgressBar.INDETERMINATE_PROGRESS);
+		dLink.show();	
 		dLink.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 		    if (event.getCode().equals(KeyCode.ESCAPE)) {
 		        dLink.close();
 		    }
 		});
 		
-		selectionTask = new Task() {
-
-			@Override
-			protected Object call() throws Exception {
-				fillInfo();				
-				return null;
-			}
-			
-		};
-		selectionTask.run();
 	}
 	
-	public void fillInfo() {
+	//does any info not specific to episode
+	public void fillMainInfo() {
 		infoScrollPane.setVvalue(0);
+
+		movieTitleLabel.setText(mediaItem.getTitle()+ " (" + mediaItem.getReleaseDate().substring(0, 4)+")");
+		genreLabel.setText( (mediaItem.getGenres().size()>1)? "Genres:" : "Genre:" );
+		genreFlowPane.getChildren().clear();
+		for (int i = 0; i < mediaItem.getGenres().size(); ++i) {
+			genreFlowPane.getChildren().add(JFXCustomChips.getGenreChip(mediaItem.getGenres().get(i)));
+		}
+		if (mediaItem.rating==-1) {
+			if (rating.getStyleClass().contains("loaded")) {
+				rating.getStyleClass().remove("loaded");
+			}
+			rating.setRating(mediaItem.getVoteAverage()/10*5);
+		} else {
+			rating.setRating(mediaItem.rating);
+			if (!rating.getStyleClass().contains("loaded")) {
+				rating.getStyleClass().add("loaded");
+			}
+		}
+		tagsFlowPane.getChildren().clear();
+		
+		for (int i = 0; i < mediaItem.getKeywords().size(); ++i) {
+			tagsFlowPane.getChildren().add(JFXCustomChips.getTagChip(mediaItem.getKeywords().get(i).getName()));
+		}
+		
+		//movie ratings are stored in releases, tv in content rating
+		boolean found = false;
 		if (mediaItem.isMovie()) {
-			showingCm = ControllerMaster.userData.getMovieById(mediaItem.getId()).cMovie;
-			if (showingCm == null) {
-				return;
-			}
-			MovieDb movie = showingCm.movie;
-			movieTitleLabel.setText(movie.getTitle()+ " (" + movie.getReleaseDate().substring(0, 4)+")");
-			genreLabel.setText( (movie.getGenres().size()>1)? "Genres:" : "Genre:" );
-			genreFlowPane.getChildren().clear();
-			for (int i = 0; i < movie.getGenres().size(); ++i) {
-				genreFlowPane.getChildren().add(JFXCustomChips.getGenreChip(movie.getGenres().get(i)));
-			}
-			
-			
-			int dirCount = 0;
-			int writCount = 0;
-			ObservableList<Node> workingDirectorCollection = FXCollections.observableArrayList();
-			ObservableList<Node> workingWriterCollection = FXCollections.observableArrayList();
-			ObservableList<Node> workingActorCollection = FXCollections.observableArrayList();
-			PersonCrew pCrew;
-			List<Integer> writerIds = new ArrayList<Integer>();
-			for (int i = 0; i < movie.getCrew().size(); ++i) {
-				pCrew = movie.getCrew().get(i);
-				if (pCrew.getJob().equalsIgnoreCase("Director")) {
-					directorTiles.get(dirCount).setPerson(pCrew, mediaItem);
-					workingDirectorCollection.add(directorTiles.get(dirCount));
-					++dirCount;
-				} else if (pCrew.getJob().equalsIgnoreCase("Screenplay") || 
-						pCrew.getJob().equalsIgnoreCase("Writer") || pCrew.getJob().equalsIgnoreCase("Story") || 
-						pCrew.getJob().equalsIgnoreCase("Author")) {
-					if (writCount<numWritersAllowed && !writerIds.contains(pCrew.getId())) {
-						writerTiles.get(writCount).setPerson(pCrew, mediaItem);
-						workingWriterCollection.add(writerTiles.get(writCount));
-						writerIds.add(pCrew.getId());
-					} 
-					++writCount;
-				}
-			}
-			
-			PersonCast pCast;
-			for (int i = 0; i < movie.getCast().size() && i<13; ++i) {
-				pCast = movie.getCast().get(i);
-				actorTiles.get(i).setPerson(pCast, mediaItem);
-				workingActorCollection.add(actorTiles.get(i));				
-			}
-			directorFlowPane.getChildren().setAll(workingDirectorCollection);
-			writerFlowPane.getChildren().setAll(workingWriterCollection);
-			actorFlowPane.getChildren().setAll(workingActorCollection);
-			if (movie.getVideos().size()>0) {
-				videoLink = movie.getVideos().get(0).getKey();
-			} else {
-				videoLink = null;
-			}
-			movieTitleGridPane.setVisible(true);
-			tvTitleGridPane.setVisible(false);
-			descriptionLabel.setText("\t"+ movie.getOverview());
-			if (mediaItem.rating==-1) {
-				if (rating.getStyleClass().contains("loaded")) {
-					rating.getStyleClass().remove("loaded");
-				}
-				rating.setRating(movie.getVoteAverage()/10*5);
-			} else {
-				rating.setRating(mediaItem.rating);
-				if (!rating.getStyleClass().contains("loaded")) {
-					rating.getStyleClass().add("loaded");
-				}
-			}
-			tagsFlowPane.getChildren().clear();
-			for (int i = 0; i < movie.getKeywords().size(); ++i) {
-				tagsFlowPane.getChildren().add(JFXCustomChips.getTagChip(movie.getKeywords().get(i).getName()));
-			}
-			boolean found = false;
-			for (int i = 0; i < movie.getReleases().size(); ++i) {
-				if (movie.getReleases().get(i).getCountry().equalsIgnoreCase("US")) {
-					for (int j = 0; j < movie.getReleases().get(i).getReleaseDates().size(); ++j) {
-						if (movie.getReleases().get(i).getReleaseDates().get(j).getCertification()!=null && !movie.getReleases().get(i).getReleaseDates().get(j).getCertification().isEmpty()) {
-							ratingLabel.setText(movie.getReleases().get(i).getReleaseDates().get(j).getCertification());
+			for (int i = 0; i < mediaItem.getReleases().size(); ++i) {
+				if (mediaItem.getReleases().get(i).getCountry().equalsIgnoreCase("US")) {
+					for (int j = 0; j < mediaItem.getReleases().get(i).getReleaseDates().size(); ++j) {
+						if (mediaItem.getReleases().get(i).getReleaseDates().get(j).getCertification()!=null && !mediaItem.getReleases().get(i).getReleaseDates().get(j).getCertification().isEmpty()) {
+							ratingLabel.setText(mediaItem.getReleases().get(i).getReleaseDates().get(j).getCertification());
 							found = true;
 							break;
 						}
@@ -257,21 +230,75 @@ public class SelectionViewController implements Initializable {
 					}
 				}
 			}
-		
-			
-			seasonComboBox.setVisible(false);
-			episodeComboBox.setVisible(false);
-			runTimeLabel.setText("Runtime: " + String.format("%d", movie.getRuntime()/60) + ":" + String.format("%02d", movie.getRuntime()%60));
-			Platform.runLater(() -> directorFlowPane.requestLayout());
-			Platform.runLater(() -> writerFlowPane.requestLayout());
-			Platform.runLater(() -> actorFlowPane.requestLayout());
 		} else {
-			seasonComboBox.setVisible(true);
-			episodeComboBox.setVisible(true);
-			movieTitleGridPane.setVisible(false);
-			tvTitleGridPane.setVisible(true);
+			for (int i = 0; i < mediaItem.getContentRating().size(); ++i) {
+				if (mediaItem.getContentRating().get(i).getLocale().equalsIgnoreCase("US")) {
+					found = true;
+					ratingLabel.setText(mediaItem.getContentRating().get(i).getRating());
+					break;
+				}
+			}
 		}
+		if (!found) {
+			ratingLabel.setText("N/A");
+		}
+		seasonComboBox.setVisible(mediaItem.isTvShow());
+		episodeComboBox.setVisible(mediaItem.isTvShow());
+		movieTitleGridPane.setVisible(mediaItem.isMovie());
+		tvTitleGridPane.setVisible(mediaItem.isTvShow());
 		posterImageView.setImage(MediaSearchHandler.getItemPoster(mediaItem, 500).getImage());
+	}
+	
+	public void fillInfo() {		
+		int dirCount = 0;
+		int writCount = 0;
+		ObservableList<Node> workingDirectorCollection = FXCollections.observableArrayList();
+		ObservableList<Node> workingWriterCollection = FXCollections.observableArrayList();
+		ObservableList<Node> workingActorCollection = FXCollections.observableArrayList();
+		PersonCrew pCrew;
+		List<Integer> writerIds = new ArrayList<Integer>();
+		for (int i = 0; i < mediaItem.getCrew().size(); ++i) {
+			pCrew = mediaItem.getCrew().get(i);
+			if (pCrew.getJob().equalsIgnoreCase("Director")) {
+				directorTiles.get(dirCount).setPerson(pCrew, mediaItem);
+				workingDirectorCollection.add(directorTiles.get(dirCount));
+				++dirCount;
+			} else if (pCrew.getJob().equalsIgnoreCase("Screenplay") || 
+					pCrew.getJob().equalsIgnoreCase("Writer") || pCrew.getJob().equalsIgnoreCase("Story") || 
+					pCrew.getJob().equalsIgnoreCase("Author")) {
+				if (writCount<numWritersAllowed && !writerIds.contains(pCrew.getId())) {
+					writerTiles.get(writCount).setPerson(pCrew, mediaItem);
+					workingWriterCollection.add(writerTiles.get(writCount));
+					writerIds.add(pCrew.getId());
+				} 
+				++writCount;
+			}
+		}
+		
+		PersonCast pCast;
+		for (int i = 0; i < mediaItem.getCast().size() && i<13; ++i) {
+			pCast = mediaItem.getCast().get(i);
+			actorTiles.get(i).setPerson(pCast, mediaItem);
+			workingActorCollection.add(actorTiles.get(i));				
+		}
+		directorFlowPane.getChildren().setAll(workingDirectorCollection);
+		writerFlowPane.getChildren().setAll(workingWriterCollection);
+		actorFlowPane.getChildren().setAll(workingActorCollection);
+		if (mediaItem.getVideos().size()>0) {
+			videoLink = mediaItem.getVideos().get(0).getKey();
+		} else {
+			videoLink = null;
+		}
+		movieTitleGridPane.setVisible(true);
+		tvTitleGridPane.setVisible(false);
+		descriptionLabel.setText("\t"+ mediaItem.getOverview());		
+		
+		//use runtime 
+		String runtimeString = (mediaItem.isMovie())? "Runtime: " : "Episode Avg: ";
+		runTimeLabel.setText(runtimeString + String.format("%d", mediaItem.getRuntime()/60) + ":" + String.format("%02d", mediaItem.getRuntime()%60));
+		Platform.runLater(() -> directorFlowPane.requestLayout());
+		Platform.runLater(() -> writerFlowPane.requestLayout());
+		Platform.runLater(() -> actorFlowPane.requestLayout());		
 	}
 	
 	// toggle drawer menu and play hamburger animation

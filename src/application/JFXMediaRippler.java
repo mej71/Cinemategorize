@@ -79,6 +79,7 @@ public class JFXMediaRippler extends JFXRippler {
 		pOver = new PopOver(gridPane);
 		pOver.setFadeInDuration(Duration.ONE);
 		pOver.setFadeOutDuration(Duration.ZERO);
+		pOver.arrowLocationProperty().set(ArrowLocation.LEFT_CENTER);
 	}
 	
 	private static TimerTask getTimerTask() {
@@ -214,17 +215,8 @@ public class JFXMediaRippler extends JFXRippler {
 						}
 					}
 				}
-			}			
-			int columnPos = listPos % (columnsWide);			
-			if (columnPos==columnsWide-1 && columnsWide != 1) { //movies on the rightmost side should have the popover on the left to keep it on the screen
-				pOver.getStyleClass().remove("pop_over_left");
-				pOver.getStyleClass().add("pop_over_right");
-				pOver.arrowLocationProperty().set(ArrowLocation.RIGHT_CENTER);
-			} else {
-				pOver.getStyleClass().remove("pop_over_right");
-				pOver.getStyleClass().add("pop_over_left");
-				pOver.arrowLocationProperty().set(ArrowLocation.LEFT_CENTER);
-			}
+			}						
+			
 			if (!hasEntered) {
 				timer = new Timer();
 				hasEntered = true;

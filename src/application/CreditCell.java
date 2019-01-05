@@ -18,7 +18,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.util.Duration;
 
-public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit> {
+public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
 	
 	
     private static GridPane gridPane;
@@ -28,6 +28,8 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
     private static boolean hasEntered = false;
     private static final int taskMiliSeconds = 500;
 	private static Timer timer;
+	private T item;
+	private Label label;
 	
 	private static CreditCell<?> tempCell;
 	
@@ -58,7 +60,6 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
 		
 		//show popover for quick movie info when mouse is over media pane
 		pOver = new PopOver(gridPane);
-		pOver.getStyleClass().add("pop_over_left");
 		pOver.setFadeInDuration(Duration.ONE);
 		pOver.setFadeOutDuration(Duration.ZERO);
 		
@@ -80,7 +81,7 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
 		};
 	}
 	
-	private String getCellString(PersonCredit item) {
+	private String getCellString(T item) {
     	String title = "";
     	String year = "";
     	if (item.getMovieTitle() != null && !item.getMovieTitle().isEmpty()) {
@@ -111,46 +112,52 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<PersonCredit
 		}
 		label = new Label();
 		label.setMaxWidth(425);
+		this.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
+			popTitle.setText(getCellString(item));
+			if (!item.getOverview().isEmpty()) {
+				popDesc.setText(item.getOverview());
+			} else {
+				popDesc.setText("Description not available");
+			}
+			if (!hasEntered) {
+				timer = new Timer();
+				hasEntered = true;
+				tempCell = this;
+				timer.schedule(getTimerTask(), taskMiliSeconds);
+			}
+			
+		});
+		this.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
+			pOver.hide();
+			if (hasEntered) {
+				timer.cancel();
+				hasEntered = false;
+			}
+			tempCell = null;
+		});
+		this.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
+			if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
+				ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getId()) );
+			}
+		});
 	}
 	
-	private Label label;
+	
 	
 	@Override
-	protected void updateItem(PersonCredit item, boolean empty) {
+	protected void updateItem(T item, boolean empty) {
 		super.updateItem(item, empty);
+		this.item = item;
 		setText(null);
 		if (item!=null) {
 			label.setText(getCellString(item));
-			this.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
-				popTitle.setText(getCellString(item));
-				if (!item.getOverview().isEmpty()) {
-					popDesc.setText(item.getOverview());
-				} else {
-					popDesc.setText("Description not available");
-				}
-				if (!hasEntered) {
-					timer = new Timer();
-					hasEntered = true;
-					tempCell = this;
-					timer.schedule(getTimerTask(), taskMiliSeconds);
-				}
-				
-			});
-			this.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
-				pOver.hide();
-				if (hasEntered) {
-					timer.cancel();
-					hasEntered = false;
-				}
-				tempCell = null;
-			});
+			
+			
 			if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
-				pseudoClassStateChanged(PseudoClass.getPseudoClass("owned-media"), true);
-				this.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-					ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getId()) );
-				});
+				this.pseudoClassStateChanged(PseudoClass.getPseudoClass("owned-media"), true);
+				
 			} else {
-				pseudoClassStateChanged(PseudoClass.getPseudoClass("owned-media"), false);
+				this.pseudoClassStateChanged(PseudoClass.getPseudoClass("owned-media"), false);
 			}
 			
             setGraphic(label);

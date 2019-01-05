@@ -13,8 +13,10 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
+import com.jfoenix.controls.events.JFXDialogEvent;
 
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCredit;
@@ -22,6 +24,8 @@ import info.movito.themoviedbapi.model.people.PersonPeople;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -41,6 +45,8 @@ public class PersonViewController implements Initializable {
 	private final int maxKnownMovies = 8;
 	private final int episodeCountThreshold = 5; //number of episodes someone must be involved in to count as "Known For"
 	private final int castPositionThreshold = 5; //order in the cast list in which to be credited
+	private final int popularityThreshold = 3;
+	private final int voteCountThreshold = 100;
 	
     
 	@FXML private GridPane mainGrid;
@@ -58,6 +64,9 @@ public class PersonViewController implements Initializable {
     @FXML private JFXListView<PersonCredit> writList;
     @FXML private JFXListView<PersonCredit> actList;
     @FXML private JFXListView<PersonCredit> prodList;
+    @FXML private StackPane overlayPane;
+    @FXML private Label progressLabel;
+    @FXML private JFXProgressBar progressBar;
     private JFXDialog dLink; 
     private PersonPeople person;
     private List<PersonCredit> crewCredits;
@@ -103,6 +112,8 @@ public class PersonViewController implements Initializable {
 		}
 		personImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		bioScrollPane.maxHeightProperty().bind(mainGrid.heightProperty().multiply(0.35));
+		overlayPane.prefHeightProperty().bind(mainGrid.heightProperty());
+		overlayPane.prefWidthProperty().bind(mainGrid.widthProperty());
 	}
 	
 	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
@@ -130,22 +141,51 @@ public class PersonViewController implements Initializable {
 		writList.getItems().clear();
 		actList.getItems().clear();
 		prodList.getItems().clear();
+		Task<Object> loadTask = new Task<Object>() {
+
+			@Override
+			protected Object call() throws Exception {
+				personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
+				creditSort();
+				setCredits();
+				loadInfo();
+				resizeTiles();
+				overlayPane.setVisible(false);
+				overlayPane.setDisable(true);
+				return null;
+			}
+		};
+		
+		dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
+
+			@Override
+			public void handle(JFXDialogEvent event) {
+				loadTask.run();				
+				event.consume();
+			}
+			
+		});
+		overlayPane.setDisable(false);
+		overlayPane.setVisible(true);
+		progressBar.setProgress(JFXProgressBar.INDETERMINATE_PROGRESS);
 		dLink.show();
-		loadInfo();
-		personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
 		dLink.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 		    if (event.getCode().equals(KeyCode.ESCAPE)) {
 		        dLink.close();
 		    }
-		});
+		});		
 	}
 	
-	public void loadInfo() {
+	public void creditSort() {
 		crewCredits = ControllerMaster.userData.getCredits(person.getId()).getCrew();
 		castCredits = ControllerMaster.userData.getCredits(person.getId()).getCast();
 		
 		Collections.sort(crewCredits, dateComparator);
 		Collections.sort(castCredits, dateComparator);
+	}
+	
+	public void setCredits() {
+		
 		for (int i = 0; i < crewCredits.size(); i++) {
 			if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Directing") && !dirList.getItems().contains(crewCredits.get(i))) {
 				dirList.getItems().add(crewCredits.get(i));
@@ -155,6 +195,7 @@ public class PersonViewController implements Initializable {
 				prodList.getItems().add(crewCredits.get(i));
 			}
 	    }
+		
 		directorTab.setDisable( (dirList.getItems().size() == 0)? true : false);
 		writerTab.setDisable( (writList.getItems().size() == 0)? true : false);
 		producerTab.setDisable( (prodList.getItems().size() == 0)? true : false);
@@ -164,23 +205,21 @@ public class PersonViewController implements Initializable {
 			}
 		}
 		actorTab.setDisable( (actList.getItems().size() == 0)? true : false);
-		
 		switch (person.getKnownForDepartment()) {
-			default:
-			case "Acting":
-				tabPane.getSelectionModel().select(actorTab);
-				break;
-			case "Writing":
-				tabPane.getSelectionModel().select(writerTab);
-				break;
-			case "Directing":
-				tabPane.getSelectionModel().select(directorTab);
-				break;
-			case "Production":
-				tabPane.getSelectionModel().select(producerTab);
-				break;
+		default:
+		case "Acting":
+			tabPane.getSelectionModel().select(actorTab);
+			break;
+		case "Writing":
+			tabPane.getSelectionModel().select(writerTab);
+			break;
+		case "Directing":
+			tabPane.getSelectionModel().select(directorTab);
+			break;
+		case "Production":
+			tabPane.getSelectionModel().select(producerTab);
+			break;
 		}
-
 		Platform.runLater(() -> {
 			if (dirList.getItems().size() != 0) {
 				dirList.scrollTo(0);
@@ -195,6 +234,9 @@ public class PersonViewController implements Initializable {
 				prodList.scrollTo(0);
 			}
 		});
+	}
+	
+	public void loadInfo() {
 		
 		ObservableList<Node> workingKnownForCollection = FXCollections.observableArrayList();
 		if (!ControllerMaster.userData.knownFor.containsKey(person.getId())) {
@@ -208,9 +250,13 @@ public class PersonViewController implements Initializable {
 			boolean isKnownDep;
 			String knownDep = person.getKnownForDepartment();
 			HashMap<PersonCredit, MediaItem> lesserKnown = new HashMap<PersonCredit, MediaItem>();
+			PersonCredit tempCredit;
 			for (int i = 0; i < knownForList.size(); ++i) {
-				
-				if (knownForList.get(i).getPopularity() >3 && knownForList.get(i).getVoteCount()>100) {
+				tempCredit = knownForList.get(i);
+				isKnownDep = ( (tempCredit.getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (tempCredit.getDepartment() != null && tempCredit.getDepartment().equals(knownDep)) )? true : false;
+				if (tempCredit.getPopularity() > popularityThreshold && tempCredit.getVoteCount() > voteCountThreshold &&
+						(tempCredit.getEpisodeCount()==0 || tempCredit.getEpisodeCount() > episodeCountThreshold) && 
+						tempCredit.getReleaseDate() != null && isKnownDep ) {
 					if (knownForList.get(i).getMediaType().equalsIgnoreCase("movie")) {
 						mi = SerializationUtils.clone(MediaSearchHandler.getMovieInfoById(knownForList.get(i).getMediaId()));
 						//if part of collection, just use first
@@ -223,10 +269,8 @@ public class PersonViewController implements Initializable {
 				} else {
 					continue;
 				}	
-				isKnownDep = ( (knownForList.get(i).getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (knownForList.get(i).getDepartment() != null && knownForList.get(i).getDepartment().equals(knownDep)) )? true : false;
 				//item credit should match what the person is known for, been released already, and bias against being in a low count of episodes for a series
-				if (mi!=null && !tempKnownList.contains(mi.getId()) && isKnownDep && mi.getReleaseDate() != null && 
-						(knownForList.get(i).getEpisodeCount() == 0 || knownForList.get(i).getEpisodeCount() > episodeCountThreshold)) {
+				if (mi!=null && !tempKnownList.contains(mi.getId())) {
 					//prefer people higher up in the cast bill and in full features or tv shows (bias against short films)
 					if ( (!knownDep.equalsIgnoreCase("Acting") || mi.getCreditPosition(person.getId()) < castPositionThreshold) && mi.isFullLength())  {
 						knownForRipplers.get(known).setItem(mi);
@@ -245,6 +289,7 @@ public class PersonViewController implements Initializable {
 				}
 				if (known == maxKnownMovies) {
 					break;
+					
 				}
 			}
 			//if the known for tiles haven't been filled, fill them up with lesser known roles.  If short of even the minimum, don't fill up two rows
@@ -285,6 +330,9 @@ public class PersonViewController implements Initializable {
 			ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>());
 		}
 		famousTilePane.getChildren().setAll(workingKnownForCollection);
+	}
+	
+	public void resizeTiles() {
 		//resized tiles to fill the space
 		float scaleWFactor = 0.83f;
 		float scaleHFactor = 0.7f;

@@ -8,7 +8,10 @@ import java.util.List;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 
 import info.movito.themoviedbapi.model.Collection;
+import info.movito.themoviedbapi.model.ContentRating;
 import info.movito.themoviedbapi.model.Genre;
+import info.movito.themoviedbapi.model.ReleaseInfo;
+import info.movito.themoviedbapi.model.Video;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
@@ -191,11 +194,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 	
 	public boolean belongsToCollection() {
-		if (isMovie()) {
-			return cMovie.getBelongsToCollection() != null;
-		} else {
-			return false;
-		}
+		return getCollection() != null;
 	}
 	
 	public Collection getCollection() {
@@ -229,20 +228,30 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 			return tvShow.getKeywords();
 		}
 	}
-
-	public List<PersonCrew> getCrew() {
+	
+	public List<PersonCrew> getCrew() { return getCrew(0,0); }
+	public List<PersonCrew> getCrew(int seasonNum, int epNum) {
 		if (isMovie()) {
-			return cMovie.getCrew();
+			return cMovie.getCredits().getCrew();
 		} else {
-			return tvShow.getCredits().getCrew();
+			if (seasonNum == 0 || epNum == 0) {
+				return tvShow.getCredits().getCrew();
+			} else {
+				return tvShow.getEpisode(seasonNum, epNum).getCredits().getCrew();
+			}
 		}
 	}
 	
-	public List<PersonCast> getCast() {
+	public List<PersonCast> getCast(){return getCast(0,0);}
+	public List<PersonCast> getCast(int seasonNum, int epNum) {
 		if (isMovie()) {
 			return cMovie.getCast();
 		} else {
-			return tvShow.getCredits().getCast();
+			if (seasonNum == 0 || epNum == 0) {
+				return tvShow.getCredits().getCast();
+			} else {
+				return tvShow.getEpisode(seasonNum, epNum).getCredits().getCast();
+			}
 		}
 	}
 	
@@ -254,11 +263,16 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		}
 	}
 
-	public String getTitle() {
+	public String getTitle() { return getTitle(0,0); }
+	public String getTitle(int seasonNum, int epNum) {
 		if (isMovie()) {
 			return cMovie.getTitle();
 		} else {
-			return tvShow.getName();
+			if (seasonNum == 0 || epNum == 0) {
+				return tvShow.getName();
+			} else {
+				return tvShow.getEpisode(seasonNum, epNum).getName();
+			}
 		}
 	}
 	
@@ -270,11 +284,16 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		}
 	}
 
-	public String getOverview() {
+	public String getOverview() { return getOverview(0,0); }
+	public String getOverview(int seasonNum, int epNum) {
 		if (isMovie()) {
 			return (!cMovie.getOverview().isEmpty())? cMovie.getOverview() : "No description available";
 		} else {
-			return (!tvShow.getOverview().isEmpty())? tvShow.getOverview() : "No description available";
+			if (seasonNum == 0 || epNum == 0) {
+				return (!tvShow.getOverview().isEmpty())? tvShow.getOverview() : "No description available";
+			} else {
+				return tvShow.getEpisodeDescription(seasonNum, epNum);
+			}
 		}
 	}
 	
@@ -307,7 +326,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	
 	public TvEpisode getEpisode(int seasonNum, int epNum) {
 		if (isMovie()) {
-			return null;
+			return new TvEpisode();
 		} else {
 			return tvShow.getEpisode(seasonNum, epNum);
 		}
@@ -315,7 +334,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	
 	public List<TvEpisode> getEpisodes() {
 		if (isMovie()) {
-			return null;
+			return new ArrayList<TvEpisode>();
 		} else {
 			return tvShow.getEpisodes();
 		}
@@ -332,6 +351,47 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 				}
 			}
 			return null;
+		}
+	}
+
+	public List<Video> getVideos() {
+		if (isMovie()) {
+			return cMovie.getVideos();
+		} else {
+			return tvShow.getVideos();
+		}
+	}
+
+	public List<ReleaseInfo> getReleases() {
+		if (isMovie()) {
+			return cMovie.getReleases();
+		} else {
+			return new ArrayList<ReleaseInfo>();
+		}
+	}
+
+	public int getRuntime() {
+		if (isMovie()) {
+			return cMovie.getRuntime();
+		} else {
+			return tvShow.getEpisodeRuntime();
+		}
+	}
+
+	public float getVoteAverage() {
+		if (isMovie()) {
+			return cMovie.getVoteAverage();
+		} else {
+			return tvShow.getVoteAverage();
+		}
+	}
+
+	
+	public List<ContentRating> getContentRating() {
+		if (isMovie()) {
+			return new ArrayList<ContentRating>();
+		} else {
+			return tvShow.getContentRating();
 		}
 	}
 }

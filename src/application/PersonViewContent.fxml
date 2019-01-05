@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXProgressBar?>
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
@@ -10,6 +11,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.TilePane?>
 
 <GridPane fx:id="mainGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PersonViewController">
@@ -112,5 +114,9 @@
             <Insets bottom="20.0" left="10.0" right="10.0" top="10.0" />
          </GridPane.margin>
       </GridPane>
+      <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="5">
+         <children>
+            <JFXProgressBar fx:id="progressBar" />
+         </children></StackPane>
    </children>
 </GridPane>

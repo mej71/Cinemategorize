@@ -30,12 +30,12 @@ public class JFXSmoothScroll  {
 	    return null;
 	}	
 	
-	public static void smoothScrolling(MovieScrollPane scrollPane) {
-		smoothScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
-	}		
-	
 	public static void smoothHScrolling(MovieScrollPane scrollPane) {
 		smoothScrolling(scrollPane, scrollPane.hvalueProperty(), bounds -> bounds.getWidth());
+	}
+	
+	public static void smoothScrolling(MovieScrollPane scrollPane) {
+		smoothScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
 	}
 
 	private static void smoothScrolling(MovieScrollPane scrollPane, DoubleProperty scrollDriection, Function<Bounds, Double> sizeFunc) {

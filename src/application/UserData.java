@@ -49,9 +49,8 @@ import javafx.scene.layout.StackPane;
 
 public class UserData implements Serializable {
 
-	/**
-	 * 
-	 */
+	public final transient static TmdbApi apiLinker = new TmdbApi(getAPIKey("THE_MOVIE_DB_API_TOKEN"));  //your key goes in api_keys.xml
+	
 	private static final long serialVersionUID = 1L;
 	private List<MediaItem> allMedia = new ArrayList<>();
 	private TreeMap<String, List<Integer>> movieTags = new TreeMap<String, List<Integer>>(String.CASE_INSENSITIVE_ORDER); // cache list of tags for search updating
@@ -68,14 +67,18 @@ public class UserData implements Serializable {
 	private LinkedHashMap<String, List<Integer>> userTvLists = new LinkedHashMap<String, List<Integer>>();
 	private LinkedHashMap<Integer, PersonPeople> personList = new LinkedHashMap<Integer, PersonPeople>();
 	private LinkedHashMap<Integer, PersonCredits> creditsList = new LinkedHashMap<Integer, PersonCredits>();
+	private List<String> allPaths = new ArrayList<String>();
+	private double scaleFactor = 1.0;
 	public LinkedHashMap<Integer, MovieDb> seenMovies = new LinkedHashMap<Integer, MovieDb>();
 	public LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<Integer, TvSeries>();
 	public LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<Integer, List<PersonCredit>>();
+	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<MediaItem, MediaResultsPage>();
 	public int minYear = 0;
 	public int maxYear = 0;
-	public final transient static TmdbApi apiLinker = new TmdbApi(getAPIKey("THE_MOVIE_DB_API_TOKEN"));  //your key here
-	private double scaleFactor = 1.0;
+
 	
+	
+	//get key from api_keys.xml by name
 	public static String getAPIKey(String keyname) {
 	
 		XPath xpath = XPathFactory.newInstance().newXPath();
@@ -118,8 +121,6 @@ public class UserData implements Serializable {
 		}
 		scaleFactor = sf;
 	}
-	
-	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<MediaItem, MediaResultsPage>();
 	
 	public List<Integer> getMoviesWithActor(PersonCast actor) {
 		if (actorsMovieList.containsKey(actor)) {
@@ -279,7 +280,7 @@ public class UserData implements Serializable {
 		URL url;
 		try {
 			url = file.toURI().toURL();
-			if (url!=null) {
+			if (url!=null && file.exists()) {
 				inputStream = url.openStream();
 				objectInputStream = new ObjectInputStream(inputStream);
 				UserData tempDat = (UserData)objectInputStream.readObject();
@@ -484,6 +485,7 @@ public class UserData implements Serializable {
 		} else if (!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), episode)) {
 			return;
 		}
+		allPaths.add(file.getPath());
 		if (!isMovie && ControllerMaster.userData.ownsShow(t.getId())) {
 			mi = ControllerMaster.userData.getTvById(t.getId());
 			mi.tvShow.addEpisode(episode);
@@ -715,8 +717,9 @@ public class UserData implements Serializable {
 		}
 	}
 	
+	//check if file has already been added.  Used to avoid unnecessary lookups
 	public boolean hasPath(String path) {
-		return allMedia.stream().map(MediaItem::getFullFilePath).filter(path::equals).findFirst().isPresent();
+		return allPaths.contains(path);
 	}	
 
 }

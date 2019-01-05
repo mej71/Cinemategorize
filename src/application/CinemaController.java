@@ -19,6 +19,7 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -344,10 +345,10 @@ public class CinemaController implements Initializable {
 	}
 		
 	public void showSelectionDialog(MediaItem mi) {
-		ControllerMaster.selectionViewController .showMediaItem(selectionViewWindow, mi);
-		selectionView.requestFocus();
+		ControllerMaster.selectionViewController.showMediaItem(selectionViewWindow, mi);
+		selectionView.requestFocus();		
 	}
-	
+
 	public void closeDialogs() {
 		selectionViewWindow.close();
 		addMovieWindow.close();
