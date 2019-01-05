@@ -16,7 +16,6 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXScrollPane;
-import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import info.movito.themoviedbapi.model.people.PersonCast;
@@ -33,20 +32,17 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-public class SelectionViewController implements Initializable {
+public class SelectionViewController extends LoadingControllerBase implements Initializable {
 	
 	private final int numDirectorsAllowed = 5;
 	private final int numWritersAllowed = 5;
 	private final int numActorsAllowed = 15;
 	
-	@FXML private GridPane mainGrid;
 	@FXML private ImageView posterImageView;
     @FXML private Label descriptionLabel;
     @FXML private GridPane canResumeGridPane;
@@ -76,12 +72,8 @@ public class SelectionViewController implements Initializable {
     @FXML private FlowPane genreFlowPane;
     @FXML private FlowPane tagsFlowPane;
     @FXML private Label ratingLabel;
-    @FXML private StackPane overlayPane;
-    @FXML private Label progressLabel;
-    @FXML private JFXProgressBar progressBar;
     //other variables
     private MediaItem mediaItem;
-    private JFXDialog dLink;
     private String videoLink;
     private FXMLLoader loader;
 	private GridPane personView;
@@ -91,11 +83,11 @@ public class SelectionViewController implements Initializable {
 	private List<JFXPersonRippler> directorTiles = new ArrayList<JFXPersonRippler>();
 	private List<JFXPersonRippler> writerTiles = new ArrayList<JFXPersonRippler>();
 	public HamburgerBackArrowBasicTransition burgertask;
-	private Task<?> selectionTask;
     
     
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
+	public void initialize(URL url, ResourceBundle rb) {
+		super.initialize(url, rb);
 		JFXScrollPane.smoothScrolling(infoScrollPane);
 		for (int i = 0; i < numDirectorsAllowed; ++i) {
 			directorTiles.add(JFXPersonRippler.createBasicRippler());
@@ -133,12 +125,10 @@ public class SelectionViewController implements Initializable {
 		genreFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		tagsFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
-		overlayPane.prefHeightProperty().bind(mainGrid.heightProperty());
-		overlayPane.prefWidthProperty().bind(mainGrid.widthProperty());
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
-		dLink = d;
+		super.setDialogLink(d);
 		mediaItem = mi;
 		if (personViewDialog == null) {
 			try {
@@ -154,7 +144,7 @@ public class SelectionViewController implements Initializable {
 				e.printStackTrace();
 			}
 		}
-		Task<Object> loadTask = new Task<Object>() {
+		loadTask = new Task<Object>() {
 
 			@Override
 			protected Object call() throws Exception {
@@ -165,24 +155,8 @@ public class SelectionViewController implements Initializable {
 				return null;
 			}
 		};
-		dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
-
-			@Override
-			public void handle(JFXDialogEvent event) {
-				loadTask.run();				
-				event.consume();
-			}
-			
-		});
-		overlayPane.setDisable(false);
-		overlayPane.setVisible(true);
-		progressBar.setProgress(JFXProgressBar.INDETERMINATE_PROGRESS);
 		dLink.show();	
-		dLink.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-		    if (event.getCode().equals(KeyCode.ESCAPE)) {
-		        dLink.close();
-		    }
-		});
+		
 		
 	}
 	

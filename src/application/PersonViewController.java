@@ -13,10 +13,8 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
-import com.jfoenix.controls.events.JFXDialogEvent;
 
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCredit;
@@ -25,7 +23,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -33,13 +30,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 
-public class PersonViewController implements Initializable {
+public class PersonViewController extends LoadingControllerBase implements Initializable {
 	
 	private final int minKnownMovies = 4;  //try and get at least this many movies for person, including lesser known if they have to
 	private final int maxKnownMovies = 8;
@@ -49,7 +43,7 @@ public class PersonViewController implements Initializable {
 	private final int voteCountThreshold = 100;
 	
     
-	@FXML private GridPane mainGrid;
+	
     @FXML private ImageView personImageView;
     @FXML private Label nameLabel;
     @FXML private ScrollPane bioScrollPane;
@@ -64,10 +58,6 @@ public class PersonViewController implements Initializable {
     @FXML private JFXListView<PersonCredit> writList;
     @FXML private JFXListView<PersonCredit> actList;
     @FXML private JFXListView<PersonCredit> prodList;
-    @FXML private StackPane overlayPane;
-    @FXML private Label progressLabel;
-    @FXML private JFXProgressBar progressBar;
-    private JFXDialog dLink; 
     private PersonPeople person;
     private List<PersonCredit> crewCredits;
     private List<PersonCredit> castCredits;
@@ -78,7 +68,8 @@ public class PersonViewController implements Initializable {
     private boolean isSmoothScrolling = false;
     
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {
+	public void initialize(URL url, ResourceBundle rb) {
+		super.initialize(url, rb);
 		JFXScrollPane.smoothScrolling(bioScrollPane);
 		dirList.setCellFactory(param -> new CreditCell<PersonCredit>());
 		writList.setCellFactory(param -> new CreditCell<PersonCredit>());
@@ -112,8 +103,6 @@ public class PersonViewController implements Initializable {
 		}
 		personImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		bioScrollPane.maxHeightProperty().bind(mainGrid.heightProperty().multiply(0.35));
-		overlayPane.prefHeightProperty().bind(mainGrid.heightProperty());
-		overlayPane.prefWidthProperty().bind(mainGrid.widthProperty());
 	}
 	
 	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
@@ -122,7 +111,7 @@ public class PersonViewController implements Initializable {
 	}
 	
 	public void showPerson(JFXDialog d) {
-		dLink = d;
+		super.setDialogLink(d);
 		bioScrollPane.setVvalue(0);
 		if (!isSmoothScrolling) {
 			JFXSmoothScroll.smoothScrollingListView(dirList, 0.1);
@@ -141,7 +130,7 @@ public class PersonViewController implements Initializable {
 		writList.getItems().clear();
 		actList.getItems().clear();
 		prodList.getItems().clear();
-		Task<Object> loadTask = new Task<Object>() {
+		loadTask = new Task<Object>() {
 
 			@Override
 			protected Object call() throws Exception {
@@ -156,24 +145,7 @@ public class PersonViewController implements Initializable {
 			}
 		};
 		
-		dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
-
-			@Override
-			public void handle(JFXDialogEvent event) {
-				loadTask.run();				
-				event.consume();
-			}
-			
-		});
-		overlayPane.setDisable(false);
-		overlayPane.setVisible(true);
-		progressBar.setProgress(JFXProgressBar.INDETERMINATE_PROGRESS);
-		dLink.show();
-		dLink.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-		    if (event.getCode().equals(KeyCode.ESCAPE)) {
-		        dLink.close();
-		    }
-		});		
+		dLink.show();	
 	}
 	
 	public void creditSort() {
@@ -184,27 +156,36 @@ public class PersonViewController implements Initializable {
 		Collections.sort(castCredits, dateComparator);
 	}
 	
-	public void setCredits() {
-		
-		for (int i = 0; i < crewCredits.size(); i++) {
-			if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Directing") && !dirList.getItems().contains(crewCredits.get(i))) {
-				dirList.getItems().add(crewCredits.get(i));
-			} else if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Writing") && !writList.getItems().contains(crewCredits.get(i))) {
-				writList.getItems().add(crewCredits.get(i));				
-			}	else if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Production") && !prodList.getItems().contains(crewCredits.get(i))){
-				prodList.getItems().add(crewCredits.get(i));
-			}
-	    }
-		
+	
+	public void addToList(JFXListView list, PersonCredit credit) {
+		if (!list.getItems().contains(credit)) {
+			list.getItems().add(credit);
+		}
+	}
+	
+	public void enableTabs() {
 		directorTab.setDisable( (dirList.getItems().size() == 0)? true : false);
 		writerTab.setDisable( (writList.getItems().size() == 0)? true : false);
 		producerTab.setDisable( (prodList.getItems().size() == 0)? true : false);
-		for (int i = 0; i <castCredits.size(); ++i) {
-			if (!actList.getItems().contains(castCredits.get(i))) {
-				actList.getItems().add(castCredits.get(i));
-			}
-		}
 		actorTab.setDisable( (actList.getItems().size() == 0)? true : false);
+	}
+	
+	public void setCredits() {
+		for (int i = 0; i < crewCredits.size(); i++) {
+			if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Directing")) {
+				addToList(dirList, crewCredits.get(i));
+			} else if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Writing")) {
+				addToList(writList, crewCredits.get(i));				
+			}	else if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Production")){
+				addToList(prodList, crewCredits.get(i));
+			}
+	    }
+		
+		
+		for (int i = 0; i <castCredits.size(); ++i) {
+			addToList(actList, castCredits.get(i));
+		}
+		
 		switch (person.getKnownForDepartment()) {
 		default:
 		case "Acting":
