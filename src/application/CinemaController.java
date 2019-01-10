@@ -12,12 +12,8 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXDrawer;
-import com.jfoenix.controls.JFXHamburger;
-import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
-import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -27,29 +23,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
-import javafx.scene.paint.Color;
+import javafx.stage.Window;
 
 public class CinemaController implements Initializable {
 
 	// local content
-	@FXML BorderPane mainPane;
-	@FXML private JFXHamburger hamburger;
+	@FXML StackPane backgroundStackPane;
 	@FXML StackPane stackPane;
-	@FXML private StackPane backgroundStackPane;
-	@FXML private JFXButton searchButton;
-	// included FXML controllers and content
-	
-	@FXML private GridPane mainGrid;
+	// included FXML controllers and content	
+	@FXML GridPane mainGrid;
 	
 	
 	@FXML JFXComboBox<SortTypes> sortCombo;
@@ -59,7 +50,7 @@ public class CinemaController implements Initializable {
 	@FXML private JFXButton textClearButton;
 	@FXML private JFXButton startDateClearButton;
 	@FXML private JFXButton endDateClearButton;
-	@FXML private JFXDrawer drawerMenu;
+
 	@FXML JFXComboBox<Integer> startYearComboBox;
 	@FXML JFXComboBox<Integer> endYearComboBox;
 	
@@ -67,7 +58,6 @@ public class CinemaController implements Initializable {
 	TilePane tilePane;
 	
 	MovieScrollPane scrollPane;
-	public HamburgerBackArrowBasicTransition burgerTask;
 	// other variables
 	public final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
 	public MediaListDisplayType showingType = MediaListDisplayType.MOVIES;
@@ -76,19 +66,16 @@ public class CinemaController implements Initializable {
 	public MovieAutoCompletePopup autoCompletePopup;
 	public MovieAutoCompleteEvent<SearchItem> autoEvent;
 	public boolean isScrolling = false;
-	JFXListView<String> list;
 	
 	private FXMLLoader loader;
 	private GridPane selectionView;
-	private JFXDialog selectionViewWindow;
+	JFXDialog selectionViewWindow;
 	
 	private GridPane manualLookupView;
-	private JFXDialog manualLookupWindow;
+	JFXDialog manualLookupWindow;
 	
-	private JFXDialogLayout addMovieDialogView;
-	private JFXDialog addMovieWindow;
-	
-	private GridPane sidePanelView;
+	private JFXDialogLayout addMediaDialogView;
+	JFXDialog addMediaWindow;
 	
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -113,8 +100,8 @@ public class CinemaController implements Initializable {
 		tilePane.setPadding(new Insets(5, 5, 5, 5));
 		tilePane.setVgap(15);
 		tilePane.setHgap(10);
-		//tilePane.setCache(true);
-		
+		TileAnimator tileAnimator = new TileAnimator();
+		tileAnimator.observe(tilePane.getChildren());
 		scaleSlider.valueProperty().addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue source, Object oldValue, Object newValue) {
@@ -127,8 +114,10 @@ public class CinemaController implements Initializable {
         			n.setMaxWidth(139*ControllerMaster.userData.getScaleFactor());
         			n.setMaxHeight(208*ControllerMaster.userData.getScaleFactor());
         			n.resize(139*ControllerMaster.userData.getScaleFactor(), 208*ControllerMaster.userData.getScaleFactor());
+        			n.requestLayout();
         		}
             	scaleLabel.textProperty().setValue("Image Size: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
+            	tilePane.requestLayout();
             } 
         });
 		
@@ -138,21 +127,6 @@ public class CinemaController implements Initializable {
 		scrollPane.setContent(tilePane);
 		JFXSmoothScroll.smoothScrolling(scrollPane);
 		stackPane.getChildren().add(scrollPane);
-		
-		// use the hamburger button to open/close the drawer
-		burgerTask = new HamburgerBackArrowBasicTransition(hamburger);
-		burgerTask.setRate(-1);
-		hamburger.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-			toggleDrawer(false);
-		});
-
-		// close drawer if clicked outside while open
-		backgroundStackPane.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
-			if (!inHierarchy(evt.getPickResult().getIntersectedNode(), sidePanelView)
-					&& !inHierarchy(evt.getPickResult().getIntersectedNode(), hamburger)) {
-				toggleDrawer(true);
-			}
-		});
 		
 		autoCompletePopup = new MovieAutoCompletePopup();
 		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty());
@@ -234,60 +208,33 @@ public class CinemaController implements Initializable {
 	    
 	    //set up dialogs
 		try {
-			loader = new FXMLLoader(getClass().getResource("SelectionViewContent.fxml"));
+			loader = new FXMLLoader(getClass().getClassLoader().getResource("SelectionViewContent.fxml"));
 			selectionView = loader.load();
 			ControllerMaster.selectionViewController = loader.getController();
 			selectionViewWindow = new JFXDialog(getBackgroundStackPane(), selectionView,
 					JFXDialog.DialogTransition.CENTER);
-			selectionView.prefWidthProperty().bind(mainPane.widthProperty().divide(1.15));
-			selectionView.prefHeightProperty().bind(mainPane.heightProperty().divide(1.3));
-			loader = new FXMLLoader(getClass().getResource("ManualLookupContent.fxml"));
+			selectionView.prefWidthProperty().bind(mainGrid.widthProperty().divide(1.15));
+			selectionView.prefHeightProperty().bind(mainGrid.heightProperty().divide(1.3));
+			loader = new FXMLLoader(getClass().getClassLoader().getResource("ManualLookupContent.fxml"));
 			manualLookupView = loader.load();
 			ControllerMaster.manualController = loader.getController();			
 			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
 					JFXDialog.DialogTransition.CENTER);
-			manualLookupView.prefWidthProperty().bind(mainPane.widthProperty().divide(1.15));
-			manualLookupView.prefHeightProperty().bind(mainPane.heightProperty().divide(1.15));
-			loader = new FXMLLoader(getClass().getResource("AddMoviesDialogContent.fxml"));
-			addMovieDialogView = loader.load();
-			ControllerMaster.addMovieDialogController = loader.getController();
-			addMovieWindow = new JFXDialog(getBackgroundStackPane(), addMovieDialogView,
+			manualLookupView.prefWidthProperty().bind(mainGrid.widthProperty().divide(1.15));
+			manualLookupView.prefHeightProperty().bind(mainGrid.heightProperty().divide(1.15));
+			loader = new FXMLLoader(getClass().getClassLoader().getResource("AddMoviesDialogContent.fxml"));
+			addMediaDialogView = loader.load();
+			ControllerMaster.addMediaDialogController = loader.getController();
+			addMediaWindow = new JFXDialog(getBackgroundStackPane(), addMediaDialogView,
 					JFXDialog.DialogTransition.CENTER);
-			loader = new FXMLLoader(getClass().getResource("MainSidePanelContent.fxml"));
-			sidePanelView = loader.load();
-			ControllerMaster.sidePanelController = loader.getController();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		// create the drawer and add to scene
-		drawerMenu.setSidePane(sidePanelView);
-		drawerMenu.minHeightProperty().bind(backgroundStackPane.heightProperty());
-		ControllerMaster.sidePanelController.setDrawer(drawerMenu);
-		drawerMenu.setOnDrawerClosed(e -> {
-			burgerTask.setRate(-1);
-			burgerTask.play();
-			drawerMenu.setVisible(false);
-			ControllerMaster.sidePanelController.mainMenuListView.getSelectionModel().clearSelection();	
-	    });
-		drawerMenu.setOnDrawerOpening(e -> {
-			drawerMenu.setVisible(true);
-	    });
+
 		ControllerMaster.userData.createAllRipplers();
 		ControllerMaster.userData.refreshViewingList(null, false);
 	    scaleSlider.setValue(ControllerMaster.userData.getScaleFactor()*4);
 		determinePrimaryStage();	
-		
-		list = new JFXListView<>();
-		for (int i = 0; i <= 200; i++) {
-			list.getItems().add(Integer.toString(1900 + i));
-        }
-		list.setVisible(false);
-		list.setOpacity(0);
-		list.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT,
-            CornerRadii.EMPTY,  Insets.EMPTY)));
-		list.resize(100, 300);
-		list.setMaxSize(150, 300);
-		backgroundStackPane.getChildren().add(list);
 	}	
 	
 	@FXML private void clearText() {
@@ -297,12 +244,12 @@ public class CinemaController implements Initializable {
 	
 	@FXML private void clearStartDate() {
 		startYearComboBox.getSelectionModel().clearSelection();
-		mainPane.requestFocus();
+		mainGrid.requestFocus();
 	}
 	
 	@FXML private void clearEndDate() {
 		endYearComboBox.getSelectionModel().clearSelection();
-		mainPane.requestFocus();
+		mainGrid.requestFocus();
 	}
 	
 	public void fillYearCombos(int minYear, int maxYear) {
@@ -316,78 +263,70 @@ public class CinemaController implements Initializable {
 
 	//make sure everything is loaded, then if the media list is empty force the player to add at least one item
 	private void determinePrimaryStage() {
-		mainPane.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
+		mainGrid.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
 			if (oldScene == null && newScene != null) {
 				// scene is set for the first time. Now its the time to listen stage changes.
 				newScene.windowProperty().addListener((observableWindow, oldWindow, newWindow) -> {
 					if (oldWindow == null && newWindow != null) {
+						window = newWindow;
 						// if no directories to search, user must select at least one
 						// opens InitialChooseDialogContent, and waits for user to add one to selection
 						if (ControllerMaster.userData.numMediaItems() == 0) {
-							ControllerMaster.addMovieDialogController.openDialogMenu(addMovieWindow, true);
+							ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, true);
 						} 
+						KeyCombination keyCombinationMac = new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
+				        KeyCombination keyCombinationWin = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+				        KeyCombination keyCombinationAdd = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
+				        newScene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+				            if (keyCombinationMac.match(event) || keyCombinationWin.match(event)) {
+				                ControllerMaster.userData.clearSaveData();
+				            } else if (keyCombinationAdd.match(event)) {
+				            	showAddMediaDialog();
+				            }
+				        });
 					}
 				});
 			}
 		});
 	}
 	
-	public void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList, JFXDialog aLink) {
-		ControllerMaster.manualController.setData(mediaList);
-		ControllerMaster.manualController.openDialog(manualLookupWindow, aLink);
-		manualLookupView.requestFocus();
+	private Window window;
+	public Window getMainWindow() {
+		return window;
 	}
 	
-	public void showAddMovieDialog() {
-		ControllerMaster.addMovieDialogController.openDialogMenu(addMovieWindow, false);
-		addMovieDialogView.requestFocus();
+	public void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList) {
+		ControllerMaster.manualController.setData(mediaList);
+		ControllerMaster.manualController.openDialog(manualLookupWindow);
+		JFXMediaRippler.forceHidePopOver();
+	}
+	
+	public void showAddMediaDialog() {
+		ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, false);
+		addMediaDialogView.requestFocus();
+		JFXMediaRippler.forceHidePopOver();
 	}
 		
 	public void showSelectionDialog(MediaItem mi) {
 		ControllerMaster.selectionViewController.showMediaItem(selectionViewWindow, mi);
 		selectionView.requestFocus();		
+		JFXMediaRippler.forceHidePopOver();
 	}
 
 	public void closeDialogs() {
 		selectionViewWindow.close();
-		addMovieWindow.close();
+		addMediaWindow.close();
 		manualLookupWindow.close();
 		JFXPersonRippler.closeWindow();
-	}
-
-	// toggle drawer menu and play hamburger animation
-	public void toggleDrawer(boolean openOnly) {
-		if (burgerTask.getRate() > 0) {
-			drawerMenu.close();
-		} else if (!openOnly) {
-			burgerTask.setRate(1);
-			burgerTask.play();
-			drawerMenu.open();
-		} else {
-			return;
-		}
+		JFXMediaRippler.forceHidePopOver();
 	}
 	
 	
 	//create pane for the media
 	public JFXMediaRippler addMediaTile(MediaItem mediaObject) {
-		JFXMediaRippler rippler = JFXMediaRippler.createBasicRippler(tilePane, scrollPane, burgerTask);
+		JFXMediaRippler rippler = JFXMediaRippler.createBasicRippler(tilePane, scrollPane);
 		rippler.setItem(mediaObject);
 		return rippler;
-	}
-	
-
-	private static boolean inHierarchy(Node node, Node potentialHierarchyElement) {
-		if (potentialHierarchyElement == null) {
-			return true;
-		}
-		while (node != null) {
-			if (node == potentialHierarchyElement) {
-				return true;
-			}
-			node = node.getParent();
-		}
-		return false;
 	}
 
 	public StackPane getBackgroundStackPane() {

@@ -30,3 +30,5 @@ images/
 *.xml
 *.prefs
 bin/
+*.gradle
+/build/

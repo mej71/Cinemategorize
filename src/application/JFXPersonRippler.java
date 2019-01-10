@@ -24,6 +24,7 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 	private T person = null;
 	private MediaItem mediaItem;
 	
+	
 	public static void setStaticVariables(PersonViewController pvc, JFXDialog pvd) {
 		pvController = pvc;
 		personViewDialog = pvd;
@@ -45,10 +46,11 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 		reference.setMaxWidth(90);
 		reference.getStyleClass().add("person_label");
 		paneChild.getChildren().add(reference);
+		
 		StackPane.setAlignment(reference, Pos.BOTTOM_CENTER);
 		StackPane.setAlignment(iView, Pos.TOP_LEFT);
 		paneChild.getStyleClass().add("person_pane");
-		JFXPersonRippler<?> rippler = new JFXPersonRippler(paneChild, reference, iView);
+		JFXPersonRippler<?> rippler = new JFXPersonRippler<>(paneChild, reference, iView);
 		rippler.setRipplerFill((Paint.valueOf("black")));
 		rippler.setMaskType(JFXRippler.RipplerMask.FIT);
 		rippler.setPosition(RipplerPos.FRONT);
@@ -69,11 +71,17 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 	} 
 	
 	public void setPerson(T person, MediaItem mediaItem) {
+		
 		this.person = person;
 		this.mediaItem = mediaItem;
-		Platform.runLater(() -> {
-			nameLabel.setText(person.getName());
-			personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());
-		});
+	}
+	
+	public void updateImage() {
+		if (person != null) {
+			Platform.runLater(() -> {
+				nameLabel.setText(person.getName());
+				personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());
+			});
+		}
 	}
 }

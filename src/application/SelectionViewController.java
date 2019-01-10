@@ -13,10 +13,7 @@ import org.controlsfx.control.Rating;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXHamburger;
-import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXScrollPane;
-import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
@@ -63,7 +60,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private Label genreLabel;
     @FXML private Label writtenLabel;
     @FXML private Label runTimeLabel;
-    @FXML private JFXHamburger hamburger;
     @FXML private FlowPane directorFlowPane;
     @FXML private FlowPane writerFlowPane;
     @FXML private FlowPane actorFlowPane;
@@ -82,7 +78,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	private List<JFXPersonRippler> actorTiles = new ArrayList<JFXPersonRippler>();
 	private List<JFXPersonRippler> directorTiles = new ArrayList<JFXPersonRippler>();
 	private List<JFXPersonRippler> writerTiles = new ArrayList<JFXPersonRippler>();
-	public HamburgerBackArrowBasicTransition burgertask;
     
     
 	@Override
@@ -98,12 +93,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		for (int i = 0; i < numActorsAllowed; ++i) {
 			actorTiles.add(JFXPersonRippler.createBasicRippler());
 		}
-		// use the hamburger button to open/close the drawer
-		burgertask = new HamburgerBackArrowBasicTransition(hamburger);
-		burgertask.setRate(-1);
-		hamburger.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-			toggleDrawer(false);
-		});
+
 		rating.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -128,17 +118,17 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
-		super.setDialogLink(d);
+		super.setDialogLink(d, !mi.hasLoaded());
 		mediaItem = mi;
 		if (personViewDialog == null) {
 			try {
-				loader = new FXMLLoader(getClass().getResource("PersonViewContent.fxml"));
+				loader = new FXMLLoader(getClass().getClassLoader().getResource("PersonViewContent.fxml"));
 				personView = loader.load();
 				personViewController = loader.getController();
 				personViewDialog = new JFXDialog(ControllerMaster.mainController.getBackgroundStackPane(), personView,
 						JFXDialog.DialogTransition.CENTER);
-				personView.prefWidthProperty().bind(ControllerMaster.mainController.mainPane.widthProperty().divide(1.35));
-				personView.prefHeightProperty().bind(ControllerMaster.mainController.mainPane.heightProperty().divide(1.15));
+				personView.prefWidthProperty().bind(ControllerMaster.mainController.mainGrid.widthProperty().divide(1.35));
+				personView.prefHeightProperty().bind(ControllerMaster.mainController.mainGrid.heightProperty().divide(1.15));
 				JFXPersonRippler.setStaticVariables(personViewController, personViewDialog);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -150,21 +140,40 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			protected Object call() throws Exception {
 				fillMainInfo();
 				fillInfo();	
-				overlayPane.setVisible(false);
-				overlayPane.setDisable(true);
+				succeeded();
 				return null;
 			}
 		};
+		loadTask.setOnSucceeded(e -> {
+			fillControlls();
+			overlayPane.setVisible(false);
+			overlayPane.setDisable(true);
+			mediaItem.setLoaded();
+		});
 		dLink.show();	
-		
+	}
+	
+	public void fillControlls() {
+		for (JFXPersonRippler<?> rip : actorTiles) {
+			rip.updateImage();
+		}
+		for (JFXPersonRippler<?> rip : writerTiles) {
+			rip.updateImage();
+		}
+		for (JFXPersonRippler<?> rip : directorTiles) {
+			rip.updateImage();
+		}
 		
 	}
 	
 	//does any info not specific to episode
 	public void fillMainInfo() {
 		infoScrollPane.setVvalue(0);
-
-		movieTitleLabel.setText(mediaItem.getTitle()+ " (" + mediaItem.getReleaseDate().substring(0, 4)+")");
+		String releaseDate = "";
+    	if (mediaItem.getReleaseDate() != null && mediaItem.getReleaseDate().length()>3) {
+    		releaseDate = mediaItem.getReleaseDate().substring(0, 4);
+    	}
+		movieTitleLabel.setText(mediaItem.getTitle()+ " (" + releaseDate +")");
 		genreLabel.setText( (mediaItem.getGenres().size()>1)? "Genres:" : "Genre:" );
 		genreFlowPane.getChildren().clear();
 		for (int i = 0; i < mediaItem.getGenres().size(); ++i) {
@@ -273,19 +282,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		Platform.runLater(() -> directorFlowPane.requestLayout());
 		Platform.runLater(() -> writerFlowPane.requestLayout());
 		Platform.runLater(() -> actorFlowPane.requestLayout());		
-	}
-	
-	// toggle drawer menu and play hamburger animation
-	public void toggleDrawer(boolean openOnly) {
-		if (burgertask.getRate() > 0) {
-			//drawerMenu.close();
-		} else if (!openOnly) {
-			//drawerMenu.open();
-		} else {
-			return;
-		}
-		burgertask.setRate(burgertask.getRate() * -1);
-		burgertask.play();
 	}
 	
 	

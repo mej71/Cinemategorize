@@ -5,19 +5,19 @@
         font-family: 'Raleway';
         font-style: normal;
         font-weight: normal;
-        src: url('/fonts/Raleway-Black.ttf');
+        src: url('Raleway-Black.ttf');
  }
     
 
 .root {
-	-fx-background-color: rgb(0.8, 15.3, 20.8);
+	-fx-background-color: #051b27;
 	background-blend-mode: screen;
 	-fx-font-family: 'Raleway', sans-serif;
 	
 }
 
 .label {
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
 	-fx-font-smoothing-type: lcd;
 }
 
@@ -27,7 +27,7 @@
 }
 
 .header {
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
     -fx-font-size: 16;
 }
 
@@ -69,12 +69,12 @@
 }
 
 .jfx-button {
-	-fx-background-color: #89c4f4;
+	-fx-background-color: #63bdff;
 	-fx-text-fill: #103E50;
 }
 
 .jfx-rippler {
-      -jfx-rippler-fill: rgb(0.8, 15.3, 20.8);
+      -jfx-rippler-fill: #001828;
 }
 
 .selectable {
@@ -105,8 +105,8 @@
  *                                                                             *
  ******************************************************************************/
 .jfx-dialog-overlay-pane > StackPane{
-    -fx-background-color: rgba(2,39,53, 0.97);
-    -fx-border-color: rgba(	137, 175, 244, 0.9);
+    -fx-background-color: rgba(16, 62, 80, 0.9);
+    -fx-border-color: rgba(137, 196, 244, 0.9);
     -fx-border-radius: 10 10 10 10;
  	-fx-background-radius: 10 10 10 10;
 }
@@ -131,7 +131,7 @@
  
  
  .scroll-pane {
- 	-fx-background-color: rgba(2,39,53, 0.97);
+ 	-fx-background-color: rgba(16, 62, 80, 0.9);
  }
 
 .scroll-bar:vertical > .track-background, .scroll-bar:horizontal > .track-background {
@@ -166,7 +166,7 @@
 }
 
 .viewport {
-	-fx-background-color: rgba(2,39,53, 0.97);
+	-fx-background-color: transparent;
 }
 
 /*******************************************************************************
@@ -175,7 +175,7 @@
  *                                                                             *
  ******************************************************************************/ 
 .list-view .jfx-list-cell .jfx-rippler {
-    -jfx-rippler-fill: #89c4f4;
+    -jfx-rippler-fill: #63bdff;
 }
  
 .list-view {
@@ -185,7 +185,7 @@
 
 
 .list-cell{
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
 	-fx-background-color: #010f15;
 }
 
@@ -203,7 +203,7 @@
 }
 
 .list-cell:selected {
-	-fx-background-color: #89c4f4;
+	-fx-background-color: #63bdff;
 }
 
 .list-cell:selected .label{
@@ -228,13 +228,13 @@
 }
 
 .jfx-combo-box .list-cell{
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
 	-fx-background-color: #010f15;
 }
 
 .combo-box-popup .list-view .list-cell:selected {
     -fx-text-fill: #001828;
-	-fx-background-color: #89c4f4;
+	-fx-background-color: #63bdff;
 }
 
 .combo-box-popup .list-view .list-cell:hover {
@@ -277,32 +277,31 @@
  *                                                                             *
  ******************************************************************************/ 
 #pop-title {
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
 }
 
 
 #pop-descript {
 	-fx-text-alignment: center;
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
 	-fx-wrap-text: true;
 }
 
 #pop-info {
 	-fx-text-alignment: left;
-	-fx-text-fill: #89c4f4;
+	-fx-text-fill: #63bdff;
 	-fx-wrap-text: true;
 }
 
-.popover {
-	-fx-border-width: 0;
-	-fx-border-style: solid solid solid hidden;
+.popover > .border {
+	-fx-fill: #63bdff!important;
 }
 
 .popover > .content {
     -fx-padding: 2px;
     -fx-background-color: #103E50; 
-    
 }
+
 
 /*******************************************************************************
  *                                                                             *
@@ -311,11 +310,11 @@
  ******************************************************************************/ 
 
 .jfx-slider > .colored-track {
-     -fx-background-color: #89c4f4;
+     -fx-background-color: #63bdff;
 }
 
 .jfx-slider > .thumb {
-     -fx-background-color: #89c4f4;
+     -fx-background-color: #63bdff;
 }
 
 .jfx-slider .animated-thumb{
@@ -329,7 +328,7 @@
 
 .slider .axis .axis-tick-mark, .slider .axis .axis-minor-tick-mark {
     -fx-fill: null;
-    -fx-stroke: #89c4f4;
+    -fx-stroke: #63bdff;
 }
 
 
@@ -340,7 +339,7 @@
  ******************************************************************************/ 
  
 .cell-name-text  {	
-	-fx-fill: #89c4f4;
+	-fx-fill: #63bdff;
 	-fx-font-size: 11pt;
 }
 
@@ -378,7 +377,7 @@
  ******************************************************************************/ 
 .genre-chip-hbox {
     -fx-font-size: 12.0;
-    -fx-background-color: #89c4f4;
+    -fx-background-color: #63bdff;
     -fx-background-radius: 40px;
     -fx-padding: 5px 8px 5px 12px;
     -fx-pref-height: 28px;
@@ -393,7 +392,7 @@
 
 .tag-chip-hbox {
 	-fx-font-size: 10.0;
-    -fx-background-color: #89c4f4;
+    -fx-background-color: #63bdff;
     -fx-background-radius: 40px;
     -fx-padding: 5px 8px 5px 12px;
     -fx-pref-height: 24px;
@@ -418,15 +417,15 @@
   
  .jfx-tab-pane .tab .tab-label {
     -fx-font-weight: normal;
-    -fx-text-fill: #89c4f4;
+    -fx-text-fill: #63bdff;
     -fx-font-size: 16;
 }
 
 .jfx-tab-pane .tab-header-area .jfx-rippler{
-    -jfx-rippler-fill :#89c4f4;
+    -jfx-rippler-fill :#63bdff;
 }
 .jfx-tab-pane .tab-selected-line {
-    -fx-background-color: #89c4f4;
+    -fx-background-color: #63bdff;
 }
 
 .jfx-tab-pane .headers-region {
@@ -452,3 +451,21 @@
 	-fx-background-radius: 5px;
 }
 
+/*******************************************************************************
+*                                                                              *
+* JFX Spinner                                                                  *
+*                                                                              *
+*******************************************************************************/
+
+.jfx-spinner {
+	-jfx-radius: 50px;
+}
+
+#personSpinner {
+	-jfx-radius: 10px;
+}
+
+.jfx-spinner .arc {
+    -fx-stroke-width: 3.0;
+    -fx-stroke: #63bdff;
+}

@@ -128,20 +128,26 @@ public class AddMediaDialogController implements Initializable {
 	    lookupTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 	    	@Override
 	    	public void handle(WorkerStateEvent t) {
-	    		if (ControllerMaster.userData.tempManualItems.size()>0) {
-	    			ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems, dialogLink);
-		    	}
-	    		if (ControllerMaster.userData.numMediaItems()>0) {
-	    			dialogLink.close();
+	    		//update media list in case items were found
+	    		if (ControllerMaster.userData.numMediaItems() > 0) {
 	    			if (!ControllerMaster.mainController.searchField.getText().isEmpty() && ControllerMaster.mainController.autoEvent!=null ) {
 	    				ControllerMaster.userData.refreshViewingList(ControllerMaster.mainController.autoEvent.getObject().getTargetIDs(), false);			
 	    			} else {
 	    				ControllerMaster.userData.refreshViewingList(null, true);
 	    			}
-			    	return;
-	    		}  	
-	    		uiMode = UIMode.ERRORED;
-				updateLayout();
+	    		} 	else {
+	    			uiMode = UIMode.ERRORED;
+	    		}
+	    		updateLayout();
+	    		//if unknown items were found, open manual lookup, if not and some items are owned, close
+	    		if (ControllerMaster.userData.tempManualItems.size() > 0) {
+	    			ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
+		    	} else {
+		    		if (ControllerMaster.userData.numMediaItems() > 0) {
+		    			dialogLink.close();
+		    			return;
+		    		}
+		    	}
 	    	}
 	    });
 	}

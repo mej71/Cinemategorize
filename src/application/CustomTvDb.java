@@ -21,6 +21,7 @@ import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 
+
 public class CustomTvDb implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

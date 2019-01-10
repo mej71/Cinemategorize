@@ -3,7 +3,6 @@ package application;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListCell;
 
@@ -15,12 +14,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.text.Text;
 
 public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsMediaItem> {
 	
@@ -52,11 +49,11 @@ public class ResultCell<T extends ResultsMediaItem> extends JFXListCell<ResultsM
                 		if (seasonBox.getValue() != null && seasonBox.getValue() > 0 &&
                 				episodeBox.getValue() != null && episodeBox.getValue() > 0 ) {
                 			item.setTvEp(seasonBox.getValue(), episodeBox.getValue());
-                			ControllerMaster.manualController.confirmMediaItem();
                 		} else {
                 			return;
                 		}
                 	}  
+                	ControllerMaster.manualController.confirmMediaItem();
 	            }
 			});
 			gridPane = new GridPane();

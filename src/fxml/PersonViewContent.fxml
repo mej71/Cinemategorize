@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXListView?>
-<?import com.jfoenix.controls.JFXProgressBar?>
+<?import com.jfoenix.controls.JFXSpinner?>
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
@@ -116,7 +116,8 @@
       </GridPane>
       <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="5">
          <children>
-            <JFXProgressBar fx:id="progressBar" />
-         </children></StackPane>
+            <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />
+         </children>
+      </StackPane>
    </children>
 </GridPane>

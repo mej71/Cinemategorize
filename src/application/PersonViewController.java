@@ -97,7 +97,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		knownForRipplers = new ArrayList<JFXMediaRippler>();
 		JFXMediaRippler mRip;
 		for (int i = 0; i < maxKnownMovies; ++i) {
-			mRip = JFXMediaRippler.createBasicRippler(famousTilePane, null, null);
+			mRip = JFXMediaRippler.createBasicRippler(famousTilePane, null);
 			mRip.getPane().prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.05));
 			knownForRipplers.add(mRip);
 		}
@@ -157,7 +157,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	}
 	
 	
-	public void addToList(JFXListView list, PersonCredit credit) {
+	public void addToList(JFXListView<PersonCredit> list, PersonCredit credit) {
 		if (!list.getItems().contains(credit)) {
 			list.getItems().add(credit);
 		}
@@ -222,14 +222,13 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		ObservableList<Node> workingKnownForCollection = FXCollections.observableArrayList();
 		if (!ControllerMaster.userData.knownFor.containsKey(person.getId())) {
 			List<Integer> tempKnownList = new ArrayList<Integer>(); 
-			knownForList = new ArrayList<PersonCredit>();
-			knownForList.addAll(crewCredits);
+			knownForList = new ArrayList<PersonCredit>(crewCredits);
 			knownForList.addAll(castCredits);
 			Collections.sort(knownForList, knownComprator);
 			int known = 0;
 			MediaItem mi;
 			boolean isKnownDep;
-			String knownDep = person.getKnownForDepartment();
+			final String knownDep = person.getKnownForDepartment();
 			HashMap<PersonCredit, MediaItem> lesserKnown = new HashMap<PersonCredit, MediaItem>();
 			PersonCredit tempCredit;
 			for (int i = 0; i < knownForList.size(); ++i) {

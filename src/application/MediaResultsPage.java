@@ -29,12 +29,12 @@ public class MediaResultsPage {
 				results.add(new ResultsMediaItem(MediaSearchHandler.getTvInfoById(tvResults.getResults().get(i).getId()).tvShow));
 			}
 			return results;
-		} else {
+		} else if (movieResults != null){
 			for (int i = 0; i < movieResults.getResults().size(); ++i) {
 				results.add( new ResultsMediaItem(MediaSearchHandler.getMovieInfoById(movieResults.getResults().get(i).getId()).cMovie));
 			}
-			return results;
 		}
+		return results;
 	}
 
 	//copies results values

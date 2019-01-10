@@ -84,7 +84,7 @@ public class UserData implements Serializable {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		InputSource inputSource;
 		try {
-			URL url = UserData.class.getResource("api_keys.xml");
+			URL url = UserData.class.getClassLoader().getResource("api_keys.xml");
 			inputSource = new InputSource(url.openStream());
 			return xpath.evaluate("/resources/" + keyname, inputSource);
 		} catch (IOException | XPathExpressionException e) {
@@ -258,6 +258,7 @@ public class UserData implements Serializable {
 
 
 	public void saveAll() {
+		new File("save_data").mkdirs();
 		File file = new File("save_data/userdata.dat");
 
 		try {
@@ -276,6 +277,7 @@ public class UserData implements Serializable {
 	public void tryLoadFile() {
 		InputStream inputStream = null;
 		ObjectInputStream objectInputStream = null;
+		new File("save_data").mkdirs();
 		File file = new File("save_data/userdata.dat");
 		URL url;
 		try {
@@ -292,12 +294,12 @@ public class UserData implements Serializable {
 				writersMovieList = tempDat.writersMovieList;
 				actorsMovieList = tempDat.actorsMovieList;
 				genreMovieList = tempDat.genreMovieList;
-				userMovieLists= tempDat.userMovieLists;
+				userMovieLists = tempDat.userMovieLists;
 				directorsTvList = tempDat.directorsTvList;
 				writersTvList = tempDat.writersTvList;
 				actorsTvList = tempDat.actorsTvList;
 				genreTvList = tempDat.genreTvList;
-				userTvLists= tempDat.userTvLists;
+				userTvLists = tempDat.userTvLists;
 				scaleFactor = tempDat.scaleFactor;
 				personList = tempDat.personList;
 				creditsList = tempDat.creditsList;
@@ -312,6 +314,29 @@ public class UserData implements Serializable {
 			e.printStackTrace();
 		}		
 	}
+	
+	public void clearSaveData() {
+		allMedia.clear();
+		movieTags.clear();
+		directorsMovieList.clear();
+		writersMovieList.clear();
+		actorsMovieList.clear();
+		genreMovieList.clear();
+		userMovieLists.clear();
+		directorsTvList.clear();
+		writersTvList.clear();
+		actorsTvList.clear();
+		genreTvList.clear();
+		userTvLists.clear();
+		scaleFactor = 1;
+		personList.clear();
+		creditsList.clear();
+		seenMovies.clear();
+		seenTv.clear();
+		knownFor.clear();
+		minYear = 0;
+		maxYear = 0;
+	}	
 	
 	final String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
 	final String regExSpecialCharsRE = regExSpecialChars.replaceAll( ".", "\\\\$0");
@@ -371,6 +396,12 @@ public class UserData implements Serializable {
 	public boolean addMovieOrTvShow(File file) {
 		
 		String[] tvParsedInfo = MediaSearchHandler.parseTVShowName(file.getName(), file.getParentFile().getName());
+		if (tvParsedInfo[1].isEmpty()) {
+			tvParsedInfo[1] = "1";
+		}
+		if (tvParsedInfo[2].isEmpty()) {
+			tvParsedInfo[2] = "2";
+		}
 		CustomTvDb series = null;
 		TvEpisode episode = null;
 		TvResultsPage tRes = null;
@@ -382,34 +413,23 @@ public class UserData implements Serializable {
 			if (tvDistance == series.getName().length()) {
 				tvDistance = 100;
 			}
-			tRes = MediaSearchHandler.getTvResults(tvParsedInfo[0]);
 		}
 		String[] movieParsedInfo = MediaSearchHandler.parseMovieName(file.getName());
+		if (movieParsedInfo[1] == null || movieParsedInfo[1].isEmpty()) {
+			movieParsedInfo[1] = "0";
+		}
 		Integer movieDistance = 100;
 		CustomMovieDb cm = null;
 		if (movieParsedInfo[0] != null && !movieParsedInfo[0].isEmpty()) {
-			if (movieParsedInfo[1] != null && !movieParsedInfo[1].isEmpty()) {
-				cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0],
-						Integer.parseInt(movieParsedInfo[1]));
-				if (cm != null) {
-					movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
-					if (movieDistance == cm.getTitle().length()) {
-						movieDistance = 100;
-					}
-					mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
-						Integer.parseInt(movieParsedInfo[1]));
+			cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0],
+					Integer.parseInt(movieParsedInfo[1]));
+			if (cm != null) {
+				System.out.println(cm.getTitle());
+				movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
+				if (movieDistance == cm.getTitle().length()) {
+					movieDistance = 100;
 				}
-			}
-			if (cm == null) {
-				cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0], 0);
-				if (cm != null) {
-					movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
-					if (movieDistance == cm.getTitle().length()) {
-						movieDistance = 100;
-					}
-					mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
-							0);
-				}
+				
 			}
 		}
 		// if both results are really far off, we probably failed
@@ -419,7 +439,7 @@ public class UserData implements Serializable {
 					return false;
 				}
 			}
-			tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), null);
+			tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
 			return false;
 		} else if (series != null) {
 			if (cm != null) {
@@ -441,17 +461,11 @@ public class UserData implements Serializable {
 					return false;
 				}
 			}
-			
-			if (tvParsedInfo[1].isEmpty()) {
-				tvParsedInfo[1] = "1";
-			}
-			if (tvParsedInfo[2].isEmpty()) {
-				tvParsedInfo[2] = "2";
-			}
+			tRes = MediaSearchHandler.getTvResults(tvParsedInfo[0]);
 			tempManualItems.put(new MediaItem(series, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(tRes));
 			return false;
 			
-		} else if (cm!=null) {
+		} else if (cm != null) {
 			if (movieDistance < 3) {
 				addMovie(cm, file);
 				return true;
@@ -461,6 +475,8 @@ public class UserData implements Serializable {
 						return false;
 					}
 				}
+				mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
+						Integer.parseInt(movieParsedInfo[1]));
 				tempManualItems.put(new MediaItem(null, cm, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
 				return false;
 			}
@@ -659,7 +675,7 @@ public class UserData implements Serializable {
 			e1.printStackTrace();
 		}
 		
-		Date parsedDate;
+		Date parsedDate = null;
 		JFXMediaRippler mRip;
 		String type;
 		ControllerMaster.mainController.showingMedia.clear();
@@ -669,31 +685,34 @@ public class UserData implements Serializable {
 					(!mRip.linkedItem.isMovie() && tvList.contains(mRip.linkedItem.getId())) ) {
 				try {
 					parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
-					if (startDate==null || startDate.before(parsedDate)) {
-						if (endDate==null || endDate.after(parsedDate)) {
-							if (mRip.linkedItem.isMovie()) {
-								type = "movie";
-							} else {
-								type = "tv";
-							}
-							ControllerMaster.mainController.showingMedia.put(type, mRip.linkedItem);
-							workingCollection.add(mRip);
-						}
-					}
 				} catch (ParseException e) {
 					e.printStackTrace();
+					startDate = null;
 				}	
+				if (startDate==null || startDate.before(parsedDate)) {
+					if (endDate==null || endDate.after(parsedDate)) {
+						if (mRip.linkedItem.isMovie()) {
+							type = "movie";
+						} else {
+							type = "tv";
+						}
+						ControllerMaster.mainController.showingMedia.put(type, mRip.linkedItem);
+						workingCollection.add(mRip);
+					}
+				}
+				
 			} else if ((moviesList == null && tvList == null) || tvList.contains(mRip.linkedItem.getId())){
 				try {
 					parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
-					if (startDate==null || startDate.before(parsedDate)) {
-						if (endDate==null || endDate.after(parsedDate)) {
-							ControllerMaster.mainController.showingMedia.put("tv", mRip.linkedItem);
-							workingCollection.add(mRip);
-						}
-					}
 				} catch (ParseException e) {
 					e.printStackTrace();
+					startDate = null;
+				}						
+				if (startDate==null || startDate.before(parsedDate)) {
+					if (endDate==null || endDate.after(parsedDate)) {
+						ControllerMaster.mainController.showingMedia.put("tv", mRip.linkedItem);
+						workingCollection.add(mRip);
+					}
 				}	
 			}
 		}
@@ -720,6 +739,7 @@ public class UserData implements Serializable {
 	//check if file has already been added.  Used to avoid unnecessary lookups
 	public boolean hasPath(String path) {
 		return allPaths.contains(path);
-	}	
+	}
+	
 
 }

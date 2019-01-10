@@ -2,8 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXHamburger?>
-<?import com.jfoenix.controls.JFXProgressBar?>
+<?import com.jfoenix.controls.JFXSpinner?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
@@ -122,17 +121,6 @@
             </Label>
          </children>
       </GridPane>
-      <JFXHamburger fx:id="hamburger" alignment="CENTER_LEFT" fillWidth="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="33.0" prefWidth="33.0" GridPane.hgrow="NEVER">
-         <GridPane.margin>
-            <Insets bottom="30.0" left="10.0" />
-         </GridPane.margin>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </JFXHamburger>
       <StackPane fx:id="youtubeStackPane" visible="false" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="4" GridPane.vgrow="NEVER">
          <GridPane.margin>
             <Insets />
@@ -251,7 +239,7 @@
       </Label>
       <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="6">
          <children>
-            <JFXProgressBar fx:id="progressBar" GridPane.columnSpan="6" GridPane.halignment="CENTER" GridPane.rowSpan="6" GridPane.valignment="CENTER" />
+            <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />
          </children>
       </StackPane>      
    </children>

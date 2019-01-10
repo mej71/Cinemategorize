@@ -12,6 +12,7 @@ import com.jfoenix.controls.JFXDialog.DialogTransition;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.validation.RequiredFieldValidator;
 
 import info.movito.themoviedbapi.model.tv.TvEpisode;
@@ -36,7 +37,6 @@ public class ManualLookupController implements Initializable {
 	@FXML private JFXComboBox<MediaTypeOptions> mediaTypeComboBox;
 	
 	private JFXDialog dialogLink;
-	private JFXDialog addMovieDialog;
 	private boolean isSmoothScrolling = false;
 	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
 
@@ -87,14 +87,23 @@ public class ManualLookupController implements Initializable {
 		titleField.resetValidation();
 	}
 
-	public void openDialog(JFXDialog dLink, JFXDialog aLink) {
+	public void openDialog(JFXDialog dLink) {
 		if (!isSmoothScrolling) {
 			JFXSmoothScroll.smoothScrollingListView(fileListView, 0.1);
 			isSmoothScrolling = true;
 		}
 		resetValidations();
-		addMovieDialog = aLink;
 		dialogLink = dLink;
+		dialogLink.setOnDialogClosed(new EventHandler<JFXDialogEvent>() {
+
+			@Override
+			public void handle(JFXDialogEvent event) {
+				if (ControllerMaster.userData.numMediaItems() > 0) {
+					ControllerMaster.mainController.addMediaWindow.close();;
+				}
+			}
+			
+		});
 		dialogLink.show();  
 	}
 	
@@ -147,9 +156,9 @@ public class ManualLookupController implements Initializable {
 
 		//set choice to proper media result
 		if (resultsListView.getSelectionModel().getSelectedItem().isMovie()) {
-			fileListView.getSelectionModel().getSelectedItem().cMovie = resultsListView.getSelectionModel().getSelectedItem().cMovie;
+			fileListView.getSelectionModel().getSelectedItem().setMovie(resultsListView.getSelectionModel().getSelectedItem().cMovie);
 		} else {
-			fileListView.getSelectionModel().getSelectedItem().tvShow = resultsListView.getSelectionModel().getSelectedItem().tvShow;
+			fileListView.getSelectionModel().getSelectedItem().setTvShow(resultsListView.getSelectionModel().getSelectedItem().tvShow);
 		}
 		
 		//add file to master list
@@ -181,9 +190,6 @@ public class ManualLookupController implements Initializable {
 		//close manual dialog if empty
 		if (fileListView.getItems().size()==0) {
 			dialogLink.close();
-			if (addMovieDialog!=null) {
-				addMovieDialog.close();
-			}
 		} else {
 			fileListView.getSelectionModel().select(0);
 		}

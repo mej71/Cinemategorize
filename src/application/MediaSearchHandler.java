@@ -63,7 +63,7 @@ public  class MediaSearchHandler {
 	
 	public static Artwork getTopPersonImage(int personId) {
 		List<Artwork> result = UserData.apiLinker.getPeople().getPersonImages(personId);
-		if (result.size()>0) {
+		if (result.size() > 0) {
 			return result.get(0);
 		} else {
 			return null;
@@ -76,7 +76,7 @@ public  class MediaSearchHandler {
 	
 	public static CustomMovieDb getMovieInfo(String movieName, int movieYear) {
 		MovieResultsPage moviePage = UserData.apiLinker.getSearch().searchMovie(movieName, movieYear, null, true, 1);
-		if (moviePage.getResults().size()>0) {
+		if (moviePage.getResults().size() > 0) {
 			MovieDb m = UserData.apiLinker.getMovies().getMovie(moviePage.getResults().get(0).getId(), null, MovieMethod.images, MovieMethod.credits, 
 					MovieMethod.keywords, MovieMethod.videos, MovieMethod.release_dates);
 			if (m == null) {
@@ -121,7 +121,7 @@ public  class MediaSearchHandler {
 	
 	public static CustomTvDb getTVInfo(String seriesName) {
 		TvResultsPage tvPage = UserData.apiLinker.getSearch().searchTv(seriesName, null, 1);
-		if (tvPage.getResults().size()>0) {
+		if (tvPage.getResults().size() > 0) {
 			TvSeries result = UserData.apiLinker.getTvSeries().getSeries(tvPage.getResults().get(0).getId(), null, TvMethod.images, 
 					TvMethod.credits, TvMethod.videos, TvMethod.keywords, TvMethod.content_ratings);
 			if (result == null) { 
@@ -214,6 +214,7 @@ public  class MediaSearchHandler {
 		    }
 	    } 
 	    if (movieTitle == null){//if all else fails, remove any brackets/parenthesis and replaces .'s with spaces
+	    	//strip everything in parenthesis or brackets for a less cluttered title
 	    	movieTitle = StringUtils.replaceAll(filename, "(\\(.*\\)|\\[.*\\])\\s*", "").replace('.', ' ');//strip everything in parenthesis or brackets for a less cluttered title
 		    movieTitle = movieTitle.substring(0, movieTitle.length()-3);
 		    movieYearMatcher = Pattern.compile("(19\\d{2}|[2-9]\\d{3})").matcher(tempFileName.replaceAll(filename, ""));
@@ -258,7 +259,7 @@ public  class MediaSearchHandler {
 		}	
 		//if all failed, use default poster
 		if (iView.getImage()==null) {
-			URL url = MediaSearchHandler.class.getResource("/images/unknown_poster.png");
+			URL url = MediaSearchHandler.class.getClassLoader().getResource("unknown_poster.png");
 			BufferedImage image;
 			try {
 				image = ImageIO.read(url);
@@ -271,7 +272,7 @@ public  class MediaSearchHandler {
 	}
 	
 	public static void getPosterFromFilePath(ImageView iView, int size, String baseFolder, String id) {
-		new File(baseFolder).mkdir();
+		new File(baseFolder).mkdirs();
 		File f = new File(baseFolder+"/"+ id + "_" + size + ".jpg");
 		if (f.exists() && !f.isDirectory()) {
 			try {
@@ -297,7 +298,7 @@ public  class MediaSearchHandler {
 			}
 			if (in!=null) {
 				iView.setImage(new Image(in));
-				new File(basePath).mkdir();
+				new File(basePath).mkdirs();
 				File file = new File(basePath + "/" + id + "_" + size + ".jpg");	
 				BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
 				ImageIO.write(b, "jpg", file);
@@ -316,7 +317,7 @@ public  class MediaSearchHandler {
 			getProfilePictureFromURL(iView, p.getId());
 		}
 		if (iView.getImage()==null) {
-			URL url = MediaSearchHandler.class.getResource("/images/unknown_poster.png");
+			URL url = MediaSearchHandler.class.getClassLoader().getResource("unknown_poster.png");
 			
 			try {
 				File file = new File(personProfileDir + "/" + p.getId()+ ".jpg");	
@@ -331,7 +332,7 @@ public  class MediaSearchHandler {
 	}
 	
 	public static void getProfilePictureFromFile(ImageView iView, int id) {
-		new File(personProfileDir).mkdir();
+		new File(personProfileDir).mkdirs();
 		File f = new File(personProfileDir+"/"+ id + ".jpg");
 		if (f.exists() && !f.isDirectory()) {
 			try {

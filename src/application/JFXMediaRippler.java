@@ -7,10 +7,10 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
 import com.jfoenix.controls.JFXRippler;
-import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -35,7 +35,9 @@ public class JFXMediaRippler extends JFXRippler {
 	public static final int taskMiliSeconds = 500;
 	public static Timer timer;
 	
-	public static JFXMediaRippler tempRippler;
+	public static StackPane tempPane;
+	public static ImageView tempIView;
+	public static EventHandler<MouseEvent> handler = MouseEvent::consume;
 	
 	
 	
@@ -61,7 +63,7 @@ public class JFXMediaRippler extends JFXRippler {
         titleLabel.setId("pop-title");
         descLabel = new Label();
         descLabel.setMaxWidth(250);
-        descLabel.setMaxHeight(-1);
+        descLabel.setMaxHeight(150);
         descLabel.setId("pop-descript");
         directorsLabel = new Label();
         directorsLabel.setMaxWidth(250);
@@ -74,6 +76,7 @@ public class JFXMediaRippler extends JFXRippler {
 		gridPane.add(descLabel, 0, 1, 5, 7);
 		gridPane.add(directorsLabel, 0, 8, 5, 1);
 		gridPane.add(actorsLabel, 0, 9, 5, 2);
+		gridPane.addEventFilter(MouseEvent.ANY, handler);
 		
 		//show popover for quick movie info when mouse is over media pane
 		pOver = new PopOver(gridPane);
@@ -88,9 +91,12 @@ public class JFXMediaRippler extends JFXRippler {
 			@Override
 			public void run() {
 				if (hasEntered && !popIsShowing()) {
-					Platform.runLater(() -> {
-						pOver.show(tempRippler);
-					});
+					if (tempPane != null) {
+						Platform.runLater(() -> {
+							pOver.setAnchorX(-300);
+							pOver.show(tempPane);
+						});
+					}
 					this.cancel();
 					hasEntered = false;
 				}				
@@ -99,6 +105,9 @@ public class JFXMediaRippler extends JFXRippler {
 	}
 	
 	public static void forceHidePopOver() {
+		if (pOver == null) {
+			return;
+		}
 		pOver.hide();
 		if (hasEntered) {
 			timer.cancel();
@@ -134,12 +143,13 @@ public class JFXMediaRippler extends JFXRippler {
 		return (StackPane) getControl();
 	}
 	
-	public static JFXMediaRippler createBasicRippler(TilePane tilePane, MovieScrollPane scrollPane, HamburgerBackArrowBasicTransition burgerTask) {
+	public static JFXMediaRippler createBasicRippler(TilePane tilePane, MovieScrollPane scrollPane) {
 		StackPane paneChild = new StackPane();
 		ImageView iView = new ImageView();
 		
 		//user a smaller resolution for smaller scale.  looks better for smaller posters
 		paneChild.getChildren().add(iView);
+		paneChild.setPickOnBounds(false);
 		iView.fitWidthProperty().bind(paneChild.widthProperty());
 		iView.fitHeightProperty().bind(paneChild.heightProperty());
 		
@@ -152,7 +162,7 @@ public class JFXMediaRippler extends JFXRippler {
 		paneChild.setMaxHeight(208);
 		paneChild.resize(139, 208);
 		paneChild.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
-			if ( (burgerTask != null && burgerTask.getRate() > 0) || (scrollPane !=null && scrollPane.isScrolling) || pOver.isShowing()) {
+			if ( (scrollPane !=null && scrollPane.isScrolling) || pOver.isShowing()) {
 				return;
 			}
 			MediaItem mi = rippler.linkedItem;
@@ -175,7 +185,11 @@ public class JFXMediaRippler extends JFXRippler {
 	        	}
 	        	JFXMediaRippler.directorsLabel.setText("Directed by: " + directors);
         	}
-        	JFXMediaRippler.titleLabel.setText(mi.getTitle()+ " (" + mi.getReleaseDate().substring(0, 4) + lastDate + ")");
+        	String releaseDate = "";
+        	if (mi.getReleaseDate() != null && mi.getReleaseDate().length()>3) {
+        		releaseDate = mi.getReleaseDate().substring(0, 4);
+        	}
+        	JFXMediaRippler.titleLabel.setText(mi.getTitle()+ " (" + releaseDate + lastDate + ")");
         	JFXMediaRippler.descLabel.setText(mi.getOverview());
         	
         	String cast = "";
@@ -189,42 +203,34 @@ public class JFXMediaRippler extends JFXRippler {
         			cast+=", " + mi.getCast().get(i).getName();
         		}
         	}
-        	JFXMediaRippler.actorsLabel.setText("Starring: " + cast);
-			int columnsWide = 0;
-			int listPos = -1;
-			int lastX = (int)((JFXRippler)tilePane.getChildren().get(0)).getLayoutX();
-			boolean foundMax = false;
-			for (int i = 0; i < tilePane.getChildren().size(); ++i) {
-				if (!foundMax) {
-					if (((JFXMediaRippler)tilePane.getChildren().get(i)).getLayoutX()<lastX) {
-						foundMax = true;
-						if (listPos != -1) {
-							break;
-						}
-					} else {
-						++columnsWide;
-						lastX = (int)((JFXRippler)tilePane.getChildren().get(i)).getLayoutX();
-					}
-				}
-				
-				if (listPos == -1) {
-					if (((JFXMediaRippler)tilePane.getChildren().get(i)).linkedItem.getId()==rippler.linkedItem.getId()) {
-						listPos = i;
-						if (foundMax) {
-							break;
-						}
-					}
-				}
-			}						
-			
+        	JFXMediaRippler.actorsLabel.setText("Starring: " + cast);		
 			if (!hasEntered) {
 				timer = new Timer();
 				hasEntered = true;
-				tempRippler = rippler;
+				tempPane = paneChild;
 				timer.schedule(getTimerTask(), taskMiliSeconds);
 			}
 		});
 		paneChild.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
+			if (e.getPickResult().getIntersectedNode() == iView) {
+				tempIView = iView;
+				tempIView.addEventHandler(MouseEvent.MOUSE_EXITED, (ev) -> {
+					if (ev.getPickResult().getIntersectedNode() == iView) {
+						return;
+					}
+					if (pOver.isShowing()) {
+						pOver.hide();
+					}
+					if (hasEntered) {
+						timer.cancel();
+						hasEntered = false;
+					}
+					
+				});
+				return;
+			} else {
+				tempIView = null;
+			}
 			if (pOver.isShowing()) {
 				pOver.hide();
 			}
@@ -235,6 +241,7 @@ public class JFXMediaRippler extends JFXRippler {
 			
 		});
 		paneChild.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
+
 			if ( (rippler.linkedItem.isMovie() && ControllerMaster.userData.ownsMovie(rippler.linkedItem.getId())) || 
 					(!rippler.linkedItem.isMovie() && ControllerMaster.userData.ownsShow(rippler.linkedItem.getId())) ) {
 				if (pOver.isShowing()) {
@@ -248,6 +255,7 @@ public class JFXMediaRippler extends JFXRippler {
 					ControllerMaster.mainController.showSelectionDialog(rippler.linkedItem);
 				});
 			}
+			e.consume();
 		});
 		return rippler;
 	}

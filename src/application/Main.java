@@ -19,9 +19,9 @@ public class Main extends Application {
 	    @Override
 	    public void start(Stage primaryStage) throws Exception {
 	        try {
-	            Parent root = FXMLLoader.load(getClass().getResource("CinemaMainContent.fxml"));
+	            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("asdf.fxml"));
 	            Scene scene = new Scene(root, 1110, 720);
-	            scene.getStylesheets().add(getClass().getResource("/css/temp.css").toExternalForm());
+	            scene.getStylesheets().add(getClass().getClassLoader().getResource("temp.css").toExternalForm());
 	            primaryStage.setTitle("Cinemategorize");
 	            //add a listener that prevents the window from being resized smaller than the initial value
 	            primaryStage.showingProperty().addListener((observable, oldValue, showing) -> {
@@ -52,9 +52,5 @@ public class Main extends Application {
 	    public void stop() throws Exception {
 	        super.stop();
 	        System.out.println("Inside stop() method! Destroy resources. Perform Cleanup.");
-	    }
-
-	    public static void main(String[] args) {
-	        launch(args);
 	    }
 }

@@ -12,7 +12,5 @@ public class ControllerMaster {
 	
 	public static SelectionViewController selectionViewController;
 	
-	public static AddMediaDialogController addMovieDialogController;
-	
-	public static SidePanelController sidePanelController;
+	public static AddMediaDialogController addMediaDialogController;
 }
