@@ -13,16 +13,27 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
+
+/**
+ * Code is written by Stack Overflow users: Chui Tey and corrected/fixed by jewelsea
+ * THIS CLASS IS FROM ->
+ * https://gist.github.com/teyc/5668517
+ * http://stackoverflow.com/questions/16828234/animation-upon-layout-changes
+ *
+ * Modified by ignoring small movements and variable animation speed
+ */
+
+/**
+ * Animates nodes on position change. Ignores very slight movements 
+ */
+
 public class TileAnimator implements ChangeListener<Number>, ListChangeListener<Node> {
 
   private Map<Node, TranslateTransition> nodeHTransitions = new HashMap<>();
   private Map<Node, TranslateTransition> nodeVTransitions = new HashMap<>();
   private final int transitionSpeed = 150;
-  
+
   public void observe(ObservableList<Node> nodes) {
-    for (Node node : nodes) {
-      this.observe(node);
-    }
     nodes.addListener(this);
   }
   
@@ -32,9 +43,6 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
   }
 
   public void unobserve(ObservableList<Node> nodes) {
-	for (Node node : nodes) {
-      this.unobserve(node);
-	}
 	nodes.removeListener(this);    
   }
 
