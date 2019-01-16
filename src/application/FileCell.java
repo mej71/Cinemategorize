@@ -1,50 +1,54 @@
 package application;
 
-import com.jfoenix.controls.JFXListCell;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
-public class FileCell<T extends MediaItem> extends JFXListCell<MediaItem> {
+public class FileCell<T extends MediaItem> extends FlowCell<T> {
 	
-	private VBox vbox;
-	private Label folderLabel;
-	private Label fileLabel;
-	private MediaItem mi;
+	public static int prefCellHeight = 110;
 	
-	public FileCell() {
-		super();
+	public FileCell(T item, ListFlowPane<FileCell<T>, T> pane) {
+		super(item, pane);
 	}
 	
 	@Override
-	protected void updateItem(MediaItem item, boolean empty) {
-		super.updateItem(item, empty);
-		mi = item;
-		setText("");
-		if (!empty && item!=null) {
-			folderLabel = new Label();
-			fileLabel = new Label();
-			vbox = new VBox();
-			vbox.setMinWidth(0);
-			vbox.setPrefWidth(1);
+	public void updateItem() {
+		super.updateItem();
+		if (item != null) {
+			GridPane gridPane = new GridPane();
+			gridPane.setPrefHeight(prefCellHeight);
+			gridPane.setMaxHeight(prefCellHeight);
+			gridPane.prefWidthProperty().bind(getPane().widthProperty());
+			gridPane.maxWidthProperty().bind(getPane().widthProperty());
+			Label folderLabel = new Label();
+			Label fileLabel = new Label();
 			folderLabel.setText(item.fileFolder);
 			fileLabel.setText(item.fileName);
-			vbox.getChildren().add(folderLabel);
-			vbox.getChildren().add(fileLabel);
-			setTooltip(new Tooltip(item.fullFilePath));
-			vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-				updateSelected(true);
-			});
-			setGraphic(vbox);
-		} else {
-			setGraphic(null);
-		}
+			gridPane.add(folderLabel, 0, 0);
+			gridPane.add(fileLabel, 0, 1);
+			Tooltip.install(this, new Tooltip(item.fullFilePath));
+			setGraphic(new HBox(gridPane));
+		} 
 	}
 	
-	public boolean matchesFilePath(String path) {
-		return path.equals(mi.fullFilePath);
+	//must be overriden in child classes
+	@Override
+	protected HBox getGraphic() {
+		return super.getGraphic();
+	}
+	
+	public static <T extends MediaItem> List<FileCell<T>> createCells(Set<T> items, ListFlowPane<FileCell<T>, T> pane) {
+		List<FileCell<T>> cells = new ArrayList<FileCell<T>>();
+		for (T item : items) {
+			cells.add(new FileCell<T>(item, pane));
+		}
+		return cells;		
 	}
 
 }

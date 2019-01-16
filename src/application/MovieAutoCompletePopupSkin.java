@@ -2,7 +2,6 @@ package application;
 
 import com.jfoenix.controls.JFXAutoCompletePopup;
 
-import application.SearchItem.SearchTypes;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.animation.Animation.Status;
@@ -23,7 +22,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -37,6 +35,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	
 	//not style-able, for some reason
 	private final int imageHeight = 32;
+	public static final int prefCellHeight = 90;	
 
 	MovieAutoCompletePopup control;
 	ListView<SearchItem> suggestionList;
@@ -64,14 +63,13 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 			suggestionList.setCellFactory(control.getSuggestionsCellFactory());
 		}
 		pane.getChildren().add(new Group(suggestionList));
-		pane.getStyleClass().add("autocomplete-container");
 		suggestionList.prefWidthProperty().bind(control.prefWidthProperty());
 		suggestionList.maxWidthProperty().bind(control.maxWidthProperty());
 		suggestionList.minWidthProperty().bind(control.minWidthProperty());
 		registerEventListener();
 		suggestionList.setCellFactory(lv -> new ListCell<SearchItem>() {
 			static final String NAME_CLASS = "cell-name-text";
-			static final String YEAR_CLASS = "cell-year-text";
+			static final String SUB_CLASS = "cell-sub-text";
 
 			@Override
 			protected void updateItem(SearchItem c, boolean empty) {
@@ -83,94 +81,55 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 					setHeight(90);
 					getStyleClass().add(NAME_CLASS);
 				} else {
-					if (c.searchType == SearchTypes.TITLE) {
-						GridPane gPane = new GridPane();
-						gPane.setHgap(5);
-						Text mediaName = new Text(c.getItemName());
-						Text year = new Text(" (" + ((MediaItem) c.getItem()).getReleaseDate().substring(0, 4) + ")");
-						year.getStyleClass().add(YEAR_CLASS);
-						mediaName.getStyleClass().add(NAME_CLASS);
-						Label reference = new Label(null, new TextFlow(mediaName, year));
-						ImageView imageView = MediaSearchHandler.getItemPoster((MediaItem)c.getItem(), 185);
-						imageView.getStyleClass().add("autocomplete-imageview");
-						imageView.setFitWidth(imageHeight);
-						imageView.setFitHeight(imageHeight);
-						gPane.add(imageView, 0, 0, 1, 3);
-						gPane.add(reference, 1, 0, 3, 3);
-						reference.setAlignment(Pos.CENTER);
-						setGraphic(gPane);
-						setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-					} else if (c.searchType == SearchTypes.TAG) {
-						HBox hbox = new HBox();
-						Text withText = new Text("With the tag: ");
-						withText.getStyleClass().add(YEAR_CLASS);
-						Text tag = new Text(c.getItemName());
-						tag.getStyleClass().add(NAME_CLASS);
-						Label reference = new Label(null, new TextFlow(withText, tag));						
-						hbox.getChildren().add(reference);
-						hbox.setAlignment(Pos.CENTER_LEFT);
-						setGraphic(hbox);
-						setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-					} else if (c.searchType == SearchTypes.GENRE) {
-						HBox hbox = new HBox();
-						Text withText = new Text("In the genre: ");
-						withText.getStyleClass().add(YEAR_CLASS);
-						Text genre = new Text(c.getItemName());
-						genre.getStyleClass().add(NAME_CLASS);
-						Label reference = new Label(null, new TextFlow(withText, genre));
-						hbox.getChildren().add(reference);
-						hbox.setAlignment(Pos.CENTER_LEFT);
-						setGraphic(hbox);
-						setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-					} else if (c.searchType == SearchTypes.DIRECTOR) {
-						GridPane gPane = new GridPane();
-						gPane.setHgap(5);
-						Text dirText = new Text("Directed by: ");
-						dirText.getStyleClass().add(YEAR_CLASS);
-						Text director = new Text(c.getItemName());
-						director.getStyleClass().add(NAME_CLASS);
-						Label reference = new Label(null, new TextFlow(dirText, director));
-						ImageView imageView = MediaSearchHandler.getProfilePicture((PersonCrew)c.getItem());
-						imageView.setFitWidth(imageHeight);
-						imageView.setFitHeight(imageHeight);
-						gPane.add(imageView, 3, 0, 1, 3);
-						gPane.add(reference, 0, 0, 3, 3);
-						reference.setAlignment(Pos.CENTER);
-						setGraphic(gPane);
-						setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-					} else if (c.searchType==SearchTypes.ACTOR) {
-						GridPane gPane = new GridPane();
-						gPane.setHgap(5);
-						Text dirText = new Text("Starring: ");
-						dirText.getStyleClass().add(YEAR_CLASS);
-						Text actorName = new Text(c.getItemName());
-						actorName.getStyleClass().add(NAME_CLASS);
-						Label reference = new Label(null, new TextFlow(dirText, actorName));						
-						ImageView imageView = MediaSearchHandler.getProfilePicture((PersonCast)c.getItem());
-						imageView.setFitWidth(imageHeight);
-						imageView.setFitHeight(imageHeight);
-						gPane.add(imageView, 3, 0, 1, 3);
-						gPane.add(reference, 0, 0, 3, 3);
-						reference.setAlignment(Pos.CENTER);
-						setGraphic(gPane);
-						setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-					} else if (c.searchType==SearchTypes.WRITER) {
-						GridPane gPane = new GridPane();
-						gPane.setHgap(5);
-						Text dirText = new Text("Written by: ");
-						dirText.getStyleClass().add(YEAR_CLASS);
-						Text writerName = new Text(c.getItemName());
-						writerName.getStyleClass().add(NAME_CLASS);
-						Label reference = new Label(null, new TextFlow(dirText, writerName));
-						ImageView imageView = MediaSearchHandler.getProfilePicture((PersonCrew)c.getItem());
-						imageView.setFitWidth(imageHeight);
-						imageView.setFitHeight(imageHeight);
-						gPane.add(imageView, 3, 0, 1, 3);
-						gPane.add(reference, 0, 0, 3, 3);
-						reference.setAlignment(Pos.CENTER);
-						setGraphic(gPane);
-						setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+					Label reference = new Label();
+					HBox hbox = new HBox();
+					hbox.setSpacing(5);
+					Text title = new Text();
+					Text subtitle = new Text();
+					ImageView imageView = null;
+					subtitle.getStyleClass().add(SUB_CLASS);
+					title.getStyleClass().add(NAME_CLASS);
+					subtitle.setText(c.getItemName());
+					switch (c.searchType) {
+					case TITLE:
+						title.setText(c.getItemName());
+						if (((MediaItem) c.getItem()).getReleaseDate() != null && ((MediaItem) c.getItem()).getReleaseDate().length()>3) {
+							subtitle.setText(" (" + ((MediaItem) c.getItem()).getReleaseDate().substring(0, 4) + ")");
+						}
+						imageView = MediaSearchHandler.getItemPoster((MediaItem)c.getItem(), 185);
+						break;
+					case TAG:
+						title.setText("With the tag: ");
+					case GENRE:
+						title.setText("In the genre: ");
+						break;
+					case DIRECTOR:
+						title.setText("Directed by: ");
+						imageView = MediaSearchHandler.getProfilePicture((PersonCrew)c.getItem());
+						break;
+					case ACTOR:
+						title.setText("Starring: ");
+						imageView = MediaSearchHandler.getProfilePicture((PersonCast)c.getItem());
+						break;
+					case WRITER:
+						title.setText("Written by: ");
+						imageView = MediaSearchHandler.getProfilePicture((PersonCrew)c.getItem());
+						break;
+					default:
+						break;
 					}
+					if (imageView != null) {
+						imageView.setFitWidth(imageHeight);
+						imageView.setFitHeight(imageHeight);
+						hbox.getChildren().add(imageView);
+					}
+					reference.setGraphic(new TextFlow(title, subtitle));
+					hbox.setAlignment(Pos.CENTER_LEFT);
+					hbox.getChildren().add(reference);
+					hbox.setPrefHeight(prefCellHeight);
+					hbox.setMaxHeight(prefCellHeight);
+					setGraphic(hbox);
+					setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 				}				
 			}
 			
@@ -209,6 +168,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	@SuppressWarnings("unchecked")
 	public void animate() {
 		updateListHeight();
+		JFXMediaRippler.forceHidePopOver();
 		if (showTransition == null || showTransition.getStatus().equals(Status.STOPPED)) {
 			if (scale == null) {
 				scale = new Scale(1, 0);
@@ -245,9 +205,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	}
 
 	private void updateListHeight() {
-		final double height = Math.min(suggestionList.getItems().size(), getSkinnable().getCellLimit())
-				* suggestionList.getFixedCellSize();
-		suggestionList.setPrefHeight(height + suggestionList.getFixedCellSize() / 2);
+		suggestionList.setPrefHeight(Math.min(suggestionList.getItems().size(), getSkinnable().getCellLimit())
+				* suggestionList.getFixedCellSize());
 		if (!isSmoothScrolling) {
 			JFXSmoothScroll.smoothScrollingListView(suggestionList, 0.5);
 			isSmoothScrolling = true;
@@ -282,7 +241,6 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 
 	@Override
 	public void dispose() {
-
 		this.control = null;
 		if (showTransition != null) {
 			showTransition.stop();

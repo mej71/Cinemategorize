@@ -26,26 +26,14 @@
     -fx-background-insets: 0;
 }
 
+.text-desc {
+	-fx-fill: #63bdff;
+	-fx-font-smoothing-type: lcd;
+}
+
 .header {
 	-fx-text-fill: #63bdff;
     -fx-font-size: 16;
-}
-
-/*******************************************************************************
- *                                                                             *
- * Hamburger			                                                       *
- *                                                                             *
- ******************************************************************************/
-.jfx-hamburger {
-    -fx-spacing: 5;
-    -fx-cursor: hand;
-}
-
-.jfx-hamburger StackPane {
-    -fx-pref-width: 40px;
-    -fx-pref-height: 7px;
-    -fx-background-color: #89c4f4;
-    -fx-background-radius: 5px;
 }
 
 /*******************************************************************************
@@ -57,7 +45,7 @@
     -fx-prompt-text-fill: #c5eff7;
     -jfx-focus-color: #103E50;
     -jfx-unfocus-color: #103E50;
-    -fx-text-fill: #89c4f4;
+    -fx-text-fill: #63bdff;
     -fx-padding: 0 30px 0 0;
     -jfx-label-float: true;
 }
@@ -132,6 +120,7 @@
  
  .scroll-pane {
  	-fx-background-color: rgba(16, 62, 80, 0.9);
+ 	-fx-background-radius: 10px;
  }
 
 .scroll-bar:vertical > .track-background, .scroll-bar:horizontal > .track-background {
@@ -154,7 +143,7 @@
 }
 
 .scroll-bar > .increment-button > .increment-arrow, .scroll-bar > .decrement-button > .decrement-arrow {
-    -fx-background-color: #022735;
+    -fx-background-color: #051b27;
 }
 
 .scroll-bar > .increment-button > .increment-arrow {
@@ -177,24 +166,45 @@
 .list-view .jfx-list-cell .jfx-rippler {
     -jfx-rippler-fill: #63bdff;
 }
+
+.list-view .scroll-bar:vertical {
+    -fx-scale-x: 1;
+}
  
 .list-view {
     -fx-background-color: rgba(0.8, 15.3, 20.8, 0.8);
     -fx-background-radius: 5px;
 }
 
-
-.list-cell{
+.flow-cell{
 	-fx-text-fill: #63bdff;
 	-fx-background-color: #010f15;
 }
 
-.list-cell:owned-media {
+.flow-cell:owned-media {
 	-fx-background-color: #c5eff7;
 }
 
-.list-cell:owned-media .label{
+.flow-cell:owned-media .label{
 	-fx-text-fill: #001828;
+}
+
+.flow-cell:hover{
+    -fx-text-fill: #103E50;
+	-fx-background-color: #487687;
+}
+
+.flow-cell:selected {
+	-fx-background-color: #63bdff;
+}
+
+.flow-cell:selected .label{
+	-fx-text-fill: #103E50;
+}
+
+.list-cell{
+	-fx-text-fill: #63bdff;
+	-fx-background-color: #010f15;
 }
 
 .list-cell:hover{
@@ -205,6 +215,7 @@
 .list-cell:selected {
 	-fx-background-color: #63bdff;
 }
+
 
 .list-cell:selected .label{
 	-fx-text-fill: #103E50;
@@ -299,7 +310,7 @@
 
 .popover > .content {
     -fx-padding: 2px;
-    -fx-background-color: #103E50; 
+    -fx-background-color: #295A6C;    
 }
 
 
@@ -343,7 +354,7 @@
 	-fx-font-size: 11pt;
 }
 
-.cell-year-text  {
+.cell-sub-text  {
 	-fx-fill: white;
 	-fx-font-size: 10pt;
 }
@@ -356,17 +367,17 @@
  ******************************************************************************/ 
  
 .rating > .container > .button {
-  -fx-background-image: url("/images/unselected_star.png");
+  -fx-background-image: url("unselected_star.png");
   -fx-background-color: transparent;
 }
 
 .rating > .container > .button.strong {
-  -fx-background-image: url("/images/selected_star_base.png");
+  -fx-background-image: url("selected_star_base.png");
   -fx-background-color: transparent;
 }
 
 .rating.loaded > .container > .button.strong {
-  -fx-background-image: url("/images/selected_star.png");
+  -fx-background-image: url("selected_star.png");
   -fx-background-color: transparent;
 }
 

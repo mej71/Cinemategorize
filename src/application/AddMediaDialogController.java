@@ -60,7 +60,6 @@ public class AddMediaDialogController implements Initializable {
 		dialogLink = d;
 		dialogLink.setOverlayClose(!initial);
 		updateLayout();
-		dialogLink.setCacheContainer(true);
 		dialogLink.show(); 
 
 		extFilter = new FileChooser.ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);

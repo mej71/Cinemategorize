@@ -10,7 +10,6 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialog.DialogTransition;
 import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.validation.RequiredFieldValidator;
@@ -24,20 +23,23 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 
 
 public class ManualLookupController implements Initializable {
 	
-	@FXML private JFXListView<MediaItem> fileListView;
-	@FXML private JFXListView<ResultsMediaItem> resultsListView;
 	@FXML private JFXButton confirmButton;
 	@FXML private JFXButton searchButton;
 	@FXML private JFXTextField titleField;
 	@FXML private JFXNumberTextField yearField;
 	@FXML private JFXComboBox<MediaTypeOptions> mediaTypeComboBox;
+	@FXML private ScrollPane fileScrollPane;
+	@FXML private ListFlowPane<FileCell<MediaItem>, MediaItem> fileFlowPane;
+	@FXML private ScrollPane resultsScrollPane;
+	@FXML private ListFlowPane<ResultCell<ResultsMediaItem>, ResultsMediaItem> resultsFlowPane;
+	
 	
 	private JFXDialog dialogLink;
-	private boolean isSmoothScrolling = false;
 	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
 
 	@Override
@@ -45,19 +47,22 @@ public class ManualLookupController implements Initializable {
 		mediaTypeComboBox.setItems( FXCollections.observableArrayList( MediaTypeOptions.values()));
 		mediaTypeComboBox.setValue(MediaTypeOptions.MOVIE);
 		//init columns info
-		fileListView.setCellFactory(param -> new FileCell<MediaItem>());
-		resultsListView.setCellFactory(param -> new ResultCell<ResultsMediaItem>());
-		fileListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<MediaItem>() {
+		
+		fileFlowPane.hasChanged.addListener(new ChangeListener<Boolean>() {
 
-		    @Override
-		    public void changed(ObservableValue<? extends MediaItem> observable, MediaItem oldValue, MediaItem newValue) {
-		    	if (oldValue != newValue && newValue != null) {
-			    	resultsListView.getItems().clear();
-			    	if (mediaList.get(newValue) != null) {
-			    		resultsListView.getItems().setAll( mediaList.get(newValue).getResults());
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (oldValue != newValue && newValue != null && newValue) {
+					fileFlowPane.setChanged(false);
+		    		resultsFlowPane.getChildren().clear();
+		    		MediaItem item = fileFlowPane.selectedCell.getItem();
+			    	if (mediaList.get(item) != null) {
+			    		resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(item).getResults(), resultsFlowPane));
+			    		resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
 			    	}
-		    	}
-		    }
+		    	}				
+			}
+			
 		});
 		
 		RequiredFieldValidator titleValidator = new RequiredFieldValidator();
@@ -74,13 +79,16 @@ public class ManualLookupController implements Initializable {
         });
        
         yearField.setMaxChars(4);
+        fileFlowPane.bindWidthToNode(fileScrollPane);
+        resultsFlowPane.bindWidthToNode(resultsScrollPane);
 	}
 	
 	public void setData(LinkedHashMap<MediaItem, MediaResultsPage> mList) {
 		mediaList = mList;
-		fileListView.getItems().clear();
-		fileListView.getItems().addAll(mediaList.keySet());
-		fileListView.getSelectionModel().select(0);
+		fileFlowPane.getChildren().clear();
+		fileFlowPane.getChildren().addAll(FileCell.createCells(mediaList.keySet(), fileFlowPane));
+		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * ResultCell.prefCellHeight);
+		fileFlowPane.selectCell((FileCell<MediaItem>)fileFlowPane.getChildren().get(0));
 	}
 	
 	public void resetValidations() {
@@ -88,10 +96,6 @@ public class ManualLookupController implements Initializable {
 	}
 
 	public void openDialog(JFXDialog dLink) {
-		if (!isSmoothScrolling) {
-			JFXSmoothScroll.smoothScrollingListView(fileListView, 0.1);
-			isSmoothScrolling = true;
-		}
 		resetValidations();
 		dialogLink = dLink;
 		dialogLink.setOnDialogClosed(new EventHandler<JFXDialogEvent>() {
@@ -99,7 +103,7 @@ public class ManualLookupController implements Initializable {
 			@Override
 			public void handle(JFXDialogEvent event) {
 				if (ControllerMaster.userData.numMediaItems() > 0) {
-					ControllerMaster.mainController.addMediaWindow.close();;
+					ControllerMaster.mainController.addMediaWindow.close();
 				}
 			}
 			
@@ -154,31 +158,31 @@ public class ManualLookupController implements Initializable {
 	@FXML
 	public void addMediaItem() {
 
+		MediaItem fileItem = fileFlowPane.selectedCell.getItem();
+		ResultsMediaItem resultItem = resultsFlowPane.selectedCell.getItem();
 		//set choice to proper media result
-		if (resultsListView.getSelectionModel().getSelectedItem().isMovie()) {
-			fileListView.getSelectionModel().getSelectedItem().setMovie(resultsListView.getSelectionModel().getSelectedItem().cMovie);
+		if (resultItem.isMovie()) {
+			fileItem.setMovie(resultItem.cMovie);
 		} else {
-			fileListView.getSelectionModel().getSelectedItem().setTvShow(resultsListView.getSelectionModel().getSelectedItem().tvShow);
+			fileItem.setTvShow(resultItem.tvShow);
 		}
 		
-		//add file to master list
-		MediaItem item = fileListView.getSelectionModel().getSelectedItem();
-		if (item.isMovie()) {
-			ControllerMaster.userData.addMovie( item.cMovie, new File(item.fullFilePath) );
+		if (fileItem.isMovie()) {
+			ControllerMaster.userData.addMovie( fileItem.cMovie, new File(fileItem.fullFilePath) );
 		} else {
-			TvEpisode episode = MediaSearchHandler.getEpisodeInfo(item.getId(), resultsListView.getSelectionModel().getSelectedItem().getTempSeasonNum(), 
-					resultsListView.getSelectionModel().getSelectedItem().getTempEpisodeNum());
-			ControllerMaster.userData.addTvShow(item.tvShow, episode, new File(item.fullFilePath));
+			TvEpisode episode = MediaSearchHandler.getEpisodeInfo(fileItem.getId(), resultItem.getTempSeasonNum(), 
+					resultItem.getTempEpisodeNum());
+			ControllerMaster.userData.addTvShow(fileItem.tvShow, episode, new File(fileItem.fullFilePath));
 		}
 		
 		//cleanup
 		for (MediaItem mi : ControllerMaster.userData.tempManualItems.keySet()) {
-			if (mi.fullFilePath.equals(item.fullFilePath)) {
+			if (mi.fullFilePath.equals(fileItem.fullFilePath)) {
 				ControllerMaster.userData.tempManualItems.remove(mi);
 				break;
 			}
 		}
-		fileListView.getItems().remove(fileListView.getSelectionModel().getSelectedItem());
+		fileFlowPane.getChildren().remove(fileFlowPane.selectedCell);
 		
 		//refresh master view with new file
 		if (!ControllerMaster.mainController.searchField.getText().isEmpty() && ControllerMaster.mainController.autoEvent!=null ) {
@@ -188,10 +192,11 @@ public class ManualLookupController implements Initializable {
 		}
 		
 		//close manual dialog if empty
-		if (fileListView.getItems().size()==0) {
+		if (fileFlowPane.getChildren().size()==0) {
 			dialogLink.close();
 		} else {
-			fileListView.getSelectionModel().select(0);
+			fileFlowPane.selectedCell = (FileCell<MediaItem>)fileFlowPane.getChildren().get(0);
+			fileFlowPane.setChanged(true);
 		}
 	}
 	
@@ -209,8 +214,9 @@ public class ManualLookupController implements Initializable {
 		} else if (mediaTypeComboBox.getValue()==MediaTypeOptions.TV_SHOW) { //tv show
 			mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(title));
 		}
-		mediaList.get(fileListView.getSelectionModel().getSelectedItem()).setResults(mRes);
-		resultsListView.getItems().clear();
-		resultsListView.getItems().setAll( mediaList.get(fileListView.getSelectionModel().getSelectedItem()).getResults());		
+		mediaList.get(fileFlowPane.selectedCell.getItem()).setResults(mRes);
+		resultsFlowPane.getChildren().clear();
+		resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));
+		resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
 	}
 }

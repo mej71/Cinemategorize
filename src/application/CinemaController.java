@@ -12,6 +12,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 
@@ -83,6 +84,9 @@ public class CinemaController implements Initializable {
 	public void initialize(URL url, ResourceBundle rb) {
 		ControllerMaster.mainController = this;
 		
+		mainGrid.prefWidthProperty().bind(backgroundStackPane.widthProperty());
+		mainGrid.prefHeightProperty().bind(backgroundStackPane.heightProperty());
+		
 		sortCombo.setItems(FXCollections.observableArrayList( SortTypes.values()));
 		sortCombo.setValue(SortTypes.NAME_ASC);
 		sortCombo.valueProperty().addListener(new ChangeListener<SortTypes>() {
@@ -114,10 +118,8 @@ public class CinemaController implements Initializable {
         			n.setMaxWidth(139*ControllerMaster.userData.getScaleFactor());
         			n.setMaxHeight(208*ControllerMaster.userData.getScaleFactor());
         			n.resize(139*ControllerMaster.userData.getScaleFactor(), 208*ControllerMaster.userData.getScaleFactor());
-        			n.requestLayout();
         		}
             	scaleLabel.textProperty().setValue("Image Size: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
-            	tilePane.requestLayout();
             } 
         });
 		
@@ -125,7 +127,7 @@ public class CinemaController implements Initializable {
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
 		scrollPane.setContent(tilePane);
-		JFXSmoothScroll.smoothScrolling(scrollPane);
+		JFXScrollPane.smoothScrolling(scrollPane);
 		stackPane.getChildren().add(scrollPane);
 		
 		autoCompletePopup = new MovieAutoCompletePopup();
@@ -213,15 +215,15 @@ public class CinemaController implements Initializable {
 			ControllerMaster.selectionViewController = loader.getController();
 			selectionViewWindow = new JFXDialog(getBackgroundStackPane(), selectionView,
 					JFXDialog.DialogTransition.CENTER);
-			selectionView.prefWidthProperty().bind(mainGrid.widthProperty().divide(1.15));
-			selectionView.prefHeightProperty().bind(mainGrid.heightProperty().divide(1.3));
+			selectionView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
+			selectionView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.3));
 			loader = new FXMLLoader(getClass().getClassLoader().getResource("ManualLookupContent.fxml"));
 			manualLookupView = loader.load();
 			ControllerMaster.manualController = loader.getController();			
 			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
 					JFXDialog.DialogTransition.CENTER);
-			manualLookupView.prefWidthProperty().bind(mainGrid.widthProperty().divide(1.15));
-			manualLookupView.prefHeightProperty().bind(mainGrid.heightProperty().divide(1.15));
+			manualLookupView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
+			manualLookupView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.15));
 			loader = new FXMLLoader(getClass().getClassLoader().getResource("AddMoviesDialogContent.fxml"));
 			addMediaDialogView = loader.load();
 			ControllerMaster.addMediaDialogController = loader.getController();
@@ -284,6 +286,8 @@ public class CinemaController implements Initializable {
 				            	showAddMediaDialog();
 				            }
 				        });
+				        backgroundStackPane.prefWidthProperty().bind(newScene.widthProperty());
+				        backgroundStackPane.prefHeightProperty().bind(newScene.heightProperty());
 					}
 				});
 			}
@@ -302,15 +306,14 @@ public class CinemaController implements Initializable {
 	}
 	
 	public void showAddMediaDialog() {
-		ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, false);
-		addMediaDialogView.requestFocus();
 		JFXMediaRippler.forceHidePopOver();
+		ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, false);		
 	}
 		
 	public void showSelectionDialog(MediaItem mi) {
-		ControllerMaster.selectionViewController.showMediaItem(selectionViewWindow, mi);
-		selectionView.requestFocus();		
 		JFXMediaRippler.forceHidePopOver();
+		ControllerMaster.selectionViewController.showMediaItem(selectionViewWindow, mi);	
+		
 	}
 
 	public void closeDialogs() {

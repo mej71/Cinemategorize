@@ -25,17 +25,17 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
     }
     nodes.addListener(this);
   }
+  
+  public void observe(Node n) {
+	n.layoutXProperty().addListener(this);
+	n.layoutYProperty().addListener(this);
+  }
 
   public void unobserve(ObservableList<Node> nodes) {
 	for (Node node : nodes) {
       this.unobserve(node);
 	}
 	nodes.removeListener(this);    
-  }
-
-  public void observe(Node n) {
-    n.layoutXProperty().addListener(this);
-    n.layoutYProperty().addListener(this);
   }
 
   public void unobserve(Node n) {

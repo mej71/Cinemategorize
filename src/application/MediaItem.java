@@ -335,8 +335,12 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 
 				// cache seasons, because they are not stored
 				List<TvSeason> seasons = new ArrayList<TvSeason>();
+				TvSeason tempSeason;
 				for (int i = 1; i <= tvShow.getNumberOfSeasons(); ++i) {
-					seasons.add(MediaSearchHandler.getSeasonInfo(getId(), i));
+					tempSeason = MediaSearchHandler.getSeasonInfo(getId(), i);
+					if (tempSeason != null) {
+						seasons.add(tempSeason);
+					}
 				}
 				tvShow.setSeasons(seasons);
 			}

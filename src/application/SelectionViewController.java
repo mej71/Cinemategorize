@@ -28,12 +28,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 
+@SuppressWarnings("rawtypes")
 public class SelectionViewController extends LoadingControllerBase implements Initializable {
 	
 	private final int numDirectorsAllowed = 5;
@@ -41,7 +44,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	private final int numActorsAllowed = 15;
 	
 	@FXML private ImageView posterImageView;
-    @FXML private Label descriptionLabel;
+    @FXML private Text descLabel;
     @FXML private GridPane canResumeGridPane;
     @FXML private JFXButton resumeButton;
     @FXML private JFXButton playBeginningButton1;
@@ -68,6 +71,9 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private FlowPane genreFlowPane;
     @FXML private FlowPane tagsFlowPane;
     @FXML private Label ratingLabel;
+    @FXML private Label tagsLabel;
+    @FXML private Label actLabel;
+    @FXML private Label writLabel;
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
@@ -75,7 +81,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	private GridPane personView;
 	private PersonViewController personViewController;
 	private JFXDialog personViewDialog;
-	private List<JFXPersonRippler> actorTiles = new ArrayList<JFXPersonRippler>();
+	private List<JFXPersonRippler> actorTiles = new ArrayList<JFXPersonRippler>();	
 	private List<JFXPersonRippler> directorTiles = new ArrayList<JFXPersonRippler>();
 	private List<JFXPersonRippler> writerTiles = new ArrayList<JFXPersonRippler>();
     
@@ -115,6 +121,8 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		genreFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		tagsFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
+		posterImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
+		descLabel.wrappingWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
@@ -179,6 +187,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		for (int i = 0; i < mediaItem.getGenres().size(); ++i) {
 			genreFlowPane.getChildren().add(JFXCustomChips.getGenreChip(mediaItem.getGenres().get(i)));
 		}
+		genreLabel.setVisible(genreFlowPane.getChildren().size()>0);
 		if (mediaItem.rating==-1) {
 			if (rating.getStyleClass().contains("loaded")) {
 				rating.getStyleClass().remove("loaded");
@@ -190,11 +199,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				rating.getStyleClass().add("loaded");
 			}
 		}
-		tagsFlowPane.getChildren().clear();
 		
+		tagsLabel.setText( (mediaItem.getKeywords().size()>1)? "Tags:" : "Tag:" );
+		tagsFlowPane.getChildren().clear();
 		for (int i = 0; i < mediaItem.getKeywords().size(); ++i) {
 			tagsFlowPane.getChildren().add(JFXCustomChips.getTagChip(mediaItem.getKeywords().get(i).getName()));
 		}
+		tagsLabel.setVisible(tagsFlowPane.getChildren().size()>0);
 		
 		//movie ratings are stored in releases, tv in content rating
 		boolean found = false;
@@ -230,8 +241,10 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		movieTitleGridPane.setVisible(mediaItem.isMovie());
 		tvTitleGridPane.setVisible(mediaItem.isTvShow());
 		posterImageView.setImage(MediaSearchHandler.getItemPoster(mediaItem, 500).getImage());
+		posterImageView.setEffect(new DropShadow());
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void fillInfo() {		
 		int dirCount = 0;
 		int writCount = 0;
@@ -265,8 +278,11 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			workingActorCollection.add(actorTiles.get(i));				
 		}
 		directorFlowPane.getChildren().setAll(workingDirectorCollection);
-		writerFlowPane.getChildren().setAll(workingWriterCollection);
 		actorFlowPane.getChildren().setAll(workingActorCollection);
+		writerFlowPane.getChildren().setAll(workingWriterCollection);		
+		dirLabel.setVisible(directorFlowPane.getChildren().size()>0);
+		actLabel.setVisible(actorFlowPane.getChildren().size()>0);
+		writLabel.setVisible(writerFlowPane.getChildren().size()>0);
 		if (mediaItem.getVideos().size()>0) {
 			videoLink = mediaItem.getVideos().get(0).getKey();
 		} else {
@@ -274,7 +290,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		}
 		movieTitleGridPane.setVisible(true);
 		tvTitleGridPane.setVisible(false);
-		descriptionLabel.setText("\t"+ mediaItem.getOverview());		
+		descLabel.setText("\t"+ mediaItem.getOverview());		
 		
 		//use runtime 
 		String runtimeString = (mediaItem.isMovie())? "Runtime: " : "Episode Avg: ";

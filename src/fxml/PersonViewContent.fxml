@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXListView?>
+<?import application.ListFlowPane?>
 <?import com.jfoenix.controls.JFXSpinner?>
 <?import com.jfoenix.controls.JFXTabPane?>
 <?import javafx.geometry.Insets?>
@@ -13,8 +13,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
 
-<GridPane fx:id="mainGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PersonViewController">
+<GridPane fx:id="mainGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PersonViewController">
    <rowConstraints>
       <RowConstraints fillHeight="false" percentHeight="5.0" />
       <RowConstraints percentHeight="20.0" />
@@ -59,61 +60,50 @@
             </GridPane>
          </content>
       </ScrollPane>
-      <GridPane GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" vgrow="ALWAYS" />
-            <RowConstraints fillHeight="false" minHeight="25.0" vgrow="ALWAYS" />
-          <RowConstraints vgrow="SOMETIMES" />
-            <RowConstraints />
-        </rowConstraints>
+      
+      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
          <children>
-            <JFXTabPane fx:id="tabPane" nodeOrientation="LEFT_TO_RIGHT" tabClosingPolicy="UNAVAILABLE" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="2">
+            <Label fx:id="famousLabel" styleClass="dialog-subtitle" text="Famous For:" />
+            <TilePane fx:id="famousTilePane" tileAlignment="TOP_CENTER"/>
+            <JFXTabPane fx:id="tabPane" nodeOrientation="LEFT_TO_RIGHT" tabClosingPolicy="UNAVAILABLE">
                <tabs>
                   <Tab fx:id="directorTab" text="Director">
                      <content>
-                        <JFXListView fx:id="dirList" />
+                        <ScrollPane fx:id="dirScrollPane"> 
+				         <content>
+				            <ListFlowPane fx:id="dirFlowPane" orientation="VERTICAL" />
+				         </content>
+				      </ScrollPane>
                      </content>
                   </Tab>
                   <Tab fx:id="writerTab" text="Writer">
-                     <content>
-                        <JFXListView fx:id="writList" depth="0" />
-                     </content>
+                     <ScrollPane fx:id="writScrollPane"> 
+				         <content>
+				            <ListFlowPane fx:id="writFlowPane" orientation="VERTICAL" />
+				         </content>
+				      </ScrollPane>
                   </Tab>
                   <Tab fx:id="actorTab" text="Actor">
-                     <content>
-                        <JFXListView fx:id="actList" />
-                     </content>
+                     <ScrollPane fx:id="actScrollPane"> 
+				         <content>
+				            <ListFlowPane fx:id="actFlowPane" orientation="VERTICAL" />
+				         </content>
+				      </ScrollPane>
                   </Tab>      
                   <Tab fx:id="producerTab" text="Producer">
-                     <content>
-                        <JFXListView fx:id="prodList" />
-                     </content>
+                     <ScrollPane fx:id="prodScrollPane"> 
+				         <content>
+				            <ListFlowPane fx:id="prodFlowPane" orientation="VERTICAL" />
+				         </content>
+				      </ScrollPane>
                   </Tab>                    
                </tabs>
-               <GridPane.margin>
-                  <Insets left="5.0" right="5.0" top="10.0" />
-               </GridPane.margin>
             </JFXTabPane>
-            <TilePane fx:id="famousTilePane" hgap="15.0" prefWidth="450.0" vgap="15.0" GridPane.columnSpan="3" GridPane.rowIndex="1">
-               <GridPane.margin>
-                  <Insets left="10.0" right="5.0" />
-               </GridPane.margin>
-            </TilePane>
-            <Label styleClass="dialog-subtitle" text="Famous For:">
-               <GridPane.margin>
-                  <Insets left="10.0" />
-               </GridPane.margin>
-            </Label>
          </children>
          <GridPane.margin>
-            <Insets bottom="20.0" left="10.0" right="10.0" top="10.0" />
+            <Insets left="5.0" right="5.0" />
          </GridPane.margin>
-      </GridPane>
+      </VBox>
       <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="5">
          <children>
             <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />

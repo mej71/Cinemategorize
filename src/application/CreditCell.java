@@ -1,24 +1,26 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.controlsfx.control.PopOver;
 
-import com.jfoenix.controls.JFXListCell;
-
 import info.movito.themoviedbapi.model.people.PersonCredit;
 import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 import javafx.util.Duration;
 
-public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
+public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	
 	
     private static GridPane gridPane;
@@ -28,7 +30,7 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
     private static boolean hasEntered = false;
     private static final int taskMiliSeconds = 500;
 	private static Timer timer;
-	private T item;
+	public static int prefCellHeight = 22;
 	private Label label;
 	
 	private static CreditCell<?> tempCell;
@@ -50,8 +52,8 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
         popTitle = new Label();
         popTitle.setId("pop-title");
         popDesc = new Label();
-        popDesc.setMaxWidth(450);
-        popDesc.setMaxHeight(-1);
+        popDesc.setMaxWidth(250);
+        popDesc.setMaxHeight(150);
         popDesc.setId("pop-descript");
         
         gridPane.add(popTitle, 0, 0, 5, 1);
@@ -105,13 +107,12 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
 		return title + year + role;
     }
 	
-	public CreditCell() {
-		super();
+	public CreditCell(T item, ListFlowPane<CreditCell<T>, T> pane) {
+		super(item, pane);
 		if (gridPane == null) {
 			init();
 		}
-		label = new Label();
-		label.setMaxWidth(425);
+		
 		this.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
 			popTitle.setText(getCellString(item));
 			if (!item.getOverview().isEmpty()) {
@@ -135,22 +136,23 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
 			}
 			tempCell = null;
 		});
-		this.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-			if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
-				ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getId()) );
-			}
-		});
 	}
 	
 	
 	
 	@Override
-	protected void updateItem(T item, boolean empty) {
-		super.updateItem(item, empty);
-		this.item = item;
-		setText(null);
-		if (item!=null) {
+	protected void updateItem() {
+		super.updateItem();
+		if (item != null) {
+			HBox hbox = new HBox();
+			hbox.setPrefHeight(prefCellHeight);
+			hbox.setMaxHeight(prefCellHeight);
+			hbox.minWidthProperty().bind(getPane().widthProperty());
+			hbox.prefWidthProperty().bind(getPane().widthProperty());
+			hbox.maxWidthProperty().bind(getPane().widthProperty());
+			label = new Label();
 			label.setText(getCellString(item));
+			hbox.setAlignment(Pos.CENTER_LEFT);
 			
 			
 			if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
@@ -159,10 +161,30 @@ public class CreditCell<T extends PersonCredit> extends JFXListCell<T> {
 			} else {
 				this.pseudoClassStateChanged(PseudoClass.getPseudoClass("owned-media"), false);
 			}
-			
-            setGraphic(label);
-		} else {
-			setGraphic(null);
+			hbox.getChildren().add(label);
+            setGraphic(hbox);
 		}
+	}
+	
+	@Override
+	protected Label getGraphic() {
+		return super.getGraphic();
+	}
+	
+	@Override
+	protected void runOnClick() {
+		super.runOnClick();
+		if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
+			ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getId()) );
+		}
+	}
+	
+	public static <T extends PersonCredit> List<CreditCell<T>> createCells(List<T> credits, ListFlowPane<CreditCell<T>,T> pane) {
+		List<CreditCell<T>> cells = new ArrayList<CreditCell<T>>();
+		for (T credit : credits) {
+			cells.add(new CreditCell<T>(credit, pane));
+		}
+		return null;
+		
 	}
 }

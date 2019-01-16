@@ -55,7 +55,7 @@
 	      </JFXComboBox>
 	      <JFXButton fx:id="textClearButton" maxHeight="25.0" maxWidth="25.0" minWidth="21.0" onMouseClicked="#clearText" pickOnBounds="false" prefHeight="25.0" prefWidth="21.0" styleClass="clearTextField" text="x" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
 	         <GridPane.margin>
-	            <Insets right="10.0" />
+	            <Insets bottom="6.0" right="10.0" />
 	         </GridPane.margin>
 	      </JFXButton>
 	      <JFXSlider fx:id="scaleSlider" blockIncrement="0.1" cache="true" cacheHint="SPEED" majorTickUnit="1.0" max="8.0" min="1.0" minorTickCount="0" showTickMarks="true" value="4.0" GridPane.columnIndex="6" GridPane.rowIndex="2">

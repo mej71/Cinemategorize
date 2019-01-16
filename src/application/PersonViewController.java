@@ -12,14 +12,12 @@ import java.util.ResourceBundle;
 import org.apache.commons.lang3.SerializationUtils;
 
 import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
 
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCredit;
 import info.movito.themoviedbapi.model.people.PersonPeople;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -41,11 +39,15 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	private final int castPositionThreshold = 5; //order in the cast list in which to be credited
 	private final int popularityThreshold = 3;
 	private final int voteCountThreshold = 100;
+	//resize tiles to fill the space
+	private final float scaleWFactor = 0.83f;
+	private final float scaleHFactor = 0.7f;
 	
     
 	
     @FXML private ImageView personImageView;
     @FXML private Label nameLabel;
+    @FXML private Label famousLabel;
     @FXML private ScrollPane bioScrollPane;
     @FXML private Label bioLabel;
     @FXML private TilePane famousTilePane;
@@ -54,10 +56,14 @@ public class PersonViewController extends LoadingControllerBase implements Initi
     @FXML private Tab writerTab;
     @FXML private Tab actorTab;
     @FXML private Tab producerTab;
-    @FXML private JFXListView<PersonCredit> dirList;
-    @FXML private JFXListView<PersonCredit> writList;
-    @FXML private JFXListView<PersonCredit> actList;
-    @FXML private JFXListView<PersonCredit> prodList;
+    @FXML private ScrollPane dirScrollPane;
+    @FXML private ListFlowPane<CreditCell<PersonCredit>, PersonCredit> dirFlowPane;
+    @FXML private ScrollPane writScrollPane;
+    @FXML private ListFlowPane<CreditCell<PersonCredit>, PersonCredit> writFlowPane;
+    @FXML private ScrollPane actScrollPane;
+    @FXML private ListFlowPane<CreditCell<PersonCredit>, PersonCredit> actFlowPane;
+    @FXML private ScrollPane prodScrollPane;
+    @FXML private ListFlowPane<CreditCell<PersonCredit>, PersonCredit> prodFlowPane;
     private PersonPeople person;
     private List<PersonCredit> crewCredits;
     private List<PersonCredit> castCredits;
@@ -65,16 +71,11 @@ public class PersonViewController extends LoadingControllerBase implements Initi
     private Comparator<PersonCredit> dateComparator;
     private Comparator<PersonCredit> knownComprator;
     private List<JFXMediaRippler> knownForRipplers;
-    private boolean isSmoothScrolling = false;
     
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		super.initialize(url, rb);
 		JFXScrollPane.smoothScrolling(bioScrollPane);
-		dirList.setCellFactory(param -> new CreditCell<PersonCredit>());
-		writList.setCellFactory(param -> new CreditCell<PersonCredit>());
-		actList.setCellFactory(param -> new CreditCell<PersonCredit>());
-		prodList.setCellFactory(param -> new CreditCell<PersonCredit>());
 		dateComparator = new Comparator<PersonCredit>(){
 		     public int compare(PersonCredit o1, PersonCredit o2){ 
 		    	 String o1Date = (o1.getReleaseDate() != null)? o1.getReleaseDate() : (o1.getFirstAirDate() != null)? o1.getFirstAirDate() : "";
@@ -94,6 +95,10 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		    	 return o2.getVoteAvg().compareTo(o1.getVoteAvg());
 		     }
 		};	
+		famousTilePane.setVgap(15*scaleHFactor);
+		famousTilePane.setHgap(10*scaleWFactor);
+		famousTilePane.setMaxHeight(208 * scaleHFactor * 2 + 15 * scaleHFactor * 2);
+		
 		knownForRipplers = new ArrayList<JFXMediaRippler>();
 		JFXMediaRippler mRip;
 		for (int i = 0; i < maxKnownMovies; ++i) {
@@ -103,6 +108,13 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		}
 		personImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		bioScrollPane.maxHeightProperty().bind(mainGrid.heightProperty().multiply(0.35));
+		dirFlowPane.bindWidthToNode(dirScrollPane);
+		writFlowPane.bindWidthToNode(writScrollPane);
+		actFlowPane.bindWidthToNode(actScrollPane);
+		prodFlowPane.bindWidthToNode(prodScrollPane);
+		TileAnimator tileAnimator = new TileAnimator();
+		tileAnimator.observe(famousTilePane.getChildren());
+		
 	}
 	
 	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
@@ -111,25 +123,15 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	}
 	
 	public void showPerson(JFXDialog d) {
-		super.setDialogLink(d);
-		bioScrollPane.setVvalue(0);
-		if (!isSmoothScrolling) {
-			JFXSmoothScroll.smoothScrollingListView(dirList, 0.1);
-			JFXSmoothScroll.smoothScrollingListView(writList, 0.1);
-			JFXSmoothScroll.smoothScrollingListView(actList, 0.1);
-			JFXSmoothScroll.smoothScrollingListView(prodList, 0.1);
-			isSmoothScrolling = true;
-		}
 		nameLabel.setText(person.getName());
 		if (person.getBiography()!=null && !person.getBiography().equals("")) {
 			bioLabel.setText(person.getBiography());
 		} else {
 			bioLabel.setText("No bio available");
 		}
-		dirList.getItems().clear();
-		writList.getItems().clear();
-		actList.getItems().clear();
-		prodList.getItems().clear();
+		resetCreditTabs();
+		super.setDialogLink(d);	
+		
 		loadTask = new Task<Object>() {
 
 			@Override
@@ -137,6 +139,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 				personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
 				creditSort();
 				setCredits();
+				enableTabs();
 				loadInfo();
 				resizeTiles();
 				overlayPane.setVisible(false);
@@ -148,6 +151,22 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		dLink.show();	
 	}
 	
+	public void resetCreditTabs() {
+		dirFlowPane.getItems().clear();
+		writFlowPane.getItems().clear();
+		actFlowPane.getItems().clear();
+		prodFlowPane.getItems().clear();
+		dirFlowPane.getChildren().clear();
+		writFlowPane.getChildren().clear();
+		actFlowPane.getChildren().clear();
+		prodFlowPane.getChildren().clear();
+		dirScrollPane.setVvalue(0);
+		writScrollPane.setVvalue(0);
+		actScrollPane.setVvalue(0);
+		prodScrollPane.setVvalue(0);
+		bioScrollPane.setVvalue(0);
+	}
+	
 	public void creditSort() {
 		crewCredits = ControllerMaster.userData.getCredits(person.getId()).getCrew();
 		castCredits = ControllerMaster.userData.getCredits(person.getId()).getCast();
@@ -157,33 +176,33 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	}
 	
 	
-	public void addToList(JFXListView<PersonCredit> list, PersonCredit credit) {
-		if (!list.getItems().contains(credit)) {
-			list.getItems().add(credit);
-		}
+	public void addToList(ListFlowPane<CreditCell<PersonCredit>, PersonCredit> listFlowPane, PersonCredit credit) {
+		listFlowPane.addItem(credit);
+		listFlowPane.getChildren().add(new CreditCell<PersonCredit>(credit, listFlowPane));
+		listFlowPane.setPrefHeight(listFlowPane.getChildren().size() * CreditCell.prefCellHeight);
 	}
 	
 	public void enableTabs() {
-		directorTab.setDisable( (dirList.getItems().size() == 0)? true : false);
-		writerTab.setDisable( (writList.getItems().size() == 0)? true : false);
-		producerTab.setDisable( (prodList.getItems().size() == 0)? true : false);
-		actorTab.setDisable( (actList.getItems().size() == 0)? true : false);
+		directorTab.setDisable( (dirFlowPane.getItems().size() == 0)? true : false);
+		writerTab.setDisable( (writFlowPane.getItems().size() == 0)? true : false);
+		actorTab.setDisable( (actFlowPane.getItems().size() == 0)? true : false);
+		producerTab.setDisable( (prodFlowPane.getItems().size() == 0)? true : false);		
 	}
 	
 	public void setCredits() {
 		for (int i = 0; i < crewCredits.size(); i++) {
 			if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Directing")) {
-				addToList(dirList, crewCredits.get(i));
+				addToList(dirFlowPane, crewCredits.get(i));
 			} else if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Writing")) {
-				addToList(writList, crewCredits.get(i));				
+				addToList(writFlowPane, crewCredits.get(i));				
 			}	else if (crewCredits.get(i).getDepartment().equalsIgnoreCase("Production")){
-				addToList(prodList, crewCredits.get(i));
+				addToList(prodFlowPane, crewCredits.get(i));
 			}
 	    }
 		
 		
 		for (int i = 0; i <castCredits.size(); ++i) {
-			addToList(actList, castCredits.get(i));
+			addToList(actFlowPane, castCredits.get(i));
 		}
 		
 		switch (person.getKnownForDepartment()) {
@@ -201,20 +220,6 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			tabPane.getSelectionModel().select(producerTab);
 			break;
 		}
-		Platform.runLater(() -> {
-			if (dirList.getItems().size() != 0) {
-				dirList.scrollTo(0);
-			}
-			if (writList.getItems().size() != 0) {
-				writList.scrollTo(0);
-			}
-			if (actList.getItems().size() != 0) {
-				actList.scrollTo(0);
-			}
-			if (prodList.getItems().size() != 0) {
-				prodList.scrollTo(0);
-			}
-		});
 	}
 	
 	public void loadInfo() {
@@ -310,14 +315,11 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>());
 		}
 		famousTilePane.getChildren().setAll(workingKnownForCollection);
+		famousLabel.setVisible(famousTilePane.getChildren().size()>0);
 	}
 	
 	public void resizeTiles() {
-		//resized tiles to fill the space
-		float scaleWFactor = 0.83f;
-		float scaleHFactor = 0.7f;
-		famousTilePane.setVgap(15*scaleHFactor);
-		famousTilePane.setHgap(10*scaleWFactor);
+		//keep tilepane from getting taller than two rows
 		StackPane n;
 		for (int i = 0; i < famousTilePane.getChildren().size(); ++i) {
 			n = ((JFXMediaRippler)famousTilePane.getChildren().get(i)).getPane();
