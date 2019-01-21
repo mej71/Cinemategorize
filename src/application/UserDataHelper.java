@@ -43,7 +43,6 @@ public class UserDataHelper {
 			cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0],
 					Integer.parseInt(movieParsedInfo[1]));
 			if (cm != null) {
-				System.out.println(cm.getTitle());
 				movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
 				if (movieDistance == cm.getTitle().length()) {
 					movieDistance = 100;

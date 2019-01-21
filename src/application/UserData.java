@@ -522,31 +522,39 @@ public class UserData implements Serializable {
 					e.printStackTrace();
 					startDate = null;
 				}	
-				if (startDate==null || startDate.before(parsedDate)) {
-					if (endDate==null || endDate.after(parsedDate)) {
-						if (mRip.linkedItem.isMovie()) {
-							type = "movie";
-						} else {
-							type = "tv";
+				if (ControllerMaster.mainController.playlistCombo.getValue() == null || userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue()).contains(mRip.linkedItem)) {
+					if (ControllerMaster.mainController.collectionsCombo.getValue() == null || ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue()).contains(mRip.linkedItem)) {
+						if (startDate==null || startDate.before(parsedDate)) {
+							if (endDate==null || endDate.after(parsedDate)) {
+								if (mRip.linkedItem.isMovie()) {
+									type = "movie";
+								} else {
+									type = "tv";
+								}
+								ControllerMaster.mainController.showingMedia.put(type, mRip.linkedItem);
+								workingCollection.add(mRip);
+							}
 						}
-						ControllerMaster.mainController.showingMedia.put(type, mRip.linkedItem);
-						workingCollection.add(mRip);
 					}
 				}
 				
 			} else if ((moviesList == null && tvList == null) || tvList.contains(mRip.linkedItem.getId())){
-				try {
-					parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
-				} catch (ParseException e) {
-					e.printStackTrace();
-					startDate = null;
-				}						
-				if (startDate==null || startDate.before(parsedDate)) {
-					if (endDate==null || endDate.after(parsedDate)) {
-						ControllerMaster.mainController.showingMedia.put("tv", mRip.linkedItem);
-						workingCollection.add(mRip);
+				if (ControllerMaster.mainController.playlistCombo.getValue() == null || userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue()).contains(mRip.linkedItem)) {
+					if (ControllerMaster.mainController.collectionsCombo.getValue() == null || ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue()).contains(mRip.linkedItem)) {
+						try {
+							parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
+						} catch (ParseException e) {
+							e.printStackTrace();
+							startDate = null;
+						}						
+						if (startDate==null || startDate.before(parsedDate)) {
+							if (endDate==null || endDate.after(parsedDate)) {
+								ControllerMaster.mainController.showingMedia.put("tv", mRip.linkedItem);
+								workingCollection.add(mRip);
+							}
+						}	
 					}
-				}	
+				}
 			}
 		}
 		ControllerMaster.mainController.tilePane.getChildren().setAll(workingCollection);

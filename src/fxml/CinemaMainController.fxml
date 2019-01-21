@@ -155,7 +155,7 @@
                </FlowPane>
                <Label text="Filters" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
                   <GridPane.margin>
-                     <Insets left="100.0" top="10.0" />
+                     <Insets left="90.0" top="10.0" />
                   </GridPane.margin>
                </Label>
             </children>
