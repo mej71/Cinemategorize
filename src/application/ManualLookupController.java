@@ -168,11 +168,11 @@ public class ManualLookupController implements Initializable {
 		}
 		
 		if (fileItem.isMovie()) {
-			ControllerMaster.userData.addMovie( fileItem.cMovie, new File(fileItem.fullFilePath) );
+			UserDataHelper.addMovie( fileItem.cMovie, new File(fileItem.fullFilePath) );
 		} else {
 			TvEpisode episode = MediaSearchHandler.getEpisodeInfo(fileItem.getId(), resultItem.getTempSeasonNum(), 
 					resultItem.getTempEpisodeNum());
-			ControllerMaster.userData.addTvShow(fileItem.tvShow, episode, new File(fileItem.fullFilePath));
+			UserDataHelper.addTvShow(fileItem.tvShow, episode, new File(fileItem.fullFilePath));
 		}
 		
 		//cleanup

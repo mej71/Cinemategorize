@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,10 +29,9 @@ import javax.xml.xpath.XPathFactory;
 import org.xml.sax.InputSource;
 
 import info.movito.themoviedbapi.TmdbApi;
-import info.movito.themoviedbapi.TvResultsPage;
+import info.movito.themoviedbapi.model.Collection;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.MovieDb;
-import info.movito.themoviedbapi.model.core.MovieResultsPage;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCredit;
@@ -73,6 +71,7 @@ public class UserData implements Serializable {
 	public LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<Integer, TvSeries>();
 	public LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<Integer, List<PersonCredit>>();
 	public MediaPlaylist userPlaylists = new MediaPlaylist();
+	public LinkedHashMap<Collection, List<MediaItem>> ownedCollections = new LinkedHashMap<Collection, List<MediaItem>>();
 	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<MediaItem, MediaResultsPage>();
 	public int minYear = 0;
 	public int maxYear = 0;
@@ -81,7 +80,6 @@ public class UserData implements Serializable {
 	
 	//get key from api_keys.xml by name
 	public static String getAPIKey(String keyname) {
-	
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		InputSource inputSource;
 		try {
@@ -194,8 +192,8 @@ public class UserData implements Serializable {
 	}
 	
 	public boolean ownsMovie(int iD) {
-		for (int i = 0; i < allMedia.size(); ++i) {
-			if (allMedia.get(i).isMovie() && allMedia.get(i).getId()==iD) {
+		for (int i = 0; i < getAllMedia().size(); ++i) {
+			if (getAllMedia().get(i).isMovie() && getAllMedia().get(i).getId()==iD) {
 				return true;
 			}
 		}
@@ -203,9 +201,9 @@ public class UserData implements Serializable {
 	}
 	
 	public MediaItem getMovieById(int iD) {
-		for (int i = 0; i < allMedia.size(); ++i) {
-			if (allMedia.get(i).isMovie() && allMedia.get(i).getId()==iD) {
-				return allMedia.get(i);
+		for (int i = 0; i < getAllMedia().size(); ++i) {
+			if (getAllMedia().get(i).isMovie() && getAllMedia().get(i).getId()==iD) {
+				return getAllMedia().get(i);
 			}
 		}
 		if (seenMovies.containsKey(iD)) {
@@ -215,18 +213,18 @@ public class UserData implements Serializable {
 	}
 	
 	public boolean ownsShow(int iD) {
-		for (int i = 0; i < allMedia.size(); ++i) {
-			if (allMedia.get(i).isTvShow() && allMedia.get(i).getId()==iD) {
+		for (int i = 0; i < getAllMedia().size(); ++i) {
+			if (getAllMedia().get(i).isTvShow() && getAllMedia().get(i).getId()==iD) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private boolean ownsEpisode(int iD, TvEpisode episode) {
-		for (int i = 0; i < allMedia.size(); ++i) {
-			if (allMedia.get(i).isTvShow() && allMedia.get(i).getId()==iD) {
-				List<TvEpisode> episodes = allMedia.get(i).getEpisodes();
+	public boolean ownsEpisode(int iD, TvEpisode episode) {
+		for (int i = 0; i < getAllMedia().size(); ++i) {
+			if (getAllMedia().get(i).isTvShow() && getAllMedia().get(i).getId()==iD) {
+				List<TvEpisode> episodes = getAllMedia().get(i).getEpisodes();
 				for (TvEpisode ep : episodes) {
 					if (ep.getId() == episode.getId()) {
 						return true;
@@ -238,9 +236,9 @@ public class UserData implements Serializable {
 	}
 	
 	public MediaItem getTvById(int iD) {
-		for (int i = 0; i < allMedia.size(); ++i) {
-			if (allMedia.get(i).isTvShow() && allMedia.get(i).getId()==iD) {
-				return allMedia.get(i);
+		for (int i = 0; i < getAllMedia().size(); ++i) {
+			if (getAllMedia().get(i).isTvShow() && getAllMedia().get(i).getId()==iD) {
+				return getAllMedia().get(i);
 			}
 		}
 		if (seenTv.containsKey(iD)) {
@@ -250,7 +248,7 @@ public class UserData implements Serializable {
 	}
 	
 	public int numMediaItems() {
-		return allMedia.size() + allMedia.size();
+		return getAllMedia().size() + getAllMedia().size();
 	}
 
 	public UserData() {
@@ -289,7 +287,7 @@ public class UserData implements Serializable {
 				UserData tempDat = (UserData)objectInputStream.readObject();
 				objectInputStream.close();
 				inputStream.close();
-				allMedia = tempDat.allMedia;
+				allMedia = tempDat.getAllMedia();
 				movieTags = tempDat.movieTags;
 				directorsMovieList = tempDat.directorsMovieList;
 				writersMovieList = tempDat.writersMovieList;
@@ -310,6 +308,7 @@ public class UserData implements Serializable {
 				minYear = tempDat.minYear;
 				maxYear = tempDat.maxYear;
 				userPlaylists = tempDat.userPlaylists;
+				ownedCollections = tempDat.ownedCollections;
 			} 
 			return;
 		} catch (IOException | ClassNotFoundException e) {
@@ -318,7 +317,7 @@ public class UserData implements Serializable {
 	}
 	
 	public void clearSaveData() {
-		allMedia.clear();
+		getAllMedia().clear();
 		movieTags.clear();
 		directorsMovieList.clear();
 		writersMovieList.clear();
@@ -359,9 +358,9 @@ public class UserData implements Serializable {
 		}
 		userInput = quoteRegExSpecialChars(userInput); // escape special characters so users can search literally
 		Pattern pattern = Pattern.compile("(?i)(^|\\s|\\()" + userInput);
-		for (int i = 0; i < allMedia.size(); ++i) {
-			if (pattern.matcher(allMedia.get(i).getItemName()).find()) {
-				suggestions.add(new SearchItem(allMedia.get(i) ));
+		for (int i = 0; i < getAllMedia().size(); ++i) {
+			if (pattern.matcher(getAllMedia().get(i).getItemName()).find()) {
+				suggestions.add(new SearchItem(getAllMedia().get(i) ));
 			}
 		}
 		for (Genre g : genreMovieList.keySet()) {
@@ -394,237 +393,69 @@ public class UserData implements Serializable {
 
 		return suggestions;
 	}
-
-	public boolean addMovieOrTvShow(File file) {
-		
-		String[] tvParsedInfo = MediaSearchHandler.parseTVShowName(file.getName(), file.getParentFile().getName());
-		if (tvParsedInfo[1].isEmpty()) {
-			tvParsedInfo[1] = "1";
-		}
-		if (tvParsedInfo[2].isEmpty()) {
-			tvParsedInfo[2] = "2";
-		}
-		CustomTvDb series = null;
-		TvEpisode episode = null;
-		TvResultsPage tRes = null;
-		MovieResultsPage mRes = null;
-		Integer tvDistance = 100;
-		series = MediaSearchHandler.getTVInfo(tvParsedInfo[0]);
-		if (series != null) {
-			tvDistance = StringTools.getLevenshteinDistance(series.getName(), tvParsedInfo[0]);
-			if (tvDistance == series.getName().length()) {
-				tvDistance = 100;
-			}
-		}
-		String[] movieParsedInfo = MediaSearchHandler.parseMovieName(file.getName());
-		if (movieParsedInfo[1] == null || movieParsedInfo[1].isEmpty()) {
-			movieParsedInfo[1] = "0";
-		}
-		Integer movieDistance = 100;
-		CustomMovieDb cm = null;
-		if (movieParsedInfo[0] != null && !movieParsedInfo[0].isEmpty()) {
-			cm = MediaSearchHandler.getMovieInfo(movieParsedInfo[0],
-					Integer.parseInt(movieParsedInfo[1]));
-			if (cm != null) {
-				System.out.println(cm.getTitle());
-				movieDistance =  StringTools.getLevenshteinDistance(cm.getTitle(), movieParsedInfo[0]);
-				if (movieDistance == cm.getTitle().length()) {
-					movieDistance = 100;
-				}
-				
-			}
-		}
-		// if both results are really far off, we probably failed
-		if (series == null &&  cm==null) { 		
-			for (MediaItem m: tempManualItems.keySet()) {
-				if (m.fullFilePath.equals(file.getPath())) {
-					return false;
-				}
-			}
-			tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
-			return false;
-		} else if (series != null) {
-			if (cm != null) {
-				if (movieDistance<tvDistance && movieDistance < 3) {
-					addMovie(cm, file);
-					return true;
-				} else if (tvDistance < 3) {
-					episode = MediaSearchHandler.getEpisodeInfo(series.getId(), Integer.parseInt(tvParsedInfo[1]), Integer.parseInt(tvParsedInfo[2]));
-					addTvShow(series, episode, file);
-					return true;
-				} 
-			} else if (tvDistance < 3) {
-				episode = MediaSearchHandler.getEpisodeInfo(series.getId(), Integer.parseInt(tvParsedInfo[1]), Integer.parseInt(tvParsedInfo[2]));
-				addTvShow(series, episode, file);
-				return true;
-			}
-			for (MediaItem m: tempManualItems.keySet()) {
-				if (m.fullFilePath.equals(file.getPath())) {
-					return false;
-				}
-			}
-			tRes = MediaSearchHandler.getTvResults(tvParsedInfo[0]);
-			tempManualItems.put(new MediaItem(series, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(tRes));
-			return false;
-			
-		} else if (cm != null) {
-			if (movieDistance < 3) {
-				addMovie(cm, file);
-				return true;
-			} else {
-				for (MediaItem m: tempManualItems.keySet()) {
-					if (m.fullFilePath.equals(file.getPath())) {
-						return false;
-					}
-				}
-				mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
-						Integer.parseInt(movieParsedInfo[1]));
-				tempManualItems.put(new MediaItem(null, cm, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
-				return false;
-			}
-		}
-		return true;
-	}
 	
-	public void addMovie(CustomMovieDb m, File filePath) {
-		addMedia(null, null, m, filePath);
-	}
-	
-	public void addTvShow(CustomTvDb t, TvEpisode e, File filePath) {
-		addMedia(t, e, null, filePath);
-	}
-
-	public void addMedia(CustomTvDb t, TvEpisode episode, CustomMovieDb m, File file) {
-		boolean isMovie = (m != null)? true : false;
-		MediaItem mi;
-		//ignore duplicates
-		if (isMovie && ControllerMaster.userData.ownsMovie(m.getId())) {
-			return;
-		} else if (!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), episode)) {
-			return;
-		}
-		allPaths.add(file.getPath());
-		if (!isMovie && ControllerMaster.userData.ownsShow(t.getId())) {
-			mi = ControllerMaster.userData.getTvById(t.getId());
-			mi.tvShow.addEpisode(episode);
+	public void addTag(Keyword tag, int mId, boolean isMovie) {
+		if (isMovie) {
+			addTag(movieTags, tag, mId);
 		} else {
-			mi = new MediaItem(t, m, file.getPath(), file.getName(), file.getParentFile().getName());
-			allMedia.add(mi);
-			ControllerMaster.mainController.allTiles.add(ControllerMaster.mainController.addMediaTile(mi));
-		}
-
-		
-		Keyword tag;
-		for (int i = 0; i < mi.getKeywords().size(); ++i) {
-			tag = mi.getKeywords().get(i);
-			if (isMovie) {
-				if (movieTags.containsKey(StringTools.capitalize(tag.getName()))) {
-					movieTags.get(StringTools.capitalize(tag.getName())).add(mi.getId());
-				} else {
-					movieTags.put(StringTools.capitalize(tag.getName()), new ArrayList<>(Arrays.asList(mi.getId())));
-				}
-			} else {
-				if (tvTags.containsKey(StringTools.capitalize(tag.getName()))) {
-					tvTags.get(StringTools.capitalize(tag.getName())).add(mi.getId());
-				} else {
-					tvTags.put(StringTools.capitalize(tag.getName()), new ArrayList<>(Arrays.asList(mi.getId())));
-				}
-			}
-		}
-		if (mi.getCrew() != null) {
-			PersonCrew crew;
-			for (int i = 0; i < mi.getCrew().size(); ++i) {
-				crew = mi.getCrew().get(i);
-				if (crew.getJob().equalsIgnoreCase("Director")) {
-					personList.put(crew.getId(), MediaSearchHandler.getPersonPeople(crew.getId()));
-					if (isMovie) {
-						if (!directorsMovieList.isEmpty() && directorsMovieList.containsKey(crew)) {
-							directorsMovieList.get(crew).add(mi.getId());
-						} else {
-							directorsMovieList.put(crew, new ArrayList<>(Arrays.asList(mi.getId())));
-						}
-					} else {
-						if (!directorsTvList.isEmpty() && directorsMovieList.containsKey(crew)) {
-							directorsTvList.get(crew).add(mi.getId());
-						} else {
-							directorsTvList.put(crew, new ArrayList<>(Arrays.asList(mi.getId())));
-						}
-					}
-				} else if (crew.getJob().equalsIgnoreCase("Screenplay") || crew.getJob().equalsIgnoreCase("Writer") || 
-						crew.getJob().equalsIgnoreCase("Story") || crew.getJob().equalsIgnoreCase("Author")) {
-					personList.put(crew.getId(), MediaSearchHandler.getPersonPeople(crew.getId()));
-					if (isMovie) {
-						if (writersMovieList.containsKey(crew)) {
-							writersMovieList.get(crew).add(m.getId());
-						} else {
-							writersMovieList.put(crew, new ArrayList<>(Arrays.asList(m.getId())));
-						}					
-					} else {
-						if (writersTvList.containsKey(crew)) {
-							writersTvList.get(crew).add(mi.getId());
-						} else {
-							writersTvList.put(crew, new ArrayList<>(Arrays.asList(mi.getId())));
-						}	
-					}
-				}
-			}
-		}
-		if (mi.getCast() != null) {
-			PersonCast actor;
-			for (int i = 0; i<mi.getCast().size() && i<15; ++i) {
-				 actor = mi.getCast().get(i);
-				personList.put(actor.getId(), MediaSearchHandler.getPersonPeople(actor.getId()));
-				if (isMovie) {
-					if (actorsMovieList.containsKey(actor)) {
-						actorsMovieList.get(actor).add(m.getId());
-					} else {
-						actorsMovieList.put(actor, new ArrayList<>(Arrays.asList(m.getId())));
-					}
-				} else {
-					if (actorsTvList.containsKey(actor)) {
-						actorsTvList.get(actor).add(mi.getId());
-					} else {
-						actorsTvList.put(actor, new ArrayList<>(Arrays.asList(mi.getId())));
-					}
-				}
-			}
-		}
-		if (mi.getGenres() != null) {
-			Genre g;
-			for (int i = 0; i < mi.getGenres().size(); ++i) {
-				g = mi.getGenres().get(i);
-				if (isMovie) {
-					if (genreMovieList.containsKey(g)) {
-						genreMovieList.get(g).add(mi.getId());
-					} else {
-						genreMovieList.put(g, new ArrayList<>(Arrays.asList(mi.getId())));
-					}
-				} else {
-					if (genreTvList.containsKey(g)) {
-						genreTvList.get(g).add(mi.getId());
-					} else {
-						genreTvList.put(g, new ArrayList<>(Arrays.asList(mi.getId())));
-					}
-				}
-			}
-		}
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
-		try {
-			Date date = formatter.parse(mi.getReleaseDate());
-			int year = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(date)).getYear();
-			if (minYear == 0 || minYear > year) {
-				minYear = year;
-				ControllerMaster.mainController.fillYearCombos(minYear, maxYear);
-			} 
-			if (maxYear == 0 || maxYear < year) {
-				maxYear = year;
-				ControllerMaster.mainController.fillYearCombos(minYear, maxYear);
-			}
-		} catch (ParseException e) {
-			e.printStackTrace();
+			addTag(tvTags, tag, mId);
 		}
 	}
-
+	
+	private void addTag(TreeMap<String, List<Integer>> tagList, Keyword tag, int mId) {
+		if (tagList.containsKey(StringTools.capitalize(tag.getName()))) {
+			tagList.get(StringTools.capitalize(tag.getName())).add(mId);
+		} else {
+			tagList.put(StringTools.capitalize(tag.getName()), new ArrayList<>(Arrays.asList(mId)));
+		}
+	}
+	
+	public void addPerson(PersonCast p, int mId, boolean isMovie) {
+		if (!personList.containsKey(p.getId())) {
+			personList.put(p.getId(), MediaSearchHandler.getPersonPeople(p.getId()));
+		}
+		if (isMovie) {
+			addToList(actorsMovieList, p, mId);
+		} else {
+			addToList(actorsTvList, p, mId);
+		}
+	}
+	
+	public void addPerson(PersonCrew p, int mId, boolean isMovie) {
+		if (!personList.containsKey(p.getId())) {
+			personList.put(p.getId(), MediaSearchHandler.getPersonPeople(p.getId()));
+		}
+		if (p.getJob().equalsIgnoreCase("Director")) {
+			if (isMovie) {
+				addToList(directorsMovieList, p, mId);
+			} else {
+				addToList(directorsTvList, p, mId);
+			}
+		} else if (p.getJob().equalsIgnoreCase("Screenplay") || p.getJob().equalsIgnoreCase("Writer") || 
+				p.getJob().equalsIgnoreCase("Story") || p.getJob().equalsIgnoreCase("Author")) {
+			if (isMovie) {
+				addToList(writersMovieList, p, mId);
+			} else {
+				addToList(writersTvList, p, mId);
+			}
+		}
+	}
+	
+	public void addGenre(Genre g, int mId, boolean isMovie) {
+		if (isMovie) {
+			addToList(genreMovieList, g, mId);
+		} else {
+			addToList(genreTvList, g, mId);
+		}
+	}
+	
+	public <T> void addToList(LinkedHashMap<T, List<Integer>> list, T g, int mId) {
+		if (list.containsKey(g)) {
+			list.get(g).add(mId);
+		} else {
+			list.put(g, new ArrayList<>(Arrays.asList(mId)));
+		}
+	}
 
 	public void removeMovie(MovieDb m) {
 
@@ -732,15 +563,20 @@ public class UserData implements Serializable {
 		}
 	}
 	
-	public void createAllRipplers() {
-		for (int i = 0; i < allMedia.size(); ++i) {
-			ControllerMaster.mainController.allTiles.add(ControllerMaster.mainController.addMediaTile(allMedia.get(i)));
-		}
-	}
+	
 	
 	//check if file has already been added.  Used to avoid unnecessary lookups
 	public boolean hasPath(String path) {
 		return allPaths.contains(path);
+	}
+	
+	public void addPath(String path) {
+		allPaths.add(path);
+	}
+
+
+	public List<MediaItem> getAllMedia() {
+		return allMedia;
 	}
 	
 

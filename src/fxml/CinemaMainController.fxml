@@ -147,7 +147,7 @@
                            <Insets left="15.0" />
                         </FlowPane.margin>
                      </JFXComboBox>
-                     <JFXButton fx:id="collectionsClearButton" onAction="#clearPlaylistSelection" styleClass="clear-button" visible="false" />
+                     <JFXButton fx:id="collectionsClearButton" onAction="#clearCollectionSelection" styleClass="clear-button" visible="false" />
                   </children>
                   <GridPane.margin>
                      <Insets bottom="5.0" />

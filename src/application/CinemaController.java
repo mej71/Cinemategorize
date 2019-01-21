@@ -16,6 +16,7 @@ import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 
+import info.movito.themoviedbapi.model.Collection;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -37,6 +38,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 
 public class CinemaController implements Initializable {
 
@@ -61,7 +63,7 @@ public class CinemaController implements Initializable {
 	@FXML JFXComboBox<Integer> startYearComboBox;
 	@FXML JFXComboBox<Integer> endYearComboBox;
 	@FXML JFXComboBox<String> playlistCombo;
-	@FXML JFXComboBox<String> collectionsCombo;
+	@FXML JFXComboBox<Collection> collectionsCombo;
 	
 	// local content initialized outside of the fxml
 	TilePane tilePane;
@@ -106,7 +108,7 @@ public class CinemaController implements Initializable {
 			
 		});
 		
-		playlistCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists.getPlaylistNames()));
+		updatePlaylistCombo();
 		playlistCombo.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
 
 			@Override
@@ -115,7 +117,6 @@ public class CinemaController implements Initializable {
 			}
 			
 		});
-		//date range validation
 		playlistCombo.valueProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -131,6 +132,44 @@ public class CinemaController implements Initializable {
 					ControllerMaster.userData.refreshViewingList(null, false);
 				}
 			}
+		});
+		
+		updateCollectionCombo();
+		collectionsCombo.setCellFactory(new Callback<ListView<Collection>, ListCell<Collection>>() {
+			@Override
+			public CollectionCell<Collection> call(ListView<Collection> param) {
+				return new CollectionCell();
+			}
+			
+		});
+		collectionsCombo.valueProperty().addListener(new ChangeListener<Collection>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Collection> observable, Collection oldValue, Collection newValue) {
+				if (newValue!=null) {
+					collectionsClearButton.setVisible(true);
+	            } else {
+	            	collectionsClearButton.setVisible(false);
+	            }
+				if (autoEvent!=null) {
+	            	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
+				} else {
+					ControllerMaster.userData.refreshViewingList(null, false);
+				}
+			}
+		});
+		collectionsCombo.setConverter(new StringConverter<Collection>() {
+
+			@Override
+			public String toString(Collection object) {
+				return object.getName();
+			}
+
+			@Override
+			public Collection fromString(String string) {
+				return null;
+			}
+			
 		});
 
 		// create tilepane and add to the scene
@@ -267,7 +306,7 @@ public class CinemaController implements Initializable {
 			e.printStackTrace();
 		}
 
-		ControllerMaster.userData.createAllRipplers();
+		createAllRipplers();
 		ControllerMaster.userData.refreshViewingList(null, false);
 	    scaleSlider.setValue(ControllerMaster.userData.getScaleFactor()*4);
 		determinePrimaryStage();	
@@ -297,6 +336,11 @@ public class CinemaController implements Initializable {
 		
 	}
 	
+	@FXML private void clearCollectionSelection() {
+		collectionsCombo.getSelectionModel().clearSelection();
+		mainGrid.requestFocus();
+	}
+	
 	public void fillYearCombos(int minYear, int maxYear) {
 		startYearComboBox.setItems(
 				FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
@@ -305,6 +349,14 @@ public class CinemaController implements Initializable {
 	    		FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
 	    ); 
 	}
+	
+	public void updatePlaylistCombo() {
+		playlistCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists.getPlaylistNames()));
+	}
+	
+	public void updateCollectionCombo() {
+		collectionsCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.ownedCollections.keySet()));
+	}	
 
 	//make sure everything is loaded, then if the media list is empty force the player to add at least one item
 	private void determinePrimaryStage() {
@@ -374,12 +426,18 @@ public class CinemaController implements Initializable {
 		rippler.setItem(mediaObject);
 		return rippler;
 	}
+	
+	public void createAllRipplers() {
+		for (int i = 0; i < ControllerMaster.userData.getAllMedia().size(); ++i) {
+			allTiles.add(ControllerMaster.mainController.addMediaTile(ControllerMaster.userData.getAllMedia().get(i)));
+		}
+	}
 
 	public StackPane getBackgroundStackPane() {
 		return backgroundStackPane;
 	}
 
-
+	
 	
 	public enum SortTypes {
 		NAME_ASC("Name (Asc)"),

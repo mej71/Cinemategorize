@@ -94,7 +94,7 @@ public class AddMediaDialogController implements Initializable {
 		            	}
 		            	for (int j = 0; j < extFilter.getExtensions().size(); ++j) {
 		            		if (file.getName().endsWith(extFilter.getExtensions().get(j).substring(1))) { //substring to get rid of the *
-		            			if (ControllerMaster.userData.addMovieOrTvShow(file)) {
+		            			if (UserDataHelper.addMovieOrTvShow(file)) {
 		            				++addedFiles;
 		            			} else {
 		            				++failedFiles;
@@ -176,7 +176,7 @@ public class AddMediaDialogController implements Initializable {
 		            	}
 		            	for (int i = 0; i < extFilter.getExtensions().size(); ++i) {            		
 		            		if (file.getName().endsWith(extFilter.getExtensions().get(i).substring(1))) { //substring to get rid of the *
-		            			if (ControllerMaster.userData.addMovieOrTvShow(file)) {
+		            			if (UserDataHelper.addMovieOrTvShow(file)) {
 		            				++addedFiles;
 		            			} else {
 		            				++failedFiles;
