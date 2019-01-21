@@ -50,10 +50,22 @@
     -jfx-label-float: true;
 }
 
-.clearTextField {
-	-fx-font-size: 9px;
-	-fx-min-width: 12px;
-	-fx-min-height: 12px;
+.clear-button {
+	-fx-pref-width: 18px;
+	-fx-max-width: 18px;
+	-fx-background-image: url('clear.png');
+	-fx-background-size: 10px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+.add-button {
+	-fx-pref-width: 18px;
+	-fx-max-width: 18px;
+	-fx-background-image: url('plus.png');
+	-fx-background-size: 10px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
 }
 
 .jfx-button {

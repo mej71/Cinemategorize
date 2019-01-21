@@ -72,6 +72,7 @@ public class UserData implements Serializable {
 	public LinkedHashMap<Integer, MovieDb> seenMovies = new LinkedHashMap<Integer, MovieDb>();
 	public LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<Integer, TvSeries>();
 	public LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<Integer, List<PersonCredit>>();
+	public MediaPlaylist userPlaylists = new MediaPlaylist();
 	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<MediaItem, MediaResultsPage>();
 	public int minYear = 0;
 	public int maxYear = 0;
@@ -308,6 +309,7 @@ public class UserData implements Serializable {
 				knownFor = tempDat.knownFor;
 				minYear = tempDat.minYear;
 				maxYear = tempDat.maxYear;
+				userPlaylists = tempDat.userPlaylists;
 			} 
 			return;
 		} catch (IOException | ClassNotFoundException e) {
@@ -336,6 +338,7 @@ public class UserData implements Serializable {
 		knownFor.clear();
 		minYear = 0;
 		maxYear = 0;
+		userPlaylists.clear();
 	}	
 	
 	final String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
@@ -343,10 +346,9 @@ public class UserData implements Serializable {
 	final Pattern reCharsREP = Pattern.compile( "[" + regExSpecialCharsRE + "]");
 
 	//escape all special characters in strings for use with regex
-	String quoteRegExSpecialChars( String s)
-	{
-	    Matcher m = reCharsREP.matcher( s);
-	    return m.replaceAll( "\\\\$0");
+	String quoteRegExSpecialChars(String s) {
+	    Matcher m = reCharsREP.matcher(s);
+	    return m.replaceAll("\\\\$0");
 	}
 
 	public ObservableList<SearchItem> getAutoCompleteItems(String userInput) {

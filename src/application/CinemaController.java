@@ -25,6 +25,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -34,6 +36,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Window;
+import javafx.util.Callback;
 
 public class CinemaController implements Initializable {
 
@@ -51,9 +54,14 @@ public class CinemaController implements Initializable {
 	@FXML private JFXButton textClearButton;
 	@FXML private JFXButton startDateClearButton;
 	@FXML private JFXButton endDateClearButton;
+	@FXML private JFXButton playlistClearButton;
+	@FXML private JFXButton playlistAddButton;
+	@FXML private JFXButton collectionsClearButton;
 
 	@FXML JFXComboBox<Integer> startYearComboBox;
 	@FXML JFXComboBox<Integer> endYearComboBox;
+	@FXML JFXComboBox<String> playlistCombo;
+	@FXML JFXComboBox<String> collectionsCombo;
 	
 	// local content initialized outside of the fxml
 	TilePane tilePane;
@@ -98,6 +106,32 @@ public class CinemaController implements Initializable {
 			
 		});
 		
+		playlistCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists.getPlaylistNames()));
+		playlistCombo.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+
+			@Override
+			public PlaylistCell<String> call(ListView<String> param) {
+				return new PlaylistCell();
+			}
+			
+		});
+		//date range validation
+		playlistCombo.valueProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (newValue!=null) {
+					playlistClearButton.setVisible(true);
+	            } else {
+	            	playlistClearButton.setVisible(false);
+	            }
+				if (autoEvent!=null) {
+	            	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
+				} else {
+					ControllerMaster.userData.refreshViewingList(null, false);
+				}
+			}
+		});
 
 		// create tilepane and add to the scene
 		tilePane = new TilePane();
@@ -174,7 +208,7 @@ public class CinemaController implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Integer> ov, Integer oldValue, Integer newValue) {
 				if (newValue!=null) {
-	            	if (endYearComboBox.getValue() != null  && newValue >= endYearComboBox.getValue()) {
+	            	if (endYearComboBox.getValue() != null  && newValue > endYearComboBox.getValue()) {
 	            		endYearComboBox.getSelectionModel().clearSelection();
 	            	}
 	            	startDateClearButton.setVisible(true);
@@ -193,7 +227,7 @@ public class CinemaController implements Initializable {
  			@Override
  			public void changed(ObservableValue<? extends Integer> ov, Integer oldValue, Integer newValue) {
  				if (newValue!=null) {
- 	            	if (startYearComboBox.getValue()!=null && newValue <= startYearComboBox.getValue()) {
+ 	            	if (startYearComboBox.getValue()!=null && newValue < startYearComboBox.getValue()) {
  	            		startYearComboBox.getSelectionModel().clearSelection();
  	            	}
  	            	endDateClearButton.setVisible(true);
@@ -252,6 +286,15 @@ public class CinemaController implements Initializable {
 	@FXML private void clearEndDate() {
 		endYearComboBox.getSelectionModel().clearSelection();
 		mainGrid.requestFocus();
+	}
+	
+	@FXML private void clearPlaylistSelection() {
+		playlistCombo.getSelectionModel().clearSelection();
+		mainGrid.requestFocus();
+	}
+	
+	@FXML private void addPlaylist() {
+		
 	}
 	
 	public void fillYearCombos(int minYear, int maxYear) {
