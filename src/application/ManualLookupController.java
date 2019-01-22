@@ -15,9 +15,11 @@ import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.validation.RequiredFieldValidator;
 
 import info.movito.themoviedbapi.model.tv.TvEpisode;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -26,7 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 
 
-public class ManualLookupController implements Initializable {
+public class ManualLookupController extends LoadingControllerBase implements Initializable {
 	
 	@FXML private JFXButton confirmButton;
 	@FXML private JFXButton searchButton;
@@ -38,15 +40,13 @@ public class ManualLookupController implements Initializable {
 	@FXML private ScrollPane resultsScrollPane;
 	@FXML private ListFlowPane<ResultCell<ResultsMediaItem>, ResultsMediaItem> resultsFlowPane;
 	
-	
-	private JFXDialog dialogLink;
 	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
+	private Task<Object> searchTask;
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		mediaTypeComboBox.setItems( FXCollections.observableArrayList( MediaTypeOptions.values()));
 		mediaTypeComboBox.setValue(MediaTypeOptions.MOVIE);
-		//init columns info
 		
 		fileFlowPane.hasChanged.addListener(new ChangeListener<Boolean>() {
 
@@ -91,14 +91,15 @@ public class ManualLookupController implements Initializable {
 		fileFlowPane.selectCell((FileCell<MediaItem>)fileFlowPane.getChildren().get(0));
 	}
 	
-	public void resetValidations() {
-		titleField.resetValidation();
+	@Override 
+	protected void runTasks() {
+		super.runTasks();
+		resetValidations();
 	}
 
 	public void openDialog(JFXDialog dLink) {
-		resetValidations();
-		dialogLink = dLink;
-		dialogLink.setOnDialogClosed(new EventHandler<JFXDialogEvent>() {
+		setDialogLink(dLink, false);	
+		dLink.setOnDialogClosed(new EventHandler<JFXDialogEvent>() {
 
 			@Override
 			public void handle(JFXDialogEvent event) {
@@ -108,7 +109,12 @@ public class ManualLookupController implements Initializable {
 			}
 			
 		});
-		dialogLink.show();  
+		dLink.show();  
+		
+	}
+	
+	public void resetValidations() {
+		//titleField.resetValidation();
 	}
 	
 	enum MediaTypeOptions {
@@ -129,7 +135,18 @@ public class ManualLookupController implements Initializable {
 	
 	public void confirmMediaItem() {
 		JFXDialogLayout confirmLayout = new JFXDialogLayout();
-		confirmLayout.setBody(new Label("Are you sure this is the right choice?"));
+		String releaseDate = "";
+    	if (resultsFlowPane.selectedCell.getItem().getReleaseDate() != null && resultsFlowPane.selectedCell.getItem().getReleaseDate().length()>3) {
+    		releaseDate = " (" + resultsFlowPane.selectedCell.getItem().getReleaseDate().substring(0, 4) + ")";
+    	} else {
+    		releaseDate += " (N/A)";
+		}
+		String text = "The file\n" + fileFlowPane.selectedCell.getItem().getFullFilePath() + "\nis " + 
+				resultsFlowPane.selectedCell.getItem().getTitle() + releaseDate;
+		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
+			text += "Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
+		} 
+		confirmLayout.setBody(new Label(text + "?"));
 		JFXDialog confirmDialog = new JFXDialog();
 		confirmDialog.setDialogContainer(ControllerMaster.mainController.getBackgroundStackPane());
 		confirmDialog.setContent(confirmLayout);
@@ -193,15 +210,31 @@ public class ManualLookupController implements Initializable {
 		
 		//close manual dialog if empty
 		if (fileFlowPane.getChildren().size()==0) {
-			dialogLink.close();
+			dLink.close();
 		} else {
 			fileFlowPane.selectedCell = (FileCell<MediaItem>)fileFlowPane.getChildren().get(0);
 			fileFlowPane.setChanged(true);
 		}
 	}
 	
-	@FXML
-	public void searchSuggestion() {
+	@FXML public void searchSuggestion() {
+		showLoadingPane();
+		searchTask = new Task<Object>() {
+
+			@Override
+			protected Object call() throws Exception {
+				searchSuggestionLookup();
+				succeeded();
+				return null;
+			}
+		};
+		searchTask.setOnSucceeded(e -> {
+			successTasks();
+		});
+		searchTask.run();
+	}
+	
+	private void searchSuggestionLookup() {
 		MediaResultsPage mRes = null;
 		String title = titleField.getText();
 		int year = (yearField.getText().isEmpty())? 0 : Integer.parseInt(yearField.getText());
@@ -215,8 +248,12 @@ public class ManualLookupController implements Initializable {
 			mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(title));
 		}
 		mediaList.get(fileFlowPane.selectedCell.getItem()).setResults(mRes);
-		resultsFlowPane.getChildren().clear();
-		resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));
-		resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
+		System.out.println("C");
+		Platform.runLater(() -> {
+			resultsFlowPane.getChildren().clear();
+			resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));
+			resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
+		});;
+		
 	}
 }

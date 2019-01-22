@@ -89,7 +89,13 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 			gridPane.setMaxHeight(prefCellHeight);
 			gridPane.prefWidthProperty().bind(getPane().widthProperty());
 			gridPane.maxWidthProperty().bind(getPane().widthProperty());
-			titleLabel.setText(getItem().getTitle());
+			String releaseDate = "";
+	    	if (item.getReleaseDate() != null && item.getReleaseDate().length()>3) {
+	    		releaseDate = " (" + item.getReleaseDate().substring(0, 4) + ")";
+	    	} else {
+	    		releaseDate = " (N/A)";
+			}
+			titleLabel.setText(getItem().getTitle() + releaseDate);
 			episodeBox.setVisible(false);
 			if (getItem().isTvShow()) {
 				seasonBox.setItems(
@@ -156,6 +162,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	}
 	
 	//must be overriden in child classes
+	@SuppressWarnings("unchecked")
 	@Override
 	protected HBox getGraphic() {
 		return super.getGraphic();
@@ -183,6 +190,14 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 			cells.add(new ResultCell<T>(result, pane));
 		}
 		return cells;
+	}
+	
+	public int getSeason() {
+		return seasonBox.getValue();
+	}
+	
+	public int getEpisode() {
+		return episodeBox.getValue();
 	}
 
 

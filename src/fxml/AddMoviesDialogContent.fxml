@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<JFXDialogLayout fx:id="dialogLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.161" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddMediaDialogController">
+<JFXDialogLayout fx:id="dialogLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.AddMediaDialogController">
    <children>
       <GridPane fx:id="dialogGridPane" translateY="-50.0">
          <columnConstraints>
@@ -26,16 +26,16 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label fx:id="welcomeLabel" alignment="CENTER" lineSpacing="1.0" prefWidth="264.0" text="Hello, new movie watcher!&#10;This is your first time using Cinemategorize, so you'll need to add at least one file or folder." textAlignment="CENTER" textOverrun="CLIP" wrapText="true" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
+            <Label fx:id="welcomeLabel" alignment="CENTER" focusTraversable="false" lineSpacing="1.0" prefWidth="264.0" text="Hello, new movie watcher!&#10;This is your first time using Cinemategorize, so you'll need to add at least one file or folder." textAlignment="CENTER" textOverrun="CLIP" wrapText="true" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
             <JFXButton fx:id="chooseFileButton" alignment="CENTER" onAction="#chooseFile" text="Choose Files" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
             <JFXButton fx:id="chooseFolderButton" onAction="#chooseFolder" text="Choose Folders" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
-            <Label fx:id="orLabel" text="or" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-            <Label fx:id="cancelLabel" text="Sorry, you must select at least one to use this program.&#10;Please add at least one file or folder" textAlignment="CENTER" visible="false" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
-            <Label fx:id="directoryEmptyLabel" alignment="CENTER" layoutX="128.0" layoutY="29.0" lineSpacing="1.0" prefWidth="264.0" text="Directory must contain at least one file with the following extensions:" textAlignment="CENTER" textOverrun="CLIP" visible="false" wrapText="true" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
-            <Label fx:id="addLabel" alignment="CENTER" lineSpacing="1.0" prefWidth="264.0" text="Add a new movie(s) from where?" textAlignment="CENTER" textOverrun="CLIP" visible="false" wrapText="true" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
-            <JFXProgressBar fx:id="progressBar" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="300.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-            <Label fx:id="progressLabel" alignment="CENTER" maxWidth="150.0" text="Label" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
-            <Label fx:id="searchingLabel" alignment="CENTER" text="Adding your movies/show!&#10;This may take a while for large quantitites" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="2" GridPane.valignment="CENTER" />
+            <Label fx:id="orLabel" focusTraversable="false" text="or" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+            <Label fx:id="cancelLabel" focusTraversable="false" text="Sorry, you must select at least one to use this program.&#10;Please add at least one file or folder" textAlignment="CENTER" visible="false" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
+            <Label fx:id="directoryEmptyLabel" alignment="CENTER" focusTraversable="false" layoutX="128.0" layoutY="29.0" lineSpacing="1.0" prefWidth="264.0" text="Directory must contain at least one file with the following extensions:" textAlignment="CENTER" textOverrun="CLIP" visible="false" wrapText="true" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
+            <Label fx:id="addLabel" alignment="CENTER" focusTraversable="false" lineSpacing="1.0" prefWidth="264.0" text="Add a new movie(s) from where?" textAlignment="CENTER" textOverrun="CLIP" visible="false" wrapText="true" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
+            <JFXProgressBar fx:id="progressBar" focusTraversable="false" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="300.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+            <Label fx:id="progressLabel" alignment="CENTER" focusTraversable="false" maxWidth="150.0" text="Label" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="BOTTOM" />
+            <Label fx:id="searchingLabel" alignment="CENTER" focusTraversable="false" text="Adding your movies/show!&#10;This may take a while for large quantitites" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="2" GridPane.valignment="CENTER" />
          </children>
       </GridPane>
    </children>

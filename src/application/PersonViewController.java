@@ -20,7 +20,6 @@ import info.movito.themoviedbapi.model.people.PersonCredit;
 import info.movito.themoviedbapi.model.people.PersonPeople;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -131,24 +130,18 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		}
 		resetCreditTabs();
 		super.setDialogLink(d);	
-		
-		loadTask = new Task<Object>() {
-
-			@Override
-			protected Object call() throws Exception {
-				personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
-				creditSort();
-				setCredits();
-				enableTabs();
-				loadInfo();
-				resizeTiles();
-				overlayPane.setVisible(false);
-				overlayPane.setDisable(true);
-				return null;
-			}
-		};
-		
 		dLink.show();	
+	}
+	
+	@Override
+	protected void runTasks() {
+		super.runTasks();
+		personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
+		creditSort();
+		setCredits();
+		enableTabs();
+		loadInfo();
+		resizeTiles();
 	}
 	
 	public void resetCreditTabs() {

@@ -111,12 +111,11 @@ public class UserDataHelper {
 	}
 
 	public static void addMedia(CustomTvDb t, TvEpisode episode, CustomMovieDb m, File file) {
-		boolean isMovie = (m != null)? true : false;
+		boolean isMovie = (m != null);
 		MediaItem mi;
 		//ignore duplicates
-		if (isMovie && ControllerMaster.userData.ownsMovie(m.getId())) {
-			return;
-		} else if (!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), episode)) {
+		if (isMovie && ControllerMaster.userData.ownsMovie(m.getId()) ||
+				!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), episode)) {
 			return;
 		}
 		ControllerMaster.userData.addPath(file.getPath());

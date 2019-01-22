@@ -37,13 +37,29 @@ public class LoadingControllerBase implements Initializable {
 		setDialogLink(dLink, true);
 	}
 	
+	protected void showLoadingPane() {
+		overlayPane.setDisable(false);
+		overlayPane.setVisible(true);
+		progressSpinner.setProgress(JFXSpinner.INDETERMINATE_PROGRESS);
+	}
+	
 	protected void setDialogLink(JFXDialog dLink, boolean needsLoad) {
 		this.dLink = dLink;
 		if (needsLoad) {
-			overlayPane.setDisable(false);
-			overlayPane.setVisible(true);
-			progressSpinner.setProgress(JFXSpinner.INDETERMINATE_PROGRESS);
+			showLoadingPane();
 		}
+		loadTask = new Task<Object>() {
+
+			@Override
+			protected Object call() throws Exception {
+				runTasks();
+				succeeded();
+				return null;
+			}
+		};
+		loadTask.setOnSucceeded(e -> {
+			successTasks();
+		});
 		this.dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
 
 			@Override
@@ -71,9 +87,7 @@ public class LoadingControllerBase implements Initializable {
 	private EventHandler<KeyEvent> keyListener = (event -> {
 	    if (event.getCode().equals(KeyCode.ESCAPE)) {
 	    	this.dLink.close();
-	    }
-	    event.consume();
-	    
+	    }	    
 	});
 	
 	private void addKeyListener(Scene scene) {
@@ -81,5 +95,12 @@ public class LoadingControllerBase implements Initializable {
 			scene.removeEventFilter(KeyEvent.KEY_PRESSED, keyListener);
 			scene.addEventFilter(KeyEvent.KEY_PRESSED, keyListener);
         }
+	}
+	
+	protected void runTasks() {}
+	
+	protected void successTasks() {
+		overlayPane.setVisible(false);
+		overlayPane.setDisable(true);
 	}
 }

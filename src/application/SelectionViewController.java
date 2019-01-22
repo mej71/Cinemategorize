@@ -20,7 +20,6 @@ import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -142,23 +141,21 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				e.printStackTrace();
 			}
 		}
-		loadTask = new Task<Object>() {
-
-			@Override
-			protected Object call() throws Exception {
-				fillMainInfo();
-				fillInfo();	
-				succeeded();
-				return null;
-			}
-		};
-		loadTask.setOnSucceeded(e -> {
-			fillControlls();
-			overlayPane.setVisible(false);
-			overlayPane.setDisable(true);
-			mediaItem.setLoaded();
-		});
-		dLink.show();	
+		dLink.show();
+	}
+	
+	@Override
+	protected void runTasks() {
+		super.runTasks();
+		fillMainInfo();
+		fillInfo();	
+	}
+	
+	@Override
+	protected void successTasks() {
+		super.successTasks();
+		fillControlls();
+		mediaItem.setLoaded();
 	}
 	
 	public void fillControlls() {
@@ -179,9 +176,11 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		infoScrollPane.setVvalue(0);
 		String releaseDate = "";
     	if (mediaItem.getReleaseDate() != null && mediaItem.getReleaseDate().length()>3) {
-    		releaseDate = mediaItem.getReleaseDate().substring(0, 4);
-    	}
-		movieTitleLabel.setText(mediaItem.getTitle()+ " (" + releaseDate +")");
+    		releaseDate = " (" + mediaItem.getReleaseDate().substring(0, 4) + ")";
+    	} else {
+    		releaseDate = " (N/A)";
+		}
+		movieTitleLabel.setText(mediaItem.getTitle()+ releaseDate);
 		genreLabel.setText( (mediaItem.getGenres().size()>1)? "Genres:" : "Genre:" );
 		genreFlowPane.getChildren().clear();
 		for (int i = 0; i < mediaItem.getGenres().size(); ++i) {

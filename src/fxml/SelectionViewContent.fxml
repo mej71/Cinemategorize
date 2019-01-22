@@ -23,8 +23,8 @@
       <ColumnConstraints percentWidth="10.0" />
       <ColumnConstraints percentWidth="12.0" />
       <ColumnConstraints percentWidth="26.0" />
-      <ColumnConstraints percentWidth="14.0" />
-      <ColumnConstraints percentWidth="18.0" />
+      <ColumnConstraints percentWidth="12.0" />
+      <ColumnConstraints percentWidth="20.0" />
    </columnConstraints>
    <rowConstraints>
       <RowConstraints percentHeight="20.0" />
@@ -152,10 +152,10 @@
       </ScrollPane>
       <Label fx:id="runTimeLabel" text="Label" GridPane.columnIndex="4" GridPane.rowIndex="5">
          <GridPane.margin>
-            <Insets bottom="10.0" left="25.0" />
+            <Insets bottom="12.0" left="20.0" />
          </GridPane.margin>
       </Label>
-      <Rating fx:id="rating" partialRating="true" rating="2.5" GridPane.columnIndex="5" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+      <Rating fx:id="rating" partialRating="true" rating="2.5" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
@@ -165,21 +165,18 @@
       </Rating>
       <Label text="Rating: " GridPane.columnIndex="4" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
          <GridPane.margin>
-            <Insets bottom="5.0" left="25.0" />
+            <Insets bottom="7.0" left="20.0" />
          </GridPane.margin>
       </Label>
       <Label fx:id="ratingLabel" minHeight="-Infinity" prefHeight="15.0" styleClass="rating-label" text="Label" GridPane.columnIndex="4" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
          <GridPane.margin>
-            <Insets bottom="5.0" left="70.0" />
+            <Insets bottom="7.0" left="65.0" />
          </GridPane.margin>
       </Label>
-      <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="6">
+      <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="2147483647" GridPane.rowSpan="6">
          <children>
             <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />
          </children>
       </StackPane>      
    </children>
-   <padding>
-      <Insets right="20.0" />
-   </padding>
 </GridPane>
