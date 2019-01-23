@@ -21,10 +21,6 @@
 	-fx-font-smoothing-type: lcd;
 }
 
-.label:focused {
-    -fx-background-color: transparent ;
-    -fx-background-insets: 0;
-}
 
 .text-desc {
 	-fx-fill: #63bdff;
@@ -105,8 +101,8 @@
  *                                                                             *
  ******************************************************************************/
 .jfx-dialog-overlay-pane > StackPane{
-    -fx-background-color: rgba(16, 62, 80, 0.9);
-    -fx-border-color: rgba(137, 196, 244, 0.9);
+    -fx-background-color: #103e50;
+    -fx-border-color: #89c4f4;
     -fx-border-radius: 10 10 10 10;
  	-fx-background-radius: 10 10 10 10;
 }
@@ -131,7 +127,7 @@
  
  
  .scroll-pane {
- 	-fx-background-color: rgba(16, 62, 80, 0.9);
+ 	-fx-background-color: #103e50;
  	-fx-background-radius: 10px;
  }
 
@@ -184,7 +180,7 @@
 }
  
 .list-view {
-    -fx-background-color: rgba(0.8, 15.3, 20.8, 0.8);
+    -fx-background-color: #010f15;
     -fx-background-radius: 5px;
 }
 
@@ -253,6 +249,7 @@
 .jfx-combo-box .list-cell{
 	-fx-text-fill: #63bdff;
 	-fx-background-color: #010f15;
+	-fx-cursor: hand;
 }
 
 .combo-box-popup .list-view .list-cell:selected {
@@ -461,7 +458,7 @@
 }
 
 .jfx-tab-pane .tab:disabled {
-    -fx-background-color: rgb(0.8, 15.3, 20.8);
+    -fx-background-color: #010f15;
     -fx-cursor: default;
 }
 
@@ -470,7 +467,7 @@
 }
 
 #overlayPane {
-	-fx-background-color: rgba(0.8, 15.3, 20.8, 0.7);
+	-fx-background-color: #010f15;
 	-fx-background-radius: 10px;
 }
 

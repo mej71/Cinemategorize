@@ -106,7 +106,6 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			knownForRipplers.add(mRip);
 		}
 		personImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
-		bioScrollPane.maxHeightProperty().bind(mainGrid.heightProperty().multiply(0.35));
 		dirFlowPane.bindWidthToNode(dirScrollPane);
 		writFlowPane.bindWidthToNode(writScrollPane);
 		actFlowPane.bindWidthToNode(actScrollPane);

@@ -253,7 +253,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 			resultsFlowPane.getChildren().clear();
 			resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));
 			resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
-		});;
+		});
 		
 	}
 }

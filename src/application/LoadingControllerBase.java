@@ -33,14 +33,14 @@ public class LoadingControllerBase implements Initializable {
 		overlayPane.prefWidthProperty().bind(mainGrid.widthProperty());		
 	}
 	
-	protected void setDialogLink(JFXDialog dLink) {
-		setDialogLink(dLink, true);
-	}
-	
 	protected void showLoadingPane() {
 		overlayPane.setDisable(false);
 		overlayPane.setVisible(true);
 		progressSpinner.setProgress(JFXSpinner.INDETERMINATE_PROGRESS);
+	}
+	
+	protected void setDialogLink(JFXDialog dLink) {
+		setDialogLink(dLink, true);
 	}
 	
 	protected void setDialogLink(JFXDialog dLink, boolean needsLoad) {
