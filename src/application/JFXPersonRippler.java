@@ -10,7 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Paint;
 
 public class JFXPersonRippler<T extends Person> extends JFXRippler { 
@@ -35,20 +35,16 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 	}
 	
 	public static JFXPersonRippler<?> createBasicRippler() {
-		StackPane paneChild = new StackPane();	
-		paneChild.setPrefWidth(150);
+		HBox paneChild = new HBox();	
+		paneChild.setAlignment(Pos.CENTER_LEFT);
+		paneChild.setSpacing(5);
 		ImageView iView = new ImageView();
-		paneChild.getChildren().add(iView);
-		iView.setFitWidth(47);
+		iView.setFitWidth(45);
 		iView.setFitHeight(70);
-		
+		paneChild.getChildren().add(iView);
 		Label reference = new Label();
-		reference.setMaxWidth(90);
 		reference.getStyleClass().add("person_label");
 		paneChild.getChildren().add(reference);
-		
-		StackPane.setAlignment(reference, Pos.BOTTOM_CENTER);
-		StackPane.setAlignment(iView, Pos.TOP_LEFT);
 		paneChild.getStyleClass().add("person_pane");
 		JFXPersonRippler<?> rippler = new JFXPersonRippler<>(paneChild, reference, iView);
 		rippler.setRipplerFill((Paint.valueOf("black")));
@@ -71,7 +67,6 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 	} 
 	
 	public void setPerson(T person, MediaItem mediaItem) {
-		
 		this.person = person;
 		this.mediaItem = mediaItem;
 	}
@@ -79,7 +74,15 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 	public void updateImage() {
 		if (person != null) {
 			Platform.runLater(() -> {
-				nameLabel.setText(person.getName());
+				//split into first/middle name + last name
+				String text = "";
+				String name = person.getName();
+				if (person.getName().split("\\w+").length > 1) {
+					text = name.substring(0, name.lastIndexOf(' ')) + "\n" + name.substring(name.lastIndexOf(' ') + 1);
+				} else {
+					text = person.getName();
+				}
+				nameLabel.setText(text);
 				personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());
 			});
 		}

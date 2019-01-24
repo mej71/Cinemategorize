@@ -313,6 +313,8 @@ public class UserData implements Serializable {
 				maxYear = tempDat.maxYear;
 				userPlaylists = tempDat.userPlaylists;
 				ownedCollections = tempDat.ownedCollections;
+				useAutoLookup = tempDat.useAutoLookup;
+				themeSelection = tempDat.themeSelection;
 			} 
 			return;
 		} catch (IOException | ClassNotFoundException e) {

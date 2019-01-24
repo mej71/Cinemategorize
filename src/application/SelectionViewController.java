@@ -115,13 +115,19 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		infoScrollPane.prefWidthProperty().bind(mainGrid.widthProperty().multiply(0.64));
 		infoScrollPane.prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.70));
 		directorFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
-		writerFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		actorFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
+		writerFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		genreFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		tagsFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
 		posterImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		descLabel.wrappingWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
+		TileAnimator tileAnimator = new TileAnimator();
+		tileAnimator.observe(genreFlowPane.getChildren());
+		tileAnimator.observe(directorFlowPane.getChildren());
+		tileAnimator.observe(actorFlowPane.getChildren());
+		tileAnimator.observe(writerFlowPane.getChildren());
+		tileAnimator.observe(tagsFlowPane.getChildren());
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
