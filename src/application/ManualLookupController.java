@@ -202,11 +202,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		fileFlowPane.getChildren().remove(fileFlowPane.selectedCell);
 		
 		//refresh master view with new file
-		if (!ControllerMaster.mainController.searchField.getText().isEmpty() && ControllerMaster.mainController.autoEvent!=null ) {
-			ControllerMaster.userData.refreshViewingList(ControllerMaster.mainController.autoEvent.getObject().getTargetIDs(), false);			
-		} else {
-			ControllerMaster.userData.refreshViewingList(null, true);
-		}
+		ControllerMaster.mainController.refreshSearch();
 		
 		//close manual dialog if empty
 		if (fileFlowPane.getChildren().size()==0) {
@@ -248,7 +244,6 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 			mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(title));
 		}
 		mediaList.get(fileFlowPane.selectedCell.getItem()).setResults(mRes);
-		System.out.println("C");
 		Platform.runLater(() -> {
 			resultsFlowPane.getChildren().clear();
 			resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));

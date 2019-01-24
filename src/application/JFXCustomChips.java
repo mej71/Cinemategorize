@@ -19,7 +19,8 @@ public class JFXCustomChips {
 			public void handle(MouseEvent ev) {
 				ControllerMaster.mainController.searchField.setText(g.getName());
 				ControllerMaster.mainController.autoCompletePopup.hide();
-				ControllerMaster.userData.refreshViewingList(new SearchItem(g).getTargetIDs(), false);
+				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(g));
+				ControllerMaster.mainController.refreshSearch();
 				ControllerMaster.mainController.closeDialogs();
 				ev.consume();
 			}
@@ -39,7 +40,8 @@ public class JFXCustomChips {
 			public void handle(MouseEvent ev) {
 				ControllerMaster.mainController.searchField.setText(tag);
 				ControllerMaster.mainController.autoCompletePopup.hide();
-				ControllerMaster.userData.refreshViewingList(new SearchItem(tag).getTargetIDs(), false);
+				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(tag));
+				ControllerMaster.mainController.refreshSearch();
 				ControllerMaster.mainController.closeDialogs();
 				ev.consume();
 			}

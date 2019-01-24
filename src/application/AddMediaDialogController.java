@@ -21,7 +21,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class AddMediaDialogController implements Initializable {
+public class AddMediaDialogController extends EscapableBase implements Initializable {
 	
 	@FXML private JFXDialogLayout dialogLayout;
 	@FXML private GridPane dialogGrid;
@@ -36,7 +36,6 @@ public class AddMediaDialogController implements Initializable {
 	@FXML private Label searchingLabel;
 	@FXML private JFXProgressBar progressBar;
 	
-	private JFXDialog dialogLink;
 	private ExtensionFilter extFilter;
 	private Task<?> lookupTask;
 	private UIMode uiMode;
@@ -57,10 +56,10 @@ public class AddMediaDialogController implements Initializable {
 	 
 	public void openDialogMenu(JFXDialog d, boolean initial) {
 		uiMode = initial? UIMode.INITIAL: UIMode.DEFAULT;
-		dialogLink = d;
-		dialogLink.setOverlayClose(!initial);
+		super.setDialogLink(d);
+		dLink.setOverlayClose(!initial);
 		updateLayout();
-		dialogLink.show(); 
+		dLink.show(); 
 
 		extFilter = new FileChooser.ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
 	}
@@ -73,7 +72,7 @@ public class AddMediaDialogController implements Initializable {
 		FileChooser chooser = new FileChooser();
 		chooser.getExtensionFilters().add(extFilter);
 	    chooser.setTitle("Choose file(s)");
-	    List<File> list = chooser.showOpenMultipleDialog(dialogLink.getScene().getWindow());	
+	    List<File> list = chooser.showOpenMultipleDialog(dLink.getScene().getWindow());	
 	    lookupTask = new Task<Object>() {
 	    	
 	    	@Override
@@ -122,18 +121,14 @@ public class AddMediaDialogController implements Initializable {
 	public void setupTaskHandlers() {
 		progressBar.progressProperty().bind(lookupTask.workDoneProperty());
 	    progressLabel.textProperty().bind(lookupTask.messageProperty());
-	    dialogLink.setOverlayClose(false);
+	    dLink.setOverlayClose(false);
 	    new Thread(lookupTask).start();
 	    lookupTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 	    	@Override
 	    	public void handle(WorkerStateEvent t) {
 	    		//update media list in case items were found
 	    		if (ControllerMaster.userData.numMediaItems() > 0) {
-	    			if (!ControllerMaster.mainController.searchField.getText().isEmpty() && ControllerMaster.mainController.autoEvent!=null ) {
-	    				ControllerMaster.userData.refreshViewingList(ControllerMaster.mainController.autoEvent.getObject().getTargetIDs(), false);			
-	    			} else {
-	    				ControllerMaster.userData.refreshViewingList(null, true);
-	    			}
+	    			ControllerMaster.mainController.refreshSearch();
 	    		} 	else {
 	    			uiMode = UIMode.ERRORED;
 	    		}
@@ -143,7 +138,7 @@ public class AddMediaDialogController implements Initializable {
 	    			ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
 		    	} else {
 		    		if (ControllerMaster.userData.numMediaItems() > 0) {
-		    			dialogLink.close();
+		    			dLink.close();
 		    			return;
 		    		}
 		    	}
@@ -156,7 +151,7 @@ public class AddMediaDialogController implements Initializable {
 	public void chooseFolder() {
 		DirectoryChooser chooser = new DirectoryChooser();
 		chooser.setTitle("Choose directory");
-		File dirFile = chooser.showDialog(dialogLink.getScene().getWindow());
+		File dirFile = chooser.showDialog(dLink.getScene().getWindow());
 		new Thread(lookupTask).start();
 		lookupTask = new Task<Object>() {
 	    	

@@ -25,6 +25,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -45,10 +46,7 @@ public class CinemaController implements Initializable {
 	// local content
 	@FXML StackPane backgroundStackPane;
 	@FXML StackPane stackPane;
-	// included FXML controllers and content	
-	@FXML GridPane mainGrid;
-	
-	
+	@FXML GridPane mainGrid;	
 	@FXML JFXComboBox<SortTypes> sortCombo;
 	@FXML JFXTextField searchField;
 	@FXML JFXSlider scaleSlider;
@@ -65,10 +63,15 @@ public class CinemaController implements Initializable {
 	@FXML JFXComboBox<String> playlistCombo;
 	@FXML JFXComboBox<Collection> collectionsCombo;
 	
-	// local content initialized outside of the fxml
-	TilePane tilePane;
+	private FXMLLoader loader;
+	private GridPane selectionView;
+	private Window window;
+	private GridPane manualLookupView;
+	private JFXDialogLayout addMediaDialogView;
+	private GridPane settingsView;
 	
-	MovieScrollPane scrollPane;
+	public TilePane tilePane;	
+	public MovieScrollPane scrollPane;
 	// other variables
 	public final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
 	public MediaListDisplayType showingType = MediaListDisplayType.MOVIES;
@@ -77,16 +80,11 @@ public class CinemaController implements Initializable {
 	public MovieAutoCompletePopup autoCompletePopup;
 	public MovieAutoCompleteEvent<SearchItem> autoEvent;
 	public boolean isScrolling = false;
-	
-	private FXMLLoader loader;
-	private GridPane selectionView;
-	JFXDialog selectionViewWindow;
-	
-	private GridPane manualLookupView;
-	JFXDialog manualLookupWindow;
-	
-	private JFXDialogLayout addMediaDialogView;
-	JFXDialog addMediaWindow;
+	public JFXDialog selectionViewWindow;
+	public JFXDialog manualLookupWindow;	
+	public JFXDialog addMediaWindow;
+	public JFXDialog settingsWindow;
+	public Scene cinemaScene;
 	
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -126,11 +124,7 @@ public class CinemaController implements Initializable {
 	            } else {
 	            	playlistClearButton.setVisible(false);
 	            }
-				if (autoEvent!=null) {
-	            	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
-				} else {
-					ControllerMaster.userData.refreshViewingList(null, false);
-				}
+				refreshSearch();
 			}
 		});
 		
@@ -151,11 +145,7 @@ public class CinemaController implements Initializable {
 	            } else {
 	            	collectionsClearButton.setVisible(false);
 	            }
-				if (autoEvent!=null) {
-	            	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
-				} else {
-					ControllerMaster.userData.refreshViewingList(null, false);
-				}
+				refreshSearch();
 			}
 		});
 		collectionsCombo.setConverter(new StringConverter<Collection>() {
@@ -201,11 +191,12 @@ public class CinemaController implements Initializable {
 		scrollPane.setFitToHeight(true);
 		scrollPane.setContent(tilePane);
 		JFXScrollPane.smoothScrolling(scrollPane);
+		scrollPane.getStyleClass().add("movie-scroll-pane");
 		stackPane.getChildren().add(scrollPane);
 		
 		autoCompletePopup = new MovieAutoCompletePopup();
 		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty());
-		autoCompletePopup.setCellLimit(7);
+		autoCompletePopup.setCellLimit(10);
 	    autoCompletePopup.setMovieSelectionHandler(e -> {
 	    	autoEvent = (MovieAutoCompleteEvent<SearchItem>)e;
 	    	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
@@ -221,7 +212,7 @@ public class CinemaController implements Initializable {
 	            autoCompletePopup.hide();
 	            if (searchField.getText().isEmpty()) {
 	            	textClearButton.setVisible(false);
-	            	if (showingMedia.size()!=ControllerMaster.userData.numMediaItems()) {
+	            	if (showingMedia.size() != ControllerMaster.userData.numMediaItems()) {
 	            		ControllerMaster.userData.refreshViewingList(null, false);
 		            	autoCompletePopup.getSuggestions().clear();
 		            	autoEvent = null;
@@ -254,11 +245,7 @@ public class CinemaController implements Initializable {
 	            } else {
 	            	startDateClearButton.setVisible(false);
 	            }
-	            if (autoEvent!=null) {
-	            	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
-				} else {
-					ControllerMaster.userData.refreshViewingList(null, false);
-				}
+				refreshSearch();
 			}
 		});
 
@@ -273,11 +260,7 @@ public class CinemaController implements Initializable {
  	            } else {
  	            	endDateClearButton.setVisible(false);
  	            }
- 	            if (autoEvent!=null) {
- 	            	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
- 				} else {
- 					ControllerMaster.userData.refreshViewingList(null, false);
- 				}
+ 				refreshSearch();
  			}
 	 	});
 	    
@@ -294,14 +277,21 @@ public class CinemaController implements Initializable {
 			manualLookupView = loader.load();
 			ControllerMaster.manualController = loader.getController();			
 			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
-					JFXDialog.DialogTransition.CENTER);
+					JFXDialog.DialogTransition.TOP);
 			manualLookupView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
 			manualLookupView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.15));
 			loader = new FXMLLoader(getClass().getClassLoader().getResource("AddMoviesDialogContent.fxml"));
 			addMediaDialogView = loader.load();
 			ControllerMaster.addMediaDialogController = loader.getController();
 			addMediaWindow = new JFXDialog(getBackgroundStackPane(), addMediaDialogView,
-					JFXDialog.DialogTransition.CENTER);
+					JFXDialog.DialogTransition.TOP);
+			loader = new FXMLLoader(getClass().getClassLoader().getResource("SettingsContent.fxml"));
+			settingsView = loader.load();
+			ControllerMaster.settingsController = loader.getController();
+			settingsWindow = new JFXDialog(getBackgroundStackPane(), settingsView,
+					JFXDialog.DialogTransition.TOP);
+			settingsView.prefWidthProperty().bind(backgroundStackPane.widthProperty().multiply(0.25));
+			settingsView.prefHeightProperty().bind(backgroundStackPane.heightProperty().multiply(0.30));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -341,6 +331,14 @@ public class CinemaController implements Initializable {
 		mainGrid.requestFocus();
 	}
 	
+	public void refreshSearch() {
+		if (autoEvent != null) {
+			ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
+		} else {
+			ControllerMaster.userData.refreshViewingList(null, false);
+		}
+	}
+	
 	public void fillYearCombos(int minYear, int maxYear) {
 		startYearComboBox.setItems(
 				FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
@@ -362,6 +360,8 @@ public class CinemaController implements Initializable {
 	private void determinePrimaryStage() {
 		mainGrid.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
 			if (oldScene == null && newScene != null) {
+				cinemaScene = newScene;
+				ThemeSelection.updateTheme(null);
 				// scene is set for the first time. Now its the time to listen stage changes.
 				newScene.windowProperty().addListener((observableWindow, oldWindow, newWindow) -> {
 					if (oldWindow == null && newWindow != null) {
@@ -389,7 +389,6 @@ public class CinemaController implements Initializable {
 		});
 	}
 	
-	private Window window;
 	public Window getMainWindow() {
 		return window;
 	}
@@ -400,6 +399,7 @@ public class CinemaController implements Initializable {
 		JFXMediaRippler.forceHidePopOver();
 	}
 	
+	@FXML
 	public void showAddMediaDialog() {
 		JFXMediaRippler.forceHidePopOver();
 		ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, false);		
@@ -408,6 +408,16 @@ public class CinemaController implements Initializable {
 	public void showSelectionDialog(MediaItem mi) {
 		JFXMediaRippler.forceHidePopOver();
 		ControllerMaster.selectionViewController.showMediaItem(selectionViewWindow, mi);	
+	}
+	
+	@FXML
+	public void showSettingsDialog() {
+		JFXMediaRippler.forceHidePopOver();
+		ControllerMaster.settingsController.show(settingsWindow);
+	}
+	
+	@FXML
+	public void showAboutDialog() {
 		
 	}
 

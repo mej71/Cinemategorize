@@ -7,24 +7,20 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.events.JFXDialogEvent;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 //Parent class for content views, implements loading bar
-public class LoadingControllerBase implements Initializable {
+public class LoadingControllerBase extends EscapableBase implements Initializable {
 
 	@FXML protected GridPane mainGrid;
 	@FXML protected StackPane overlayPane;
     @FXML protected JFXSpinner progressSpinner;
-	protected JFXDialog dLink;
+	
 	protected Task<Object> loadTask;
 	
 	@Override
@@ -39,12 +35,13 @@ public class LoadingControllerBase implements Initializable {
 		progressSpinner.setProgress(JFXSpinner.INDETERMINATE_PROGRESS);
 	}
 	
-	protected void setDialogLink(JFXDialog dLink) {
-		setDialogLink(dLink, true);
+	@Override
+	protected void setDialogLink(JFXDialog d) {
+		setDialogLink(d, true);
 	}
 	
-	protected void setDialogLink(JFXDialog dLink, boolean needsLoad) {
-		this.dLink = dLink;
+	protected void setDialogLink(JFXDialog d, boolean needsLoad) {
+		super.setDialogLink(d);
 		if (needsLoad) {
 			showLoadingPane();
 		}
@@ -69,32 +66,6 @@ public class LoadingControllerBase implements Initializable {
 			}
 			
 		});
-		Platform.runLater(() -> determinePrimaryStage());
-	}
-	
-	//check for esc 
-	//have to use listener because scene is null for a bit
-	private void determinePrimaryStage() {
-		if (dLink.getScene() == null) {
-			dLink.sceneProperty().addListener((observableScene, oldScene, newScene) -> {             
-				addKeyListener(newScene);
-	        });
-		} else {
-			addKeyListener(dLink.getScene());
-		}
-    }
-	
-	private EventHandler<KeyEvent> keyListener = (event -> {
-	    if (event.getCode().equals(KeyCode.ESCAPE)) {
-	    	this.dLink.close();
-	    }	    
-	});
-	
-	private void addKeyListener(Scene scene) {
-		if (scene != null) {
-			scene.removeEventFilter(KeyEvent.KEY_PRESSED, keyListener);
-			scene.addEventFilter(KeyEvent.KEY_PRESSED, keyListener);
-        }
 	}
 	
 	protected void runTasks() {}

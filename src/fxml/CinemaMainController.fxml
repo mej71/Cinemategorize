@@ -10,156 +10,133 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
 <StackPane fx:id="backgroundStackPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CinemaController">
 	<GridPane fx:id="mainGrid">
 	   <rowConstraints>
-	      <RowConstraints minHeight="10.0" percentHeight="7.0" />
-	      <RowConstraints minHeight="10.0" percentHeight="8.0" />
-	      <RowConstraints minHeight="10.0" percentHeight="15.0" />
-	      <RowConstraints minHeight="10.0" percentHeight="70.0" />
+	      <RowConstraints minHeight="10.0" percentHeight="10.0" />
+	      <RowConstraints minHeight="10.0" percentHeight="90.0" />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
 	   </rowConstraints>
 	   <columnConstraints>
-	      <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-	      <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
+	      <ColumnConstraints minWidth="10.0" percentWidth="27.0" />
 	      <ColumnConstraints halignment="CENTER" minWidth="10.0" percentWidth="30.0" />
-	      <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-	      <ColumnConstraints minWidth="10.0" percentWidth="10.0" />
-	      <ColumnConstraints minWidth="10.0" percentWidth="20.0" />
+	      <ColumnConstraints minWidth="10.0" percentWidth="22.0" />
+	      <ColumnConstraints minWidth="10.0" percentWidth="21.0" />
+         <ColumnConstraints />
          <ColumnConstraints />
 	   </columnConstraints>
 	   <children>
-	      <StackPane fx:id="stackPane" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="2" GridPane.rowSpan="6">
+	      <StackPane fx:id="stackPane" GridPane.columnSpan="6" GridPane.rowIndex="1" GridPane.rowSpan="6">
 	         <padding>
 	            <Insets top="5.0" />
 	         </padding>
             <GridPane.margin>
-               <Insets left="10.0" right="10.0" top="5.0" />
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </GridPane.margin>
 	      </StackPane>
-	      <JFXTextField fx:id="searchField" minHeight="20.0" prefColumnCount="20" prefHeight="20.0" promptText="Search titles, directors, etc" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-	         <GridPane.margin>
-	            <Insets left="15.0" right="10.0" />
-	         </GridPane.margin>
-	      </JFXTextField>
-	      <JFXComboBox fx:id="sortCombo" labelFloat="true" promptText="Sort By" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-	         <GridPane.margin>
-	            <Insets bottom="5.0" />
-	         </GridPane.margin>
-	      </JFXComboBox>
-	      <JFXButton fx:id="textClearButton" maxHeight="25.0" maxWidth="25.0" minWidth="21.0" onMouseClicked="#clearText" pickOnBounds="false" prefHeight="25.0" prefWidth="21.0" styleClass="clearTextField" text="x" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-	         <GridPane.margin>
-	            <Insets bottom="6.0" right="10.0" />
-	         </GridPane.margin>
-	      </JFXButton>
-	      <JFXSlider fx:id="scaleSlider" blockIncrement="0.1" cache="true" cacheHint="SPEED" majorTickUnit="1.0" max="8.0" min="1.0" minorTickCount="0" showTickMarks="true" value="4.0" GridPane.rowIndex="2">
-	         <cursor>
-	            <Cursor fx:constant="CLOSED_HAND" />
-	         </cursor>
-	         <GridPane.margin>
-	            <Insets left="5.0" right="5.0" top="10.0" />
-	         </GridPane.margin>
-            <padding>
-               <Insets left="5.0" right="5.0" />
-            </padding>
-	      </JFXSlider>
-	      <Label fx:id="scaleLabel" alignment="CENTER" text="Poster Scale: 1.0" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
-	         <GridPane.margin>
-	            <Insets bottom="30.0" />
-	         </GridPane.margin>
-            <padding>
-               <Insets left="5.0" right="5.0" />
-            </padding>
-	      </Label>
-         <GridPane GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-           <columnConstraints>
-             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-             <ColumnConstraints hgrow="SOMETIMES" />
-           </columnConstraints>
-           <rowConstraints>
-             <RowConstraints vgrow="SOMETIMES" />
-           </rowConstraints>
+         <HBox alignment="BOTTOM_CENTER">
             <children>
-      	      <Label text="From:" GridPane.valignment="CENTER">
-      	         <GridPane.margin>
-      	            <Insets bottom="5.0" top="3.0" />
-      	         </GridPane.margin>
-      	      </Label>
-               <FlowPane alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
-                  <children>
-            	      <JFXComboBox fx:id="startYearComboBox" labelFloat="true" maxWidth="-Infinity" minWidth="-Infinity" promptText="Start Year">
-                        <FlowPane.margin>
-                           <Insets top="3.0" />
-                        </FlowPane.margin></JFXComboBox>
-            	      <JFXButton fx:id="startDateClearButton" onAction="#clearStartDate" styleClass="clear-button" visible="false">
-                        <FlowPane.margin>
-                           <Insets left="2.0" top="5.0" />
-                        </FlowPane.margin>
-            	      </JFXButton>
-                     <JFXComboBox fx:id="playlistCombo" labelFloat="true" maxWidth="100.0" promptText="Playlist">
-                        <FlowPane.margin>
-                           <Insets left="15.0" top="3.0" />
-                        </FlowPane.margin>
-                     </JFXComboBox>
-                     <JFXButton fx:id="playlistClearButton" onAction="#clearPlaylistSelection" styleClass="clear-button" visible="false">
-                        <FlowPane.margin>
-                           <Insets left="2.0" top="5.0" />
-                        </FlowPane.margin>
-                     </JFXButton>
-                     <JFXButton fx:id="playlistAddButton" onAction="#addPlaylist" styleClass="add-button">
-                        <FlowPane.margin>
-                           <Insets left="2.0" top="5.0" />
-                        </FlowPane.margin>
-                     </JFXButton>
-                  </children>
-                  <GridPane.margin>
-                     <Insets bottom="5.0" />
-                  </GridPane.margin>
-               </FlowPane>
+      	      <JFXTextField fx:id="searchField" minHeight="20.0" prefColumnCount="20" prefHeight="20.0" promptText="Search titles, directors, etc" HBox.hgrow="ALWAYS">
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+      	      </JFXTextField>
+               <JFXButton fx:id="textClearButton" onAction="#clearText" styleClass="clear-button" visible="false">
+                  <HBox.margin>
+                     <Insets right="20.0" />
+                  </HBox.margin>
+               </JFXButton>
             </children>
-         </GridPane>
-         <GridPane GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-           <columnConstraints>
-             <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="40.0" />
-             <ColumnConstraints hgrow="SOMETIMES" />
-           </columnConstraints>
-           <rowConstraints>
-             <RowConstraints vgrow="SOMETIMES" />
-           </rowConstraints>
+            <GridPane.margin>
+               <Insets left="10.0" />
+            </GridPane.margin>
+         </HBox>
+         <FlowPane alignment="BOTTOM_LEFT" hgap="10.0" prefWrapLength="500.0" rowValignment="BOTTOM" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.valignment="BOTTOM">
             <children>
-      	      <Label text="To:" GridPane.valignment="CENTER">
-      	         <GridPane.margin>
-      	            <Insets bottom="5.0" />
-      	         </GridPane.margin>
-      	      </Label>
-               <FlowPane alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+               <VBox alignment="BOTTOM_LEFT" spacing="15.0">
                   <children>
-            	      <JFXComboBox fx:id="endYearComboBox" labelFloat="true" promptText="End Year" />
-            	      <JFXButton fx:id="endDateClearButton" buttonType="RAISED" onAction="#clearEndDate" styleClass="clear-button" visible="false">
-                        <FlowPane.margin>
-                           <Insets left="2.0" top="2.0" />
-                        </FlowPane.margin>
-            	      </JFXButton>
-                     <JFXComboBox fx:id="collectionsCombo" labelFloat="true" maxWidth="100.0" promptText="Collection">
-                        <FlowPane.margin>
-                           <Insets left="15.0" />
-                        </FlowPane.margin>
-                     </JFXComboBox>
-                     <JFXButton fx:id="collectionsClearButton" onAction="#clearCollectionSelection" styleClass="clear-button" visible="false" />
+                     <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="2.0">
+                        <children>
+                  	      <JFXComboBox fx:id="startYearComboBox" labelFloat="true" maxWidth="-Infinity" minWidth="-Infinity" promptText="From Year" />
+                  	      <JFXButton fx:id="startDateClearButton" onAction="#clearStartDate" styleClass="clear-button" visible="false" />
+                        </children>
+                     </HBox>
+                     <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="2.0">
+                        <children>
+                  	      <JFXComboBox fx:id="endYearComboBox" labelFloat="true" promptText="To Year" />
+                  	      <JFXButton fx:id="endDateClearButton" buttonType="RAISED" onAction="#clearEndDate" styleClass="clear-button" visible="false" />
+                        </children>
+                     </HBox>
                   </children>
-                  <GridPane.margin>
-                     <Insets bottom="5.0" />
-                  </GridPane.margin>
-               </FlowPane>
-               <Label text="Filters" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="BOTTOM">
-                  <GridPane.margin>
-                     <Insets left="90.0" top="10.0" />
-                  </GridPane.margin>
-               </Label>
+               </VBox>
+               <VBox alignment="BOTTOM_LEFT" spacing="15.0">
+                  <children>
+                     <HBox alignment="BOTTOM_LEFT" fillHeight="false" spacing="2.0">
+                        <children>
+                           <JFXComboBox fx:id="playlistCombo" labelFloat="true" maxWidth="100.0" promptText="Playlist" />
+                           <JFXButton fx:id="playlistClearButton" onAction="#clearPlaylistSelection" styleClass="clear-button" visible="false" />
+                           <JFXButton fx:id="playlistAddButton" onAction="#addPlaylist" styleClass="add-button" />
+                        </children>
+                     </HBox>
+                     <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="2.0">
+                        <children>
+                           <JFXComboBox fx:id="collectionsCombo" labelFloat="true" maxWidth="100.0" promptText="Collection" />
+                           <JFXButton fx:id="collectionsClearButton" onAction="#clearCollectionSelection" styleClass="clear-button" visible="false" />
+                        </children>
+                     </HBox>
+                  </children>
+                  <opaqueInsets>
+                     <Insets left="5.0" />
+                  </opaqueInsets>
+               </VBox>
+      	      <JFXComboBox fx:id="sortCombo" labelFloat="true" promptText="Sort By">
+                  <FlowPane.margin>
+                     <Insets />
+                  </FlowPane.margin></JFXComboBox>
+               <VBox alignment="BOTTOM_CENTER">
+                  <children>
+            	      <Label fx:id="scaleLabel" alignment="CENTER" text="Poster Scale: 1.0" textAlignment="CENTER">
+                        <padding>
+                           <Insets left="5.0" right="5.0" />
+                        </padding>
+            	      </Label>
+            	      <JFXSlider fx:id="scaleSlider" blockIncrement="0.1" cache="true" cacheHint="SPEED" majorTickUnit="1.0" max="8.0" min="1.0" minorTickCount="0" showTickMarks="true" value="4.0">
+            	         <cursor>
+            	            <Cursor fx:constant="CLOSED_HAND" />
+            	         </cursor>
+                        <padding>
+                           <Insets left="5.0" right="5.0" />
+                        </padding>
+            	      </JFXSlider>
+                  </children>
+                  <opaqueInsets>
+                     <Insets />
+                  </opaqueInsets>
+                  <padding>
+                     <Insets bottom="-8.0" />
+                  </padding>
+               </VBox>
             </children>
-         </GridPane>
+         </FlowPane>
+         <HBox alignment="BOTTOM_RIGHT" spacing="10.0" GridPane.columnIndex="3">
+            <children>
+               <JFXButton onAction="#showAddMediaDialog" text="Add Media" />
+               <JFXButton onAction="#showSettingsDialog" text="Settings" />
+               <JFXButton onAction="#showAboutDialog" text="About" />
+            </children>
+            <GridPane.margin>
+               <Insets right="10.0" />
+            </GridPane.margin>
+         </HBox>
 	      
 	   </children>
 	</GridPane>

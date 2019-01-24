@@ -75,6 +75,10 @@ public class UserData implements Serializable {
 	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<MediaItem, MediaResultsPage>();
 	public int minYear = 0;
 	public int maxYear = 0;
+	
+	//settings
+	public boolean useAutoLookup = true;
+	public ThemeSelection themeSelection = ThemeSelection.themes.get(0);
 
 	
 	
@@ -491,6 +495,7 @@ public class UserData implements Serializable {
 	public void refreshViewingList(Map<String, List<Integer>> map, boolean retainScrollPos) {
 		List<Integer> moviesList = null;
 		List<Integer> tvList = null;
+		
 		if (map != null && map.containsKey("movies")) {
 			moviesList = map.get("movies");
 		} 

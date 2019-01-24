@@ -112,8 +112,7 @@ public class SearchItem {
 				movieList.add(media.getId());
 			} else {
 				tvList.add(media.getId());
-			}
-			
+			}			
 			break;
 		case GENRE:
 			movieList.addAll(userData.getMoviesWithGenre(genre));
@@ -143,7 +142,6 @@ public class SearchItem {
 	}
 	
 	public enum SearchTypes {
-		ALL,
 		TITLE,
 		GENRE,
 		TAG,

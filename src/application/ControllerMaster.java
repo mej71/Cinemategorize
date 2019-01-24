@@ -13,4 +13,6 @@ public class ControllerMaster {
 	public static SelectionViewController selectionViewController;
 	
 	public static AddMediaDialogController addMediaDialogController;
+	
+	public static SettingsController settingsController;
 }

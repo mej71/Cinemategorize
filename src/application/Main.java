@@ -21,7 +21,6 @@ public class Main extends Application {
 	        try {
 	            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("CinemaMainController.fxml"));
 	            Scene scene = new Scene(root, 1110, 720);
-	            scene.getStylesheets().add(getClass().getClassLoader().getResource("main.css").toExternalForm());
 	            primaryStage.setTitle("Cinemategorize");
 	            //add a listener that prevents the window from being resized smaller than the initial value
 	            primaryStage.showingProperty().addListener((observable, oldValue, showing) -> {
