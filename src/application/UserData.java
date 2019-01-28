@@ -368,23 +368,23 @@ public class UserData implements Serializable {
 				suggestions.add(new SearchItem(SearchTypes.TITLE, getAllMedia().get(i)));
 			}
 		}
-		addGenre(genreMovieList.keySet(), pattern, suggestions);
-		addGenre(genreTvList.keySet(), pattern, suggestions);
+		addGenreSuggestion(genreMovieList.keySet(), pattern, suggestions);
+		addGenreSuggestion(genreTvList.keySet(), pattern, suggestions);
 		if (detailedLength || suggestions.size()==0) {
-			addTags(movieTags.keySet(), pattern, suggestions);
-			addTags(tvTags.keySet(), pattern, suggestions);
-			addAllPeopleMatch(directorsMovieList.keySet(), pattern, suggestions, SearchTypes.DIRECTOR);
-			addAllPeopleMatch(directorsTvList.keySet(), pattern, suggestions, SearchTypes.DIRECTOR);
-			addAllPeopleMatch(actorsMovieList.keySet(), pattern, suggestions, SearchTypes.ACTOR);
-			addAllPeopleMatch(actorsTvList.keySet(), pattern, suggestions, SearchTypes.ACTOR);
-			addAllPeopleMatch(writersMovieList.keySet(), pattern, suggestions, SearchTypes.WRITER);
-			addAllPeopleMatch(writersTvList.keySet(), pattern, suggestions, SearchTypes.WRITER);
+			addTagSuggestion(movieTags.keySet(), pattern, suggestions);
+			addTagSuggestion(tvTags.keySet(), pattern, suggestions);
+			addPeopleSuggestion(directorsMovieList.keySet(), pattern, suggestions, SearchTypes.DIRECTOR);
+			addPeopleSuggestion(directorsTvList.keySet(), pattern, suggestions, SearchTypes.DIRECTOR);
+			addPeopleSuggestion(actorsMovieList.keySet(), pattern, suggestions, SearchTypes.ACTOR);
+			addPeopleSuggestion(actorsTvList.keySet(), pattern, suggestions, SearchTypes.ACTOR);
+			addPeopleSuggestion(writersMovieList.keySet(), pattern, suggestions, SearchTypes.WRITER);
+			addPeopleSuggestion(writersTvList.keySet(), pattern, suggestions, SearchTypes.WRITER);
 		}
 
 		return suggestions;
 	}
 	
-	public void addGenre(Set<Genre> set, Pattern pattern, ObservableList<SearchItem> suggestions) {
+	public void addGenreSuggestion(Set<Genre> set, Pattern pattern, ObservableList<SearchItem> suggestions) {
 		for (Genre t : set) {
 			if (pattern.matcher(t.getName()).find()) {
 				suggestions.add(new SearchItem(SearchTypes.GENRE, t));
@@ -392,7 +392,7 @@ public class UserData implements Serializable {
 		}
 	}
 	
-	public void addTags(Set<String> set, Pattern pattern, ObservableList<SearchItem> suggestions) {
+	public void addTagSuggestion(Set<String> set, Pattern pattern, ObservableList<SearchItem> suggestions) {
 		for (String t : set) {
 			if (pattern.matcher(t).find()) {
 				suggestions.add(new SearchItem(SearchTypes.TAG, t));
@@ -400,7 +400,7 @@ public class UserData implements Serializable {
 		}
 	}
 	
-	public <T extends Person> void addAllPeopleMatch(Set<T> set, Pattern pattern, ObservableList<SearchItem> suggestions, SearchTypes type) {
+	public <T extends Person> void addPeopleSuggestion(Set<T> set, Pattern pattern, ObservableList<SearchItem> suggestions, SearchTypes type) {
 		for (T t : set) {
 			if (pattern.matcher(t.getName()).find()) {
 				suggestions.add(new SearchItem(type, t));
