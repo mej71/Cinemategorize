@@ -502,14 +502,13 @@ public class UserData implements Serializable {
 		ControllerMaster.mainController.tilePane.getChildren().setAll(workingCollection);
 	}
 
-	public void refreshViewingList(Map<String, List<Integer>> map, boolean retainScrollPos) {
-		List<Integer> moviesList = null;
-		List<Integer> tvList = null;
-		
-		if (map != null && map.containsKey("movies")) {
+	public void refreshViewingList(Map<String, List<Integer>> map) {
+		List<Integer> moviesList = new ArrayList<Integer>();
+		List<Integer> tvList = new ArrayList<Integer>();
+		if (map.containsKey("movies")) {
 			moviesList = map.get("movies");
 		} 
-		if (map != null && map.containsKey("tv")) {
+		if (map.containsKey("tv")) {
 			tvList = map.get("tv");
 		}
 		ObservableList<Node> workingCollection = FXCollections.observableArrayList();
@@ -523,51 +522,48 @@ public class UserData implements Serializable {
 			e1.printStackTrace();
 		}
 		
+		boolean noSearchIds = moviesList.isEmpty() && tvList.isEmpty();
+		boolean canShowMovies = ControllerMaster.mainController.mediaTypeCombo.getValue() != MediaListDisplayType.TVSHOWS;
+		boolean canShowTv = ControllerMaster.mainController.mediaTypeCombo.getValue() != MediaListDisplayType.MOVIES;
+		List<MediaItem> selectedPlaylist = (ControllerMaster.mainController.playlistCombo.getValue() == null) ? 
+				new ArrayList<MediaItem>() : userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue());
+		List<MediaItem> selectedCollection = (ControllerMaster.mainController.collectionsCombo.getValue() == null)? 
+				new ArrayList<MediaItem>() : ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue());
 		Date parsedDate = null;
 		JFXMediaRippler mRip;
+		MediaItem mi;
+		int mId;
 		String type;
 		ControllerMaster.mainController.showingMedia.clear();
 		for (int i = 0; i < ControllerMaster.mainController.allTiles.size(); ++i) {
 			mRip = ControllerMaster.mainController.allTiles.get(i);
-			if (  (map == null) || (mRip.linkedItem.isMovie() && moviesList.contains(mRip.linkedItem.getId())) ||
-					(!mRip.linkedItem.isMovie() && tvList.contains(mRip.linkedItem.getId())) ) {
-				try {
-					parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
-				} catch (ParseException e) {
-					e.printStackTrace();
-					startDate = null;
-				}	
-				if (ControllerMaster.mainController.playlistCombo.getValue() == null || userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue()).contains(mRip.linkedItem)) {
-					if (ControllerMaster.mainController.collectionsCombo.getValue() == null || ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue()).contains(mRip.linkedItem)) {
-						if (startDate==null || startDate.before(parsedDate)) {
-							if (endDate==null || endDate.after(parsedDate)) {
-								if (mRip.linkedItem.isMovie()) {
-									type = "movie";
-								} else {
-									type = "tv";
+			mi = mRip.linkedItem;
+			mId = mi.getId();
+			//if it fits search criteria
+			if ( noSearchIds || tvList.contains(mId) || moviesList.contains(mId)) {
+				//if it can be shown
+				if ( (mi.isMovie() && canShowMovies) || (!mi.isMovie() && canShowTv) ) {
+					//if no playlist is selected or it contains this
+					if (selectedPlaylist.isEmpty() || selectedPlaylist.contains(mi)) {
+						if (selectedCollection.isEmpty() || selectedCollection.contains(mi)) {
+							try {
+								parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
+							} catch (ParseException e) {
+								//e.printStackTrace(); happens occasionally from improperly maintained db items
+							}	
+							//if it's in the proper date selection
+							if (startDate==null || parsedDate == null || startDate.before(parsedDate)) {
+								if (endDate==null || parsedDate == null || endDate.after(parsedDate)) {
+									if (mRip.linkedItem.isMovie()) {
+										type = "movie";
+									} else {
+										type = "tv";
+									}
+									ControllerMaster.mainController.showingMedia.put(type, mRip.linkedItem);
+									workingCollection.add(mRip);
 								}
-								ControllerMaster.mainController.showingMedia.put(type, mRip.linkedItem);
-								workingCollection.add(mRip);
 							}
 						}
-					}
-				}
-				
-			} else if ((moviesList == null && tvList == null) || tvList.contains(mRip.linkedItem.getId())){
-				if (ControllerMaster.mainController.playlistCombo.getValue() == null || userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue()).contains(mRip.linkedItem)) {
-					if (ControllerMaster.mainController.collectionsCombo.getValue() == null || ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue()).contains(mRip.linkedItem)) {
-						try {
-							parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
-						} catch (ParseException e) {
-							e.printStackTrace();
-							startDate = null;
-						}						
-						if (startDate==null || startDate.before(parsedDate)) {
-							if (endDate==null || endDate.after(parsedDate)) {
-								ControllerMaster.mainController.showingMedia.put("tv", mRip.linkedItem);
-								workingCollection.add(mRip);
-							}
-						}	
 					}
 				}
 			}
@@ -584,6 +580,12 @@ public class UserData implements Serializable {
 			n.setMaxHeight(208*getScaleFactor());
 			n.resize(139*getScaleFactor(), 208*getScaleFactor());
 		}
+	}
+	
+	public boolean canAddToList(Date parsedDate, int iD, boolean isMove) {
+		boolean ret = true;
+		
+		return ret;
 	}
 	
 	

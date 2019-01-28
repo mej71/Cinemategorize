@@ -145,7 +145,7 @@
                   <Label fx:id="actLabel" styleClass="dialog-subtitle" text="Starring:" />
                   <FlowPane fx:id="actorFlowPane" hgap="5.0" vgap="7.0" />
                   <Label fx:id="writLabel" styleClass="dialog-subtitle" text="Written by:" />
-                  <FlowPane fx:id="writerFlowPane" />
+                  <FlowPane fx:id="writerFlowPane" hgap="5.0" vgap="7.0" />
                   <Label fx:id="tagsLabel" text="Tags:" />
                   <FlowPane fx:id="tagsFlowPane" hgap="5.0" vgap="7.0" />
                </children>

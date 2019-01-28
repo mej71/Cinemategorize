@@ -125,13 +125,13 @@ public class SearchItem {
 		movieList.removeAll(Collections.singleton(null)); //remove all null values so we don't get an empty list
 		tvList.removeAll(Collections.singleton(null)); 
 		Map<String,List<Integer>> map = new HashMap<String, List<Integer>>();
-		map.put("movies", movieList);
-		map.put("tv", tvList);
-		if (movieList.isEmpty() && tvList.isEmpty()) {
-			return null;
-		} else {
-			return map;
+		if (!movieList.isEmpty()) {
+			map.put("movies", movieList);
 		}
+		if (!tvList.isEmpty()) {
+			map.put("tv", tvList);
+		}
+		return map;		
 	}
 	
 	public enum SearchTypes {

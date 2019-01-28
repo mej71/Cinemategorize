@@ -11,7 +11,7 @@ import com.jfoenix.controls.JFXRippler;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -61,6 +61,8 @@ public class JFXMediaRippler extends JFXRippler {
         }
         titleLabel = new Label();
         titleLabel.setId("pop-title");
+        titleLabel.setAlignment(Pos.CENTER);
+        titleLabel.setMaxWidth(250);
         descLabel = new Label();
         descLabel.setMaxWidth(250);
         descLabel.setMaxHeight(150);
@@ -71,11 +73,10 @@ public class JFXMediaRippler extends JFXRippler {
         actorsLabel = new Label();
         actorsLabel.setId("pop-info");
         actorsLabel.setMaxWidth(250);
-        gridPane.add(titleLabel, 0, 0, 5, 1);
-		GridPane.setHalignment(titleLabel, HPos.CENTER);
-		gridPane.add(descLabel, 0, 1, 5, 7);
-		gridPane.add(directorsLabel, 0, 8, 5, 1);
-		gridPane.add(actorsLabel, 0, 9, 5, 2);
+        gridPane.add(titleLabel, 0, 0, numCols, 1);
+		gridPane.add(descLabel, 0, 1, numCols, 7);
+		gridPane.add(directorsLabel, 0, 8, numCols, 1);
+		gridPane.add(actorsLabel, 0, 9, numCols, 2);
 		gridPane.addEventFilter(MouseEvent.ANY, handler);
 		
 		//show popover for quick movie info when mouse is over media pane
@@ -168,7 +169,12 @@ public class JFXMediaRippler extends JFXRippler {
 			MediaItem mi = rippler.linkedItem;
         	String lastDate = "";
         	if (mi.isTvShow()) {
-        		lastDate = " - " + mi.getLastAirDate();
+        		lastDate = " - ";
+        		if (mi.getLastAirDate() != null && mi.getLastAirDate().length()>3) {
+        			lastDate += mi.getLastAirDate().substring(0, 4);
+            	} else {
+            		lastDate += "(N/A)";
+            	}
         		JFXMediaRippler.directorsLabel.setText(mi.getNumSeasons() + " seasons");
         	} else {
         		String directors = "";

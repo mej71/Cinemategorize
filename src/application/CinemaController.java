@@ -2,6 +2,7 @@ package application;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -62,6 +63,7 @@ public class CinemaController implements Initializable {
 	@FXML JFXComboBox<Integer> endYearComboBox;
 	@FXML JFXComboBox<String> playlistCombo;
 	@FXML JFXComboBox<Collection> collectionsCombo;
+	@FXML JFXComboBox<MediaListDisplayType> mediaTypeCombo;
 	
 	private FXMLLoader loader;
 	private GridPane selectionView;
@@ -74,7 +76,6 @@ public class CinemaController implements Initializable {
 	public MovieScrollPane scrollPane;
 	// other variables
 	public final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
-	public MediaListDisplayType showingType = MediaListDisplayType.MOVIES;
 	public List<JFXMediaRippler> allTiles = new ArrayList<JFXMediaRippler>();
 	public LinkedHashMap<String, MediaItem> showingMedia = new LinkedHashMap<String, MediaItem>();
 	public MovieAutoCompletePopup autoCompletePopup;
@@ -95,6 +96,17 @@ public class CinemaController implements Initializable {
 		mainGrid.prefWidthProperty().bind(backgroundStackPane.widthProperty());
 		mainGrid.prefHeightProperty().bind(backgroundStackPane.heightProperty());
 		
+		mediaTypeCombo.getItems().clear();
+		mediaTypeCombo.setItems(FXCollections.observableArrayList( MediaListDisplayType.values()));
+		mediaTypeCombo.setValue(MediaListDisplayType.ALL);
+		mediaTypeCombo.valueProperty().addListener(new ChangeListener<MediaListDisplayType>() {
+			@Override
+			public void changed(ObservableValue<? extends MediaListDisplayType> ov, MediaListDisplayType oldVal, MediaListDisplayType newVal) {
+				refreshSearch();
+			}
+		});
+		
+		sortCombo.getItems().clear();
 		sortCombo.setItems(FXCollections.observableArrayList( SortTypes.values()));
 		sortCombo.setValue(SortTypes.NAME_ASC);
 		sortCombo.valueProperty().addListener(new ChangeListener<SortTypes>() {
@@ -195,12 +207,12 @@ public class CinemaController implements Initializable {
 		stackPane.getChildren().add(scrollPane);
 		
 		autoCompletePopup = new MovieAutoCompletePopup();
-		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty());
+		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty().multiply(1.6));
 		autoCompletePopup.setCellLimit(10);
 	    autoCompletePopup.setMovieSelectionHandler(e -> {
 	    	autoEvent = (MovieAutoCompleteEvent<SearchItem>)e;
-	    	ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
 	    	searchField.setText(autoEvent.getObject().getItemName());
+	    	refreshSearch();
 	    });
 
 	    // filtering options
@@ -213,9 +225,9 @@ public class CinemaController implements Initializable {
 	            if (searchField.getText().isEmpty()) {
 	            	textClearButton.setVisible(false);
 	            	if (showingMedia.size() != ControllerMaster.userData.numMediaItems()) {
-	            		ControllerMaster.userData.refreshViewingList(null, false);
 		            	autoCompletePopup.getSuggestions().clear();
 		            	autoEvent = null;
+		            	refreshSearch();
 	            	}
 	            }             
 	        } else {
@@ -297,7 +309,7 @@ public class CinemaController implements Initializable {
 		}
 
 		createAllRipplers();
-		ControllerMaster.userData.refreshViewingList(null, false);
+		refreshSearch();
 	    scaleSlider.setValue(ControllerMaster.userData.getScaleFactor()*4);
 		determinePrimaryStage();	
 	}	
@@ -333,9 +345,9 @@ public class CinemaController implements Initializable {
 	
 	public void refreshSearch() {
 		if (autoEvent != null) {
-			ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs(), false);
+			ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs());
 		} else {
-			ControllerMaster.userData.refreshViewingList(null, false);
+			ControllerMaster.userData.refreshViewingList(new HashMap<String, List<Integer>>());
 		}
 	}
 	

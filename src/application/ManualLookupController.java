@@ -39,6 +39,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	@FXML private ListFlowPane<FileCell<MediaItem>, MediaItem> fileFlowPane;
 	@FXML private ScrollPane resultsScrollPane;
 	@FXML private ListFlowPane<ResultCell<ResultsMediaItem>, ResultsMediaItem> resultsFlowPane;
+	@FXML private Label noResultsLabel;
 	
 	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
 	private Task<Object> searchTask;
@@ -60,6 +61,8 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 			    		resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(item).getResults(), resultsFlowPane));
 			    		resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
 			    	}
+			    	
+			    	noResultsLabel.setVisible(resultsFlowPane.getChildren().size() == 0);
 		    	}				
 			}
 			
@@ -81,6 +84,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
         yearField.setMaxChars(4);
         fileFlowPane.bindWidthToNode(fileScrollPane);
         resultsFlowPane.bindWidthToNode(resultsScrollPane);
+        noResultsLabel.setVisible(false);
 	}
 	
 	public void setData(LinkedHashMap<MediaItem, MediaResultsPage> mList) {
@@ -144,7 +148,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		String text = "The file\n" + fileFlowPane.selectedCell.getItem().getFullFilePath() + "\nis " + 
 				resultsFlowPane.selectedCell.getItem().getTitle(false) + releaseDate;
 		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
-			text += "Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
+			text += " Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
 		} 
 		confirmLayout.setBody(new Label(text + "?"));
 		JFXDialog confirmDialog = new JFXDialog();
@@ -247,6 +251,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 			resultsFlowPane.getChildren().clear();
 			resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));
 			resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
+			noResultsLabel.setVisible(resultsFlowPane.getChildren().size() == 0);
 		});
 		
 	}

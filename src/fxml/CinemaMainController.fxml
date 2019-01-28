@@ -98,10 +98,12 @@
                      <Insets left="5.0" />
                   </opaqueInsets>
                </VBox>
-      	      <JFXComboBox fx:id="sortCombo" labelFloat="true" promptText="Sort By">
-                  <FlowPane.margin>
-                     <Insets />
-                  </FlowPane.margin></JFXComboBox>
+               <VBox alignment="BOTTOM_LEFT" spacing="15.0">
+                  <children>
+                     <JFXComboBox fx:id="mediaTypeCombo" labelFloat="true" promptText="Media Type" />
+            	      <JFXComboBox fx:id="sortCombo" labelFloat="true" promptText="Sort By" />
+                  </children>
+               </VBox>
                <VBox alignment="BOTTOM_CENTER">
                   <children>
             	      <Label fx:id="scaleLabel" alignment="CENTER" text="Poster Scale: 1.0" textAlignment="CENTER">

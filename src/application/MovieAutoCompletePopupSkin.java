@@ -129,6 +129,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 					hbox.getChildren().add(reference);
 					hbox.setPrefHeight(prefCellHeight);
 					hbox.setMaxHeight(prefCellHeight);
+					hbox.setMinWidth(0);
+					hbox.setPrefWidth(1);
 					setGraphic(hbox);
 					setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 				}				

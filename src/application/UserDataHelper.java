@@ -50,13 +50,17 @@ public class UserDataHelper {
 				
 			}
 		}
-		// if both results are really far off, we probably failed
+		// if both results are really far off, we probably failed.  Use a temporary movie lookup to avoid errors
 		if (series == null &&  cm==null) { 		
 			for (MediaItem m: ControllerMaster.userData.tempManualItems.keySet()) {
 				if (m.getFullFilePath().equals(file.getPath())) {
 					return false;
 				}
 			}
+			cm = MediaSearchHandler.getMovieInfo("Movie", 0);
+			mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
+					Integer.parseInt(movieParsedInfo[1]));
+			System.out.println("a");
 			ControllerMaster.userData.tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
 			return false;
 		} else if (series != null) {

@@ -70,12 +70,13 @@
             </JFXComboBox>
             <ScrollPane fx:id="resultsScrollPane" fitToWidth="true" GridPane.columnSpan="4">
             	<GridPane.margin>
-                  <Insets left="5.0" right="5.0" />
+                  <Insets left="5.0" right="5.0" top="5.0" />
                </GridPane.margin>
                <content>
                   <ListFlowPane fx:id="resultsFlowPane" orientation="VERTICAL" />
                </content>
             </ScrollPane>
+            <Label fx:id="noResultsLabel" text="No Results Found" GridPane.columnSpan="4" GridPane.halignment="CENTER" />
             <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="4">
                <children>
                   <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />

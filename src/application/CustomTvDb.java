@@ -31,11 +31,15 @@ public class CustomTvDb implements Serializable {
 		series = tvs;
 		//init path list (FileInfo members are null until specific episode is loaded)
 		for (int i = 0; i < series.getNumberOfSeasons(); ++i) {
-			loadSeason(i+1);
+			if (series.getSeasons().get(i) != null) {
+				loadSeason(i+1);
+			}
 		}
 		for (int i = 0; i < series.getNumberOfSeasons(); ++i) {
-			for (int j = 0; j < series.getSeasons().get(i).getEpisodes().size(); ++j) {
-				episodePaths.get(i+1).put(j+1, null);
+			if (series.getSeasons().get(i).getEpisodes() != null) {
+				for (int j = 0; j < series.getSeasons().get(i).getEpisodes().size(); ++j) {
+					episodePaths.get(i+1).put(j+1, null);
+				}
 			}
 		}
 	}

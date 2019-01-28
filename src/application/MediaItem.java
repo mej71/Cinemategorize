@@ -99,15 +99,15 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public String getFullFilePath() {
-		return (isMovie())? fileInfo.fPath : tvShow.getFilePath();
+		return (isMovie() || tvShow == null)? fileInfo.fPath : tvShow.getFilePath();
 	}
 	
 	public String getFileName() {
-		return (isMovie())? fileInfo.fName : tvShow.getFileName();
+		return (isMovie() || tvShow == null)? fileInfo.fName : tvShow.getFileName();
 	}
 	
 	public String getFolder() {
-		return (isMovie())? fileInfo.fFolder : tvShow.getFileFolder();
+		return (isMovie() || tvShow == null)? fileInfo.fFolder : tvShow.getFileFolder();
 	}
 	
 	//makes sure lastview* fields are set properly

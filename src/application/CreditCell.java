@@ -51,7 +51,9 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
         }
         popTitle = new Label();
         popTitle.setId("pop-title");
-        popDesc = new Label();
+        popTitle.setAlignment(Pos.CENTER);
+        popTitle.setMaxWidth(250);
+        popDesc = new Label();        
         popDesc.setMaxWidth(250);
         popDesc.setMaxHeight(150);
         popDesc.setId("pop-descript");
