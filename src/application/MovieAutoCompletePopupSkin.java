@@ -100,6 +100,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 						break;
 					case TAG:
 						title.setText("With the tag: ");
+						break;
 					case GENRE:
 						title.setText("In the genre: ");
 						break;

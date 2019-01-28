@@ -19,38 +19,31 @@ public class SearchItem {
 	private Genre genre;
 	private PersonCrew writer;
 	
-	public SearchItem(MediaItem mi) {
-		media = mi;
-		if (mi.isMovie()) {
-			searchType = SearchTypes.TITLE;
-		} else {
-			searchType = SearchTypes.TITLE;
+	public SearchItem(SearchTypes type, Object obj) {
+		searchType = type;
+		switch (type) {
+		case TITLE:
+			media = (MediaItem) obj;
+			break;
+		case TAG:
+			tag = (String) obj;
+			break;
+		case DIRECTOR:
+			director = (PersonCrew) obj;
+			break;
+		case WRITER:
+			writer = (PersonCrew) obj;
+			break;
+		case ACTOR:
+			actor = (PersonCast) obj;
+			break;
+		case GENRE:
+			genre = (Genre) obj;
+			break;
+		default:
+			tag = obj.toString();
+			break;
 		}
-	}
-	
-	public SearchItem(String t) {
-		tag = t;
-		searchType = SearchTypes.TAG;
-	}
-	
-	public SearchItem(PersonCrew d, boolean b) {
-		if (b) {
-			director = d;
-			searchType = SearchTypes.DIRECTOR;
-		} else {
-			writer = d;
-			searchType = SearchTypes.WRITER;
-		}
-	}
-	
-	public SearchItem(PersonCast c) {
-		actor = c;
-		searchType = SearchTypes.ACTOR;
-	}
-	
-	public SearchItem(Genre g) {
-		genre = g;
-		searchType = SearchTypes.GENRE;
 	}
 	
 	

@@ -1,5 +1,6 @@
 package application;
 
+import application.SearchItem.SearchTypes;
 import info.movito.themoviedbapi.model.Genre;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
@@ -19,7 +20,7 @@ public class JFXCustomChips {
 			public void handle(MouseEvent ev) {
 				ControllerMaster.mainController.searchField.setText(g.getName());
 				ControllerMaster.mainController.autoCompletePopup.hide();
-				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(g));
+				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.GENRE, g));
 				ControllerMaster.mainController.refreshSearch();
 				ControllerMaster.mainController.closeDialogs();
 				ev.consume();
@@ -40,7 +41,7 @@ public class JFXCustomChips {
 			public void handle(MouseEvent ev) {
 				ControllerMaster.mainController.searchField.setText(tag);
 				ControllerMaster.mainController.autoCompletePopup.hide();
-				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(tag));
+				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.TAG, tag));
 				ControllerMaster.mainController.refreshSearch();
 				ControllerMaster.mainController.closeDialogs();
 				ev.consume();

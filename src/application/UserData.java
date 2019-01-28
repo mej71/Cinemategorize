@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,17 +29,18 @@ import javax.xml.xpath.XPathFactory;
 
 import org.xml.sax.InputSource;
 
+import application.SearchItem.SearchTypes;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.Collection;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.keywords.Keyword;
+import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCredit;
 import info.movito.themoviedbapi.model.people.PersonCredits;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import info.movito.themoviedbapi.model.people.PersonPeople;
-import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -225,15 +227,11 @@ public class UserData implements Serializable {
 		return false;
 	}
 	
-	public boolean ownsEpisode(int iD, TvEpisode episode) {
+	public boolean ownsEpisode(int iD, int seasonNum, int epNum) {
 		for (int i = 0; i < getAllMedia().size(); ++i) {
 			if (getAllMedia().get(i).isTvShow() && getAllMedia().get(i).getId()==iD) {
-				List<TvEpisode> episodes = getAllMedia().get(i).getEpisodes();
-				for (TvEpisode ep : episodes) {
-					if (ep.getId() == episode.getId()) {
-						return true;
-					}
-				}
+				List<Integer> episodes = getAllMedia().get(i).tvShow.getOwnedEpisodeNumbers(seasonNum);
+				return episodes.contains(epNum);
 			}
 		}
 		return false;
@@ -344,6 +342,7 @@ public class UserData implements Serializable {
 		minYear = 0;
 		maxYear = 0;
 		userPlaylists.clear();
+		ownedCollections.clear();
 	}	
 	
 	final String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
@@ -366,38 +365,47 @@ public class UserData implements Serializable {
 		Pattern pattern = Pattern.compile("(?i)(^|\\s|\\()" + userInput);
 		for (int i = 0; i < getAllMedia().size(); ++i) {
 			if (pattern.matcher(getAllMedia().get(i).getItemName()).find()) {
-				suggestions.add(new SearchItem(getAllMedia().get(i) ));
+				suggestions.add(new SearchItem(SearchTypes.TITLE, getAllMedia().get(i)));
 			}
 		}
-		for (Genre g : genreMovieList.keySet()) {
-			if (pattern.matcher(g.getName()).find()) {
-				suggestions.add(new SearchItem(g));
-			}
-		}
+		addGenre(genreMovieList.keySet(), pattern, suggestions);
+		addGenre(genreTvList.keySet(), pattern, suggestions);
 		if (detailedLength || suggestions.size()==0) {
-			for (String t : movieTags.keySet()) {
-				if (pattern.matcher(t).find()) {
-					suggestions.add(new SearchItem(t));
-				}
-			}
-			for (PersonCrew d : directorsMovieList.keySet()) {
-				if (pattern.matcher(d.getName()).find()) {
-					suggestions.add(new SearchItem(d, true));
-				}
-			}
-			for (PersonCast c : actorsMovieList.keySet()) {
-				if (pattern.matcher(c.getName()).find()) {
-					suggestions.add(new SearchItem(c));
-				}
-			}
-			for (PersonCrew c : writersMovieList.keySet()) {
-				if (pattern.matcher(c.getName()).find()) {
-					suggestions.add(new SearchItem(c, false));
-				}
-			}
+			addTags(movieTags.keySet(), pattern, suggestions);
+			addTags(tvTags.keySet(), pattern, suggestions);
+			addAllPeopleMatch(directorsMovieList.keySet(), pattern, suggestions, SearchTypes.DIRECTOR);
+			addAllPeopleMatch(directorsTvList.keySet(), pattern, suggestions, SearchTypes.DIRECTOR);
+			addAllPeopleMatch(actorsMovieList.keySet(), pattern, suggestions, SearchTypes.ACTOR);
+			addAllPeopleMatch(actorsTvList.keySet(), pattern, suggestions, SearchTypes.ACTOR);
+			addAllPeopleMatch(writersMovieList.keySet(), pattern, suggestions, SearchTypes.WRITER);
+			addAllPeopleMatch(writersTvList.keySet(), pattern, suggestions, SearchTypes.WRITER);
 		}
 
 		return suggestions;
+	}
+	
+	public void addGenre(Set<Genre> set, Pattern pattern, ObservableList<SearchItem> suggestions) {
+		for (Genre t : set) {
+			if (pattern.matcher(t.getName()).find()) {
+				suggestions.add(new SearchItem(SearchTypes.GENRE, t));
+			}
+		}
+	}
+	
+	public void addTags(Set<String> set, Pattern pattern, ObservableList<SearchItem> suggestions) {
+		for (String t : set) {
+			if (pattern.matcher(t).find()) {
+				suggestions.add(new SearchItem(SearchTypes.TAG, t));
+			}
+		}
+	}
+	
+	public <T extends Person> void addAllPeopleMatch(Set<T> set, Pattern pattern, ObservableList<SearchItem> suggestions, SearchTypes type) {
+		for (T t : set) {
+			if (pattern.matcher(t.getName()).find()) {
+				suggestions.add(new SearchItem(type, t));
+			}
+		}
 	}
 	
 	public void addTag(Keyword tag, int mId, boolean isMovie) {

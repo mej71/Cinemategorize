@@ -90,12 +90,12 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 			gridPane.prefWidthProperty().bind(getPane().widthProperty());
 			gridPane.maxWidthProperty().bind(getPane().widthProperty());
 			String releaseDate = "";
-	    	if (item.getReleaseDate() != null && item.getReleaseDate().length()>3) {
-	    		releaseDate = " (" + item.getReleaseDate().substring(0, 4) + ")";
+	    	if (item.getReleaseDate(false) != null && item.getReleaseDate(false).length()>3) {
+	    		releaseDate = " (" + item.getReleaseDate(false).substring(0, 4) + ")";
 	    	} else {
 	    		releaseDate = " (N/A)";
 			}
-			titleLabel.setText(getItem().getTitle() + releaseDate);
+			titleLabel.setText(getItem().getTitle(false) + releaseDate);
 			episodeBox.setVisible(false);
 			if (getItem().isTvShow()) {
 				seasonBox.setItems(
@@ -132,11 +132,11 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 					@Override
 					public void changed(ObservableValue<? extends Integer> ov, Integer oldVal, Integer newVal) {
 						if (newVal != null) {
-							titleLabel.setText(getItem().getTitle() + ": " + getItem().getEpisode(seasonBox.getValue(), newVal).getName());
+							titleLabel.setText(getItem().getTitle(false) + ": " + getItem().getTitle(true, seasonBox.getValue(), episodeBox.getValue()));
 							descLabel.setText(getItem().getEpisode(seasonBox.getValue(), newVal).getOverview());
 						} else {
-							titleLabel.setText(getItem().getTitle());
-							descLabel.setText(getItem().getOverview());
+							titleLabel.setText(getItem().getTitle(false));
+							descLabel.setText(getItem().getOverview(false));
 						}
 						
 					}
@@ -145,14 +145,12 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 				gridPane.add(seasonBox, 2, 4);
 				gridPane.add(episodeBox, 3, 4);
 				seasonBox.setVisible(true);
-				if (getItem().getFirstAvailableEpisode() != null) {
-					seasonBox.getSelectionModel().select(getItem().getFirstAvailableEpisode().getSeasonNumber()-1);
-					episodeBox.getSelectionModel().select(getItem().getFirstAvailableEpisode().getEpisodeNumber());
-				}
+				seasonBox.getSelectionModel().clearSelection();
+				episodeBox.getSelectionModel().clearSelection();
 			} else {
 				seasonBox.setVisible(false);
 			}
-			descLabel.setText(getItem().getOverview());
+			descLabel.setText(getItem().getOverview(false));
 			gridPane.add(iView, 0, 0, 2, 5);
 			gridPane.add(titleLabel, 2, 0, 3, 1);
 			gridPane.add(descLabel, 2, 1, 3, 3);	

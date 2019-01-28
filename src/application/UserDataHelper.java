@@ -53,7 +53,7 @@ public class UserDataHelper {
 		// if both results are really far off, we probably failed
 		if (series == null &&  cm==null) { 		
 			for (MediaItem m: ControllerMaster.userData.tempManualItems.keySet()) {
-				if (m.fullFilePath.equals(file.getPath())) {
+				if (m.getFullFilePath().equals(file.getPath())) {
 					return false;
 				}
 			}
@@ -66,16 +66,16 @@ public class UserDataHelper {
 					return true;
 				} else if (tvDistance < 3) {
 					episode = MediaSearchHandler.getEpisodeInfo(series.getId(), Integer.parseInt(tvParsedInfo[1]), Integer.parseInt(tvParsedInfo[2]));
-					addTvShow(series, episode, file);
+					addTvShow(series, episode.getSeasonNumber(), episode.getEpisodeNumber(), file);
 					return true;
 				} 
 			} else if (tvDistance < 3) {
 				episode = MediaSearchHandler.getEpisodeInfo(series.getId(), Integer.parseInt(tvParsedInfo[1]), Integer.parseInt(tvParsedInfo[2]));
-				addTvShow(series, episode, file);
+				addTvShow(series, episode.getSeasonNumber(), episode.getEpisodeNumber(), file);
 				return true;
 			}
 			for (MediaItem m: ControllerMaster.userData.tempManualItems.keySet()) {
-				if (m.fullFilePath.equals(file.getPath())) {
+				if (m.getFullFilePath().equals(file.getPath())) {
 					return false;
 				}
 			}
@@ -89,7 +89,7 @@ public class UserDataHelper {
 				return true;
 			} else {
 				for (MediaItem m: ControllerMaster.userData.tempManualItems.keySet()) {
-					if (m.fullFilePath.equals(file.getPath())) {
+					if (m.getFullFilePath().equals(file.getPath())) {
 						return false;
 					}
 				}
@@ -103,27 +103,35 @@ public class UserDataHelper {
 	}
 	
 	public static void addMovie(CustomMovieDb m, File filePath) {
-		addMedia(null, null, m, filePath);
+		addMedia(null, 0, 0, m, filePath);
 	}
 	
-	public static void addTvShow(CustomTvDb t, TvEpisode e, File filePath) {
-		addMedia(t, e, null, filePath);
+	public static void addTvShow(CustomTvDb t, int seasonNum, int epNum, File filePath) {
+		addMedia(t, seasonNum, epNum, null, filePath);
 	}
 
-	public static void addMedia(CustomTvDb t, TvEpisode episode, CustomMovieDb m, File file) {
+	public static void addMedia(CustomTvDb t, int seasonNum, int epNum, CustomMovieDb m, File file) {
 		boolean isMovie = (m != null);
 		MediaItem mi;
 		//ignore duplicates
 		if (isMovie && ControllerMaster.userData.ownsMovie(m.getId()) ||
-				!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), episode)) {
+				!isMovie && ControllerMaster.userData.ownsShow(t.getId()) && ControllerMaster.userData.ownsEpisode(t.getId(), seasonNum, epNum)) {
 			return;
 		}
 		ControllerMaster.userData.addPath(file.getPath());
 		if (!isMovie && ControllerMaster.userData.ownsShow(t.getId())) {
 			mi = ControllerMaster.userData.getTvById(t.getId());
-			mi.tvShow.addEpisode(episode);
+			mi.tvShow.lastViewedSeason = seasonNum;
+			mi.tvShow.lastViewedEpisode = epNum;
+			
+			mi.tvShow.addEpisode(seasonNum, epNum, file.getPath(), file.getName(), file.getParentFile().getName());
 		} else {
 			mi = new MediaItem(t, m, file.getPath(), file.getName(), file.getParentFile().getName());
+			if (!isMovie) {
+				mi.tvShow.addEpisode(seasonNum, epNum, file.getPath(), file.getName(), file.getParentFile().getName());
+				mi.tvShow.lastViewedSeason = seasonNum;
+				mi.tvShow.lastViewedEpisode = epNum;
+			}
 			ControllerMaster.userData.getAllMedia().add(mi);
 			ControllerMaster.mainController.allTiles.add(ControllerMaster.mainController.addMediaTile(mi));
 			//add movie to known collections if there is one

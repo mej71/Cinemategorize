@@ -137,8 +137,8 @@ public  class MediaSearchHandler {
 		return UserData.apiLinker.getSearch().searchTv(seriesName, null, 1);
 	}
 	
-	public static TvSeason getSeasonInfo(int id, int sesId) {
-		TvSeason season = UserData.apiLinker.getTvSeasons().getSeason(id, sesId, "en", SeasonMethod.credits);
+	public static TvSeason getSeasonInfo(int id, int sesNum) {
+		TvSeason season = UserData.apiLinker.getTvSeasons().getSeason(id, sesNum, "en", SeasonMethod.credits);
 		return season;
 	}
 	

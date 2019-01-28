@@ -15,6 +15,7 @@ import javafx.scene.input.KeyEvent;
 public class EscapableBase implements Initializable {
 
 	protected JFXDialog dLink;
+	protected boolean preventEscape = false;
 	
 	
 	@Override
@@ -38,7 +39,7 @@ public class EscapableBase implements Initializable {
     }
 	
 	private EventHandler<KeyEvent> keyListener = (event -> {
-	    if (event.getCode().equals(KeyCode.ESCAPE)) {
+	    if (event.getCode().equals(KeyCode.ESCAPE) && !preventEscape) {
 	    	this.dLink.close();
 	    }	    
 	});

@@ -58,7 +58,9 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		uiMode = initial? UIMode.INITIAL: UIMode.DEFAULT;
 		super.setDialogLink(d);
 		dLink.setOverlayClose(!initial);
+		preventEscape = initial;
 		updateLayout();
+		chooseFileButton.requestFocus();
 		dLink.show(); 
 
 		extFilter = new FileChooser.ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
@@ -122,12 +124,14 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		progressBar.progressProperty().bind(lookupTask.workDoneProperty());
 	    progressLabel.textProperty().bind(lookupTask.messageProperty());
 	    dLink.setOverlayClose(false);
+	    preventEscape = true;
 	    new Thread(lookupTask).start();
 	    lookupTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 	    	@Override
 	    	public void handle(WorkerStateEvent t) {
 	    		//update media list in case items were found
 	    		if (ControllerMaster.userData.numMediaItems() > 0) {
+	    			preventEscape = false;
 	    			ControllerMaster.mainController.refreshSearch();
 	    		} 	else {
 	    			uiMode = UIMode.ERRORED;
@@ -138,6 +142,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	    			ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
 		    	} else {
 		    		if (ControllerMaster.userData.numMediaItems() > 0) {
+		    			preventEscape = false;
 		    			dLink.close();
 		    			return;
 		    		}

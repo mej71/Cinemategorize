@@ -28,11 +28,11 @@ public class FileCell<T extends MediaItem> extends FlowCell<T> {
 			gridPane.maxWidthProperty().bind(getPane().widthProperty());
 			Label folderLabel = new Label();
 			Label fileLabel = new Label();
-			folderLabel.setText(item.fileFolder);
-			fileLabel.setText(item.fileName);
+			folderLabel.setText(item.getFolder());
+			fileLabel.setText(item.getFileName());
 			gridPane.add(folderLabel, 0, 0);
 			gridPane.add(fileLabel, 0, 1);
-			Tooltip.install(this, new Tooltip(item.fullFilePath));
+			Tooltip.install(this, new Tooltip(item.getFullFilePath()));
 			setGraphic(new HBox(gridPane));
 		} 
 	}

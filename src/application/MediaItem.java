@@ -9,6 +9,7 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 
 import info.movito.themoviedbapi.model.Collection;
 import info.movito.themoviedbapi.model.ContentRating;
+import info.movito.themoviedbapi.model.Credits;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.ReleaseInfo;
 import info.movito.themoviedbapi.model.Video;
@@ -27,9 +28,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	private MediaListDisplayType displayType; // can't be mixed
 	CustomTvDb tvShow;
 	CustomMovieDb cMovie;
-	public String fullFilePath;
-	public String fileName;
-	public String fileFolder;
+	private FileInfo fileInfo;
 	public LocalDateTime dateAdded;
 	public double rating = -1;
 	private List<CustomMovieDb> otherParts = new ArrayList<CustomMovieDb>();
@@ -49,14 +48,14 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	public MediaItem(CustomTvDb tv, CustomMovieDb m, String fPath, String fName, String fFolder) {
 		tvShow = tv;
 		cMovie = m;
+		
 		if (cMovie != null) {
-			displayType = MediaListDisplayType.MOVIES;
+			displayType = MediaListDisplayType.MOVIES;	
 		} else if (tv != null) {
 			displayType = MediaListDisplayType.TVSHOWS;
+			tv.setTempFileInfo(fPath, fName, fFolder);
 		}
-		fullFilePath = fPath;
-		fileName = fName;
-		fileFolder = fFolder;
+		fileInfo = new FileInfo(fPath, fName, fFolder);
 		dateAdded = LocalDateTime.now();
 	}
 	
@@ -67,8 +66,9 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 	
 	public void setTvShow(CustomTvDb tv) {
-		cMovie = null;
-		tvShow = tv;
+		this.cMovie = null;
+		this.tvShow = tv;
+		tvShow.tempFileInfo = fileInfo;
 		displayType = MediaListDisplayType.TVSHOWS;
 	}
 
@@ -99,7 +99,28 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public String getFullFilePath() {
-		return fullFilePath;
+		return (isMovie())? fileInfo.fPath : tvShow.getFilePath();
+	}
+	
+	public String getFileName() {
+		return (isMovie())? fileInfo.fName : tvShow.getFileName();
+	}
+	
+	public String getFolder() {
+		return (isMovie())? fileInfo.fFolder : tvShow.getFileFolder();
+	}
+	
+	//makes sure lastview* fields are set properly
+	public void ensureLastViewed() {
+		if (isMovie()) {
+			return;
+		}
+		if (tvShow.lastViewedSeason == 0) {
+			tvShow.lastViewedSeason = getFirstAvailableSeason().getSeasonNumber();
+		}
+		if (tvShow.lastViewedEpisode == 0) {
+			tvShow.lastViewedEpisode = getFirstAvailableEpisode().getEpisodeNumber();
+		}
 	}
 
 	public boolean isMovie() {
@@ -126,7 +147,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 				return "Unknown Movie";
 			}
 		} else {
-			if (cMovie != null) {
+			if (tvShow != null) {
 				return tvShow.getName();
 			} else {
 				return "Unknown TV Show";
@@ -142,7 +163,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 				return "Unknown Movie";
 			}
 		} else {
-			if (cMovie != null) {
+			if (tvShow != null) {
 				return tvShow.getOverview();
 			} else {
 				return "Unknown TV Show";
@@ -161,19 +182,42 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		}
 		return -1;
 	}
+	
+	public int getEpisodeId() {
+		if (isMovie()) {
+			if (cMovie != null) {
+				return cMovie.getId();
+			}
+		} else {
+			return tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getId();
+		}
+		return -1;
+	}
 
 	public String getReleaseDate() {
+		return getReleaseDate(true);
+	}
+	
+	public String getReleaseDate(boolean useEpisode) {
 		if (isMovie()) {
 			if (cMovie != null && cMovie.movie != null) {
 				return cMovie.getReleaseDate();
 			}
 		} else {
-			return tvShow.getFirstAirDate();
+			if (useEpisode) {
+				return tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getAirDate();
+			} else {
+				return tvShow.getFirstAirDate();
+			}
 		}
 		return "";
 	}
-
+	
 	public int getCreditPosition(int personId) {
+		return getCreditPosition(personId, true);
+	}
+
+	public int getCreditPosition(int personId, boolean useEpisode) {
 		if (isMovie()) {
 			if (cMovie != null && cMovie.movie != null) {
 				for (int i = 0; i < cMovie.getCast().size(); ++i) {
@@ -188,13 +232,14 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 				}
 			}
 		} else {
-			for (int i = 0; i < tvShow.getCredits().getCast().size(); ++i) {
-				if (tvShow.getCredits().getCast().get(i).getId() == personId) {
+			Credits credits = (useEpisode)? tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits() : tvShow.getCredits(); 
+			for (int i = 0; i < credits.getCast().size(); ++i) {
+				if (credits.getCast().get(i).getId() == personId) {
 					return i;
 				}
 			}
-			for (int i = 0; i < tvShow.getCredits().getCrew().size(); ++i) {
-				if (tvShow.getCredits().getCrew().get(i).getId() == personId) {
+			for (int i = 0; i < credits.getCrew().size(); ++i) {
+				if (credits.getCrew().get(i).getId() == personId) {
 					return i;
 				}
 			}
@@ -223,10 +268,14 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public List<Person> getCredits() {
+		return getCredits(true);
+	}
+	
+	public List<Person> getCredits(boolean useEpisode) {
 		if (isMovie()) {
 			return cMovie.getCredits().getAll();
 		} else {
-			return tvShow.getCredits().getAll();
+			return (useEpisode)? tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits().getAll() : tvShow.getCredits().getAll();
 		}
 	}
 
@@ -239,34 +288,31 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public List<PersonCrew> getCrew() {
-		return getCrew(0, 0);
+		return getCrew(true);
 	}
 
-	public List<PersonCrew> getCrew(int seasonNum, int epNum) {
+	public List<PersonCrew> getCrew(boolean useEpisode) {
 		if (isMovie()) {
 			return cMovie.getCredits().getCrew();
 		} else {
-			if (seasonNum == 0 || epNum == 0) {
-				return tvShow.getCredits().getCrew();
-			} else {
-				return tvShow.getEpisode(seasonNum, epNum).getCredits().getCrew();
+			if (useEpisode) {
+				if (tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits() != null) {
+					return tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits().getCrew();
+				}
 			}
+			return tvShow.getCredits().getCrew();
 		}
 	}
 
 	public List<PersonCast> getCast() {
-		return getCast(0, 0);
+		return getCast(true);
 	}
 
-	public List<PersonCast> getCast(int seasonNum, int epNum) {
+	public List<PersonCast> getCast(boolean useEpisode) {
 		if (isMovie()) {
 			return cMovie.getCast();
 		} else {
-			if (seasonNum == 0 || epNum == 0) {
-				return tvShow.getCredits().getCast();
-			} else {
-				return tvShow.getEpisode(seasonNum, epNum).getCredits().getCast();
-			}
+			return (useEpisode)? tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits().getCast() : tvShow.getCredits().getCast();
 		}
 	}
 
@@ -279,18 +325,22 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public String getTitle() {
-		return getTitle(0, 0);
+		if (tvShow != null) {
+			return getTitle(true, tvShow.lastViewedSeason, tvShow.lastViewedEpisode);
+		} else {
+			return getTitle(false);
+		}
 	}
 
-	public String getTitle(int seasonNum, int epNum) {
+	public String getTitle(boolean useEpisode) {
+		return getTitle(false, 0, 0);
+	}
+	
+	public String getTitle(boolean useEpisode, int season, int episode) {
 		if (isMovie()) {
 			return cMovie.getTitle();
 		} else {
-			if (seasonNum == 0 || epNum == 0) {
-				return tvShow.getName();
-			} else {
-				return tvShow.getEpisode(seasonNum, epNum).getName();
-			}
+			return (useEpisode)? tvShow.getEpisode(season, episode).getName() : tvShow.getName();
 		}
 	}
 
@@ -303,18 +353,14 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public String getOverview() {
-		return getOverview(0, 0);
+		return getOverview(true);
 	}
 
-	public String getOverview(int seasonNum, int epNum) {
+	public String getOverview(boolean useEpisode) {
 		if (isMovie()) {
 			return (!cMovie.getOverview().isEmpty()) ? cMovie.getOverview() : "No description available";
 		} else {
-			if (seasonNum == 0 || epNum == 0) {
-				return (!tvShow.getOverview().isEmpty()) ? tvShow.getOverview() : "No description available";
-			} else {
-				return tvShow.getEpisodeDescription(seasonNum, epNum);
-			}
+			return (useEpisode)? tvShow.getEpisodeDescription(tvShow.lastViewedSeason, tvShow.lastViewedEpisode) : ((!tvShow.getOverview().isEmpty()) ? tvShow.getOverview() : "No description available");
 		}
 	}
 
@@ -331,21 +377,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		if (isMovie()) {
 			return 0;
 		} else {
-			if (tvShow.getSeasons().get(seasonNum - 1).getEpisodes() == null) {
-
-				// cache seasons, because they are not stored
-				List<TvSeason> seasons = new ArrayList<TvSeason>();
-				TvSeason tempSeason;
-				for (int i = 1; i <= tvShow.getNumberOfSeasons(); ++i) {
-					tempSeason = MediaSearchHandler.getSeasonInfo(getId(), i);
-					if (tempSeason != null) {
-						seasons.add(tempSeason);
-					}
-				}
-				tvShow.setSeasons(seasons);
-			}
-
-			return tvShow.getSeasons().get(seasonNum - 1).getEpisodes().size();
+			return tvShow.getEpisodeNumbers(seasonNum).size();
 		}
 	}
 
@@ -356,12 +388,20 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 			return tvShow.getEpisode(seasonNum, epNum);
 		}
 	}
-
-	public List<TvEpisode> getEpisodes() {
+	
+	public List<TvEpisode> getAllEpisodes() {
 		if (isMovie()) {
 			return new ArrayList<TvEpisode>();
 		} else {
-			return tvShow.getEpisodes();
+			return tvShow.getAllEpisodes();
+		}
+	}
+
+	public List<TvEpisode> getEpisodes(int seasonNum) {
+		if (isMovie()) {
+			return new ArrayList<TvEpisode>();
+		} else {
+			return tvShow.getEpisodes(seasonNum);
 		}
 	}
 
@@ -370,12 +410,15 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		if (isMovie()) {
 			return null;
 		} else {
-			for (int i : tvShow.getSeasonNumbers()) {
-				for (int j : tvShow.getEpisodes(i)) {
-					return tvShow.getEpisode(i, j);
-				}
-			}
+			return tvShow.getFirstAvailableEpisode(tvShow.getFirstAvailableSeason().getSeasonNumber());
+		}
+	}
+	
+	public TvSeason getFirstAvailableSeason() {
+		if (isMovie()) {
 			return null;
+		} else {
+			return tvShow.getFirstAvailableSeason();
 		}
 	}
 
@@ -404,10 +447,14 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public float getVoteAverage() {
+		return getVoteAverage(true);
+	}
+	
+	public float getVoteAverage(boolean useEpisode) {
 		if (isMovie()) {
 			return cMovie.getVoteAverage();
 		} else {
-			return tvShow.getVoteAverage();
+			return (useEpisode)? tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getVoteAverage() : tvShow.getVoteAverage();
 		}
 	}
 

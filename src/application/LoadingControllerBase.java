@@ -45,6 +45,18 @@ public class LoadingControllerBase extends EscapableBase implements Initializabl
 		if (needsLoad) {
 			showLoadingPane();
 		}
+		this.dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
+
+			@Override
+			public void handle(JFXDialogEvent event) {
+				startTask();				
+				event.consume();
+			}
+			
+		});
+	}
+	
+	protected void startTask() {
 		loadTask = new Task<Object>() {
 
 			@Override
@@ -57,15 +69,7 @@ public class LoadingControllerBase extends EscapableBase implements Initializabl
 		loadTask.setOnSucceeded(e -> {
 			successTasks();
 		});
-		this.dLink.setOnDialogOpened(new EventHandler<JFXDialogEvent>() {
-
-			@Override
-			public void handle(JFXDialogEvent event) {
-				loadTask.run();				
-				event.consume();
-			}
-			
-		});
+		loadTask.run();
 	}
 	
 	protected void runTasks() {}

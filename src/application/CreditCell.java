@@ -174,8 +174,11 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	@Override
 	protected void runOnClick() {
 		super.runOnClick();
-		if (ControllerMaster.userData.ownsMovie(item.getId()) || ControllerMaster.userData.ownsShow(item.getId()) ) {
-			ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getId()) );
+		if (item.getMediaType().equalsIgnoreCase("TV") &&  ControllerMaster.userData.ownsShow(item.getId())) {
+			ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getTvById(item.getMediaId()) );
+		}
+		if (!item.getMediaType().equalsIgnoreCase("TV") && ControllerMaster.userData.ownsMovie(item.getId())) {
+			ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getMediaId()));		
 		}
 	}
 	

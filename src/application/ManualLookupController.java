@@ -136,13 +136,13 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	public void confirmMediaItem() {
 		JFXDialogLayout confirmLayout = new JFXDialogLayout();
 		String releaseDate = "";
-    	if (resultsFlowPane.selectedCell.getItem().getReleaseDate() != null && resultsFlowPane.selectedCell.getItem().getReleaseDate().length()>3) {
-    		releaseDate = " (" + resultsFlowPane.selectedCell.getItem().getReleaseDate().substring(0, 4) + ")";
+    	if (resultsFlowPane.selectedCell.getItem().getReleaseDate(false) != null && resultsFlowPane.selectedCell.getItem().getReleaseDate(false).length()>3) {
+    		releaseDate = " (" + resultsFlowPane.selectedCell.getItem().getReleaseDate(false).substring(0, 4) + ")";
     	} else {
     		releaseDate += " (N/A)";
 		}
 		String text = "The file\n" + fileFlowPane.selectedCell.getItem().getFullFilePath() + "\nis " + 
-				resultsFlowPane.selectedCell.getItem().getTitle() + releaseDate;
+				resultsFlowPane.selectedCell.getItem().getTitle(false) + releaseDate;
 		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
 			text += "Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
 		} 
@@ -174,7 +174,6 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	
 	@FXML
 	public void addMediaItem() {
-
 		MediaItem fileItem = fileFlowPane.selectedCell.getItem();
 		ResultsMediaItem resultItem = resultsFlowPane.selectedCell.getItem();
 		//set choice to proper media result
@@ -185,16 +184,16 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		}
 		
 		if (fileItem.isMovie()) {
-			UserDataHelper.addMovie( fileItem.cMovie, new File(fileItem.fullFilePath) );
+			UserDataHelper.addMovie( fileItem.cMovie, new File(fileItem.getFullFilePath()) );
 		} else {
 			TvEpisode episode = MediaSearchHandler.getEpisodeInfo(fileItem.getId(), resultItem.getTempSeasonNum(), 
 					resultItem.getTempEpisodeNum());
-			UserDataHelper.addTvShow(fileItem.tvShow, episode, new File(fileItem.fullFilePath));
+			UserDataHelper.addTvShow(fileItem.tvShow, episode.getSeasonNumber(), episode.getEpisodeNumber(), new File(fileItem.getFullFilePath()));
 		}
 		
 		//cleanup
 		for (MediaItem mi : ControllerMaster.userData.tempManualItems.keySet()) {
-			if (mi.fullFilePath.equals(fileItem.fullFilePath)) {
+			if (mi.getFullFilePath().equals(fileItem.getFullFilePath())) {
 				ControllerMaster.userData.tempManualItems.remove(mi);
 				break;
 			}

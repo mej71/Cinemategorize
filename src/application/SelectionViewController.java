@@ -18,6 +18,8 @@ import com.jfoenix.controls.JFXScrollPane;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -73,6 +75,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private Label tagsLabel;
     @FXML private Label actLabel;
     @FXML private Label writLabel;
+    @FXML private Label episodeTitleLabel;
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
@@ -83,6 +86,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	private List<JFXPersonRippler> actorTiles = new ArrayList<JFXPersonRippler>();	
 	private List<JFXPersonRippler> directorTiles = new ArrayList<JFXPersonRippler>();
 	private List<JFXPersonRippler> writerTiles = new ArrayList<JFXPersonRippler>();
+	private TileAnimator tileAnimator = new TileAnimator();
     
     
 	@Override
@@ -112,6 +116,32 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			}
 			
 		});
+		seasonComboBox.valueProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (newValue != null && newValue != oldValue) {
+					int season = Integer.parseInt(newValue);
+					mediaItem.tvShow.lastViewedSeason = season;
+					episodeComboBox.getItems().clear();
+					for (Integer i : mediaItem.tvShow.getOwnedEpisodeNumbers(season)) {
+						episodeComboBox.getItems().add(i.toString());
+					}
+					//select first available episode on season change
+					episodeComboBox.getSelectionModel().select(0);
+					startTask();
+				}
+			}			
+		});
+		episodeComboBox.valueProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (newValue != null && newValue != oldValue) {
+					int episode = Integer.parseInt(newValue);
+					mediaItem.tvShow.lastViewedEpisode = episode;
+					startTask();			
+				}
+			}			
+		});
 		infoScrollPane.prefWidthProperty().bind(mainGrid.widthProperty().multiply(0.64));
 		infoScrollPane.prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.70));
 		directorFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
@@ -122,17 +152,27 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
 		posterImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		descLabel.wrappingWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
-		TileAnimator tileAnimator = new TileAnimator();
 		tileAnimator.observe(genreFlowPane.getChildren());
 		tileAnimator.observe(directorFlowPane.getChildren());
 		tileAnimator.observe(actorFlowPane.getChildren());
 		tileAnimator.observe(writerFlowPane.getChildren());
 		tileAnimator.observe(tagsFlowPane.getChildren());
+	
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
 		super.setDialogLink(d, !mi.hasLoaded());
 		mediaItem = mi;
+		tvTitleGridPane.setVisible(!mediaItem.isMovie());
+		movieTitleGridPane.setVisible(mediaItem.isMovie());
+		if (!mi.isMovie() ) {
+			seasonComboBox.getItems().clear();
+			for (Integer i : mediaItem.tvShow.getOwnedSeasonNumbers()) {
+				seasonComboBox.getItems().add(i.toString());
+			}
+			seasonComboBox.getSelectionModel().select(String.valueOf(mediaItem.tvShow.lastViewedSeason));
+			episodeComboBox.getSelectionModel().select(String.valueOf(mediaItem.tvShow.lastViewedEpisode));
+		}
 		if (personViewDialog == null) {
 			try {
 				loader = new FXMLLoader(getClass().getClassLoader().getResource("PersonViewContent.fxml"));
@@ -186,7 +226,12 @@ public class SelectionViewController extends LoadingControllerBase implements In
     	} else {
     		releaseDate = " (N/A)";
 		}
-		movieTitleLabel.setText(mediaItem.getTitle()+ releaseDate);
+		if (mediaItem.isMovie()) {
+			movieTitleLabel.setText(mediaItem.getTitle()+ releaseDate);  
+		} else {
+			tvTitleLabel.setText(mediaItem.getTitle(false) + ": ");
+			episodeTitleLabel.setText(mediaItem.getTitle() + releaseDate);
+		}
 		genreLabel.setText( (mediaItem.getGenres().size()>1)? "Genres:" : "Genre:" );
 		genreFlowPane.getChildren().clear();
 		for (int i = 0; i < mediaItem.getGenres().size(); ++i) {
@@ -241,10 +286,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		if (!found) {
 			ratingLabel.setText("N/A");
 		}
-		seasonComboBox.setVisible(mediaItem.isTvShow());
-		episodeComboBox.setVisible(mediaItem.isTvShow());
-		movieTitleGridPane.setVisible(mediaItem.isMovie());
-		tvTitleGridPane.setVisible(mediaItem.isTvShow());
 		posterImageView.setImage(MediaSearchHandler.getItemPoster(mediaItem, 500).getImage());
 		posterImageView.setEffect(new DropShadow());
 	}
@@ -293,8 +334,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		} else {
 			videoLink = null;
 		}
-		movieTitleGridPane.setVisible(true);
-		tvTitleGridPane.setVisible(false);
 		descLabel.setText("\t"+ mediaItem.getOverview());		
 		
 		//use runtime 
