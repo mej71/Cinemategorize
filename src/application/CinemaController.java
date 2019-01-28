@@ -185,15 +185,7 @@ public class CinemaController implements Initializable {
             @Override
             public void changed(ObservableValue source, Object oldValue, Object newValue) {
             	ControllerMaster.userData.setScaleFactor(scaleSlider.getValue()*0.25);
-            	tilePane.setVgap(15*ControllerMaster.userData.getScaleFactor());
-        		tilePane.setHgap(10*ControllerMaster.userData.getScaleFactor());
-        		StackPane n;
-        		for (int i = 0; i < tilePane.getChildren().size(); ++i) {
-        			n = ((JFXMediaRippler)tilePane.getChildren().get(i)).getPane();
-        			n.setMaxWidth(139*ControllerMaster.userData.getScaleFactor());
-        			n.setMaxHeight(208*ControllerMaster.userData.getScaleFactor());
-        			n.resize(139*ControllerMaster.userData.getScaleFactor(), 208*ControllerMaster.userData.getScaleFactor());
-        		}
+            	updateScale();
             	scaleLabel.textProperty().setValue("Image Size: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
             } 
         });
@@ -341,6 +333,18 @@ public class CinemaController implements Initializable {
 	@FXML private void clearCollectionSelection() {
 		collectionsCombo.getSelectionModel().clearSelection();
 		mainGrid.requestFocus();
+	}
+	
+	public void updateScale() {
+		tilePane.setVgap(15*ControllerMaster.userData.getScaleFactor());
+		tilePane.setHgap(10*ControllerMaster.userData.getScaleFactor());
+		StackPane n;
+		for (int i = 0; i < tilePane.getChildren().size(); ++i) {
+			n = ((JFXMediaRippler)tilePane.getChildren().get(i)).getPane();
+			n.setMaxWidth(139*ControllerMaster.userData.getScaleFactor());
+			n.setMaxHeight(208*ControllerMaster.userData.getScaleFactor());
+			n.resize(139*ControllerMaster.userData.getScaleFactor(), 208*ControllerMaster.userData.getScaleFactor());
+		}
 	}
 	
 	public void refreshSearch() {

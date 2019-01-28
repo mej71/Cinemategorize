@@ -570,16 +570,7 @@ public class UserData implements Serializable {
 		}
 		ControllerMaster.mainController.tilePane.getChildren().setAll(workingCollection);
 		sortShownItems();
-		//force resize of nodes to account for size changes made while searching
-		ControllerMaster.mainController.tilePane.setVgap(15*getScaleFactor());
-		ControllerMaster.mainController.tilePane.setHgap(10*getScaleFactor());
-		StackPane n;
-		for (int i = 0; i < ControllerMaster.mainController.tilePane.getChildren().size(); ++i) {
-			n = ((JFXMediaRippler)ControllerMaster.mainController.tilePane.getChildren().get(i)).getPane();
-			n.setMaxWidth(139*getScaleFactor());
-			n.setMaxHeight(208*getScaleFactor());
-			n.resize(139*getScaleFactor(), 208*getScaleFactor());
-		}
+		ControllerMaster.mainController.updateScale();
 	}
 	
 	public boolean canAddToList(Date parsedDate, int iD, boolean isMove) {
