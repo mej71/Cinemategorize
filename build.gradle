@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'maven'
 }
 
 group 'com.mej71'
@@ -32,4 +33,23 @@ dependencies {
     compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.14'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
     compile group: 'com.eeeeeric', name: 'mpc-hc-api', version: '0.1.0'
+}
+
+task createPom  {
+    pom {
+        project {
+            groupId this.group
+            artifactId 'cinemategorize'
+            version this.version
+
+            inceptionYear '2019'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("pom.xml")
 }

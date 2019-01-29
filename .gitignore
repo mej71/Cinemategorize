@@ -27,7 +27,7 @@ save_data/
 images/
 *.ttf
 #hides the api keys
-*.xml
+xml/
 *.prefs
 bin/
 /build/
