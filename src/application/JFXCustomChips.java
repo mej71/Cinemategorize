@@ -15,18 +15,14 @@ public class JFXCustomChips {
         label.getStyleClass().add("genre-chip-label");
         HBox root = new HBox(label);
         root.getStyleClass().add("genre-chip-hbox");
-        root.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent ev) {
-				ControllerMaster.mainController.searchField.setText(g.getName());
-				ControllerMaster.mainController.autoCompletePopup.hide();
-				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.GENRE, g));
-				ControllerMaster.mainController.refreshSearch();
-				ControllerMaster.mainController.closeDialogs();
-				ev.consume();
-			}
-        	
-        });
+        root.setOnMouseClicked(ev -> {
+			ControllerMaster.mainController.searchField.setText(g.getName());
+			ControllerMaster.mainController.autoCompletePopup.hide();
+			ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.GENRE, g));
+			ControllerMaster.mainController.refreshSearch();
+			ControllerMaster.mainController.closeDialogs();
+			ev.consume();
+		});
         return root;
 	}
 	
@@ -36,18 +32,14 @@ public class JFXCustomChips {
         label.getStyleClass().add("tag-chip-label");
         HBox root = new HBox(label);
         root.getStyleClass().add("tag-chip-hbox");
-        root.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent ev) {
-				ControllerMaster.mainController.searchField.setText(tag);
-				ControllerMaster.mainController.autoCompletePopup.hide();
-				ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.TAG, tag));
-				ControllerMaster.mainController.refreshSearch();
-				ControllerMaster.mainController.closeDialogs();
-				ev.consume();
-			}
-        	
-        });
+        root.setOnMouseClicked(ev -> {
+			ControllerMaster.mainController.searchField.setText(tag);
+			ControllerMaster.mainController.autoCompletePopup.hide();
+			ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.TAG, tag));
+			ControllerMaster.mainController.refreshSearch();
+			ControllerMaster.mainController.closeDialogs();
+			ev.consume();
+		});
         return root;
 	}
 

@@ -23,15 +23,10 @@ public class SettingsController extends EscapableBase implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		themeComboBox.setItems(FXCollections.observableArrayList(ThemeSelection.themes));
 		
-		themeComboBox.valueProperty().addListener(new ChangeListener<ThemeSelection>() {
-
-			@Override
-			public void changed(ObservableValue<? extends ThemeSelection> ov, ThemeSelection oldVal, ThemeSelection newVal) {
-				if (newVal != null) {
-					ThemeSelection.updateTheme(newVal);
-				}
+		themeComboBox.valueProperty().addListener((ov, oldVal, newVal) -> {
+			if (newVal != null) {
+				ThemeSelection.updateTheme(newVal);
 			}
-			
 		});
 		
 		themeComboBox.setConverter(new StringConverter<ThemeSelection>() {
@@ -48,15 +43,10 @@ public class SettingsController extends EscapableBase implements Initializable {
 			
 		});
 		
-		autoLookupToggle.selectedProperty().addListener(new ChangeListener<Boolean>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldVal, Boolean newVal) {
-				if (newVal != null) {
-					ControllerMaster.userData.useAutoLookup = newVal;
-				}				
+		autoLookupToggle.selectedProperty().addListener((observable, oldVal, newVal) -> {
+			if (newVal != null) {
+				ControllerMaster.userData.useAutoLookup = newVal;
 			}
-			
 		});
 		
 	}

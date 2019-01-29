@@ -1,6 +1,7 @@
 package application;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,7 +35,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 @SuppressWarnings("rawtypes")
@@ -44,23 +44,14 @@ public class SelectionViewController extends LoadingControllerBase implements In
 
 	@FXML private ImageView posterImageView;
     @FXML private Text descLabel;
-    @FXML private GridPane canResumeGridPane;
-    @FXML private JFXButton resumeButton;
-    @FXML private JFXButton playBeginningButton1;
-    @FXML private JFXButton trailerButton1;
-    @FXML private GridPane noResumeGridPane;
-    @FXML private JFXButton playBeginningButton2;
-    @FXML private JFXButton trailerButton2;
     @FXML private GridPane tvTitleGridPane;
     @FXML private Label tvTitleLabel;
     @FXML private JFXComboBox<String> seasonComboBox;
     @FXML private JFXComboBox<String> episodeComboBox;
     @FXML private GridPane movieTitleGridPane;
     @FXML private Label movieTitleLabel;
-    @FXML private StackPane youtubeStackPane;
     @FXML private Label dirLabel;
     @FXML private Label genreLabel;
-    @FXML private Label writtenLabel;
     @FXML private Label runTimeLabel;
     @FXML private FlowPane directorFlowPane;
     @FXML private FlowPane writerFlowPane;
@@ -74,13 +65,14 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private Label actLabel;
     @FXML private Label writLabel;
     @FXML private Label episodeTitleLabel;
+    @FXML private JFXButton playAllEpisodesButton;
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
 	private JFXDialog personViewDialog;
-	private List<JFXPersonRippler> actorTiles = new ArrayList<JFXPersonRippler>();	
-	private List<JFXPersonRippler> directorTiles = new ArrayList<JFXPersonRippler>();
-	private List<JFXPersonRippler> writerTiles = new ArrayList<JFXPersonRippler>();
+	private List<JFXPersonRippler> actorTiles = new ArrayList<>();
+	private List<JFXPersonRippler> directorTiles = new ArrayList<>();
+	private List<JFXPersonRippler> writerTiles = new ArrayList<>();
 	private TileAnimator tileAnimator = new TileAnimator();
     
     
@@ -100,44 +92,32 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			actorTiles.add(JFXPersonRippler.createBasicRippler());
 		}
 
-		rating.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				if (mediaItem!=null) {
-					mediaItem.rating = rating.getRating();
-		    		if (!rating.getStyleClass().contains("loaded")) {
-						rating.getStyleClass().add("loaded");
-					}
-		    	}
+		rating.setOnMouseClicked(event -> {
+			if (mediaItem!=null) {
+				mediaItem.rating = rating.getRating();
+				if (!rating.getStyleClass().contains("loaded")) {
+					rating.getStyleClass().add("loaded");
+				}
 			}
-			
 		});
-		seasonComboBox.valueProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue != null && newValue != oldValue) {
-					int season = Integer.parseInt(newValue);
-					mediaItem.tvShow.lastViewedSeason = season;
-					episodeComboBox.getItems().clear();
-					for (Integer i : mediaItem.tvShow.getOwnedEpisodeNumbers(season)) {
-						episodeComboBox.getItems().add(i.toString());
-					}
-					//select first available episode on season change
-					episodeComboBox.getSelectionModel().select(0);
-					startTask();
+		seasonComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != null && newValue != oldValue) {
+				int season = Integer.parseInt(newValue);
+				mediaItem.tvShow.lastViewedSeason = season;
+				episodeComboBox.getItems().clear();
+				for (Integer i : mediaItem.tvShow.getOwnedEpisodeNumbers(season)) {
+					episodeComboBox.getItems().add(i.toString());
 				}
-			}			
+				//select first available episode on season change
+				episodeComboBox.getSelectionModel().select(0);
+				startTask();
+			}
 		});
-		episodeComboBox.valueProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue != null && newValue != oldValue) {
-					int episode = Integer.parseInt(newValue);
-					mediaItem.tvShow.lastViewedEpisode = episode;
-					startTask();			
-				}
-			}			
+		episodeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != null && newValue != oldValue) {
+				mediaItem.tvShow.lastViewedEpisode= Integer.parseInt(newValue);
+				startTask();
+			}
 		});
 		infoScrollPane.prefWidthProperty().bind(mainGrid.widthProperty().multiply(0.64));
 		infoScrollPane.prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.70));
@@ -154,7 +134,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		tileAnimator.observe(actorFlowPane.getChildren());
 		tileAnimator.observe(writerFlowPane.getChildren());
 		tileAnimator.observe(tagsFlowPane.getChildren());
-	
+		playAllEpisodesButton.managedProperty().bindBidirectional(playAllEpisodesButton.visibleProperty());
 	}
 	
 	public void showMediaItem(JFXDialog d, MediaItem mi) {
@@ -162,6 +142,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		mediaItem = mi;
 		tvTitleGridPane.setVisible(!mediaItem.isMovie());
 		movieTitleGridPane.setVisible(mediaItem.isMovie());
+		playAllEpisodesButton.setVisible(!mediaItem.isMovie());
 		if (!mi.isMovie() ) {
 			seasonComboBox.getItems().clear();
 			for (Integer i : mediaItem.tvShow.getOwnedSeasonNumbers()) {
@@ -236,9 +217,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		}
 		genreLabel.setVisible(genreFlowPane.getChildren().size()>0);
 		if (mediaItem.rating==-1) {
-			if (rating.getStyleClass().contains("loaded")) {
-				rating.getStyleClass().remove("loaded");
-			}
+			rating.getStyleClass().remove("loaded");
 			rating.setRating(mediaItem.getVoteAverage()/10*5);
 		} else {
 			rating.setRating(mediaItem.rating);
@@ -295,7 +274,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		ObservableList<Node> workingWriterCollection = FXCollections.observableArrayList();
 		ObservableList<Node> workingActorCollection = FXCollections.observableArrayList();
 		PersonCrew pCrew;
-		List<Integer> writerIds = new ArrayList<Integer>();
+		List<Integer> writerIds = new ArrayList<>();
 		for (int i = 0; i < mediaItem.getCrew().size(); ++i) {
 			pCrew = mediaItem.getCrew().get(i);
 			if (pCrew.getJob().equalsIgnoreCase("Director")) {
@@ -341,11 +320,49 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		Platform.runLater(() -> actorFlowPane.requestLayout());		
 	}
 	
-	@FXML public void playVideo() {
-		//MediaPlayerClassicHomeCinema mpc = new MediaPlayerClassicHomeCinema("127.0.0.1", 55555);
+	@FXML public void playMedia() {
+		openFile(mediaItem.getFullFilePath());
 	}
-	
-	
+
+	//create a m3u playlist of all path files, then play
+	//adds episodes before after the last episode so it plays in a loop starting with your chosen episode
+	@FXML public void playShow() {
+		List<String> previousFilePaths = new ArrayList<>();
+		List<String> filePaths = new ArrayList<>();
+		String tempPath = "";
+		for (int i = 1; i <= mediaItem.getNumSeasons(); ++i) {
+			for (int j = 1; j < mediaItem.getEpisodes(i).size(); ++j) {
+				tempPath = mediaItem.getFullFilePath(i, j);
+				//skip empty paths
+				if (!tempPath.isEmpty()) {
+					if (i <= Integer.parseInt(seasonComboBox.getValue()) && j < Integer.parseInt(episodeComboBox.getValue())) {
+						previousFilePaths.add(tempPath);
+					} else {
+						filePaths.add(tempPath);
+					}
+				}
+			}
+		}
+		filePaths.addAll(previousFilePaths);
+		File file = M3UBuilder.buildFile(filePaths);
+		if (file != null) {
+			openFile(file.getAbsolutePath());
+		}
+	}
+
+	private void openFile(String path) {
+		if (Desktop.isDesktopSupported()) {
+			try {
+				File file = new File(path);
+				Desktop.getDesktop().open(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("The filepath " + path + " is invalid.");
+			}
+		} else {
+			System.out.println("Unsupported OS, please post this bug and your OS at github");
+		}
+	}
 	
 	@FXML public void playTrailer() {
 		if (videoLink==null || videoLink.isEmpty()) {

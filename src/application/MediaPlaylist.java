@@ -11,7 +11,7 @@ public class MediaPlaylist implements Serializable {
 	private LinkedHashMap<String, List<MediaItem>> playlists;
 	
 	public MediaPlaylist() {
-		playlists = new LinkedHashMap<String, List<MediaItem>>();
+		playlists = new LinkedHashMap<>();
 	}
 	
 	public boolean nameAlreadyUsed(String name) {
@@ -27,7 +27,7 @@ public class MediaPlaylist implements Serializable {
 	
 	public void addItemToPlaylist(String name, MediaItem item) {
 		if (!playlists.containsKey(name)) {
-			playlists.put(name, new ArrayList<MediaItem>());
+			playlists.put(name, new ArrayList<>());
 		}
 		playlists.get(name).add(item);
 	}
@@ -41,7 +41,7 @@ public class MediaPlaylist implements Serializable {
 	}
 	
 	public List<String> getPlaylistNames() {
-		return new ArrayList<String>(playlists.keySet());
+		return new ArrayList<>(playlists.keySet());
 	}
 	
 	public void clear() {

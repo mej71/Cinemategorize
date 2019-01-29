@@ -31,11 +31,11 @@ public class JFXSmoothScroll  {
 	}	
 	
 	public static void smoothHScrolling(MovieScrollPane scrollPane) {
-		smoothScrolling(scrollPane, scrollPane.hvalueProperty(), bounds -> bounds.getWidth());
+		smoothScrolling(scrollPane, scrollPane.hvalueProperty(), Bounds::getWidth);
 	}
 	
 	public static void smoothScrolling(MovieScrollPane scrollPane) {
-		smoothScrolling(scrollPane, scrollPane.vvalueProperty(), bounds -> bounds.getHeight());
+		smoothScrolling(scrollPane, scrollPane.vvalueProperty(), Bounds::getHeight);
 	}
 
 	private static void smoothScrolling(MovieScrollPane scrollPane, DoubleProperty scrollDriection, Function<Bounds, Double> sizeFunc) {
@@ -87,11 +87,11 @@ public class JFXSmoothScroll  {
 	}
 	
 	public static void smoothHScrollingListView(ListView<?> listView, double speed) {
-		smoothScrollingListView(listView, speed, Orientation.HORIZONTAL, bounds -> bounds.getHeight());
+		smoothScrollingListView(listView, speed, Orientation.HORIZONTAL, Bounds::getHeight);
 	}
 	
 	public static void smoothScrollingListView(ListView<?> listView, double speed) {
-		smoothScrollingListView(listView, speed, Orientation.VERTICAL, bounds -> bounds.getHeight());
+		smoothScrollingListView(listView, speed, Orientation.VERTICAL, Bounds::getHeight);
 	}
 	
 	private  static void smoothScrollingListView(ListView<?> listView, double speed, Orientation orientation, Function<Bounds, Double> sizeFunc) {

@@ -124,7 +124,7 @@ public class SearchItem {
 		}
 		movieList.removeAll(Collections.singleton(null)); //remove all null values so we don't get an empty list
 		tvList.removeAll(Collections.singleton(null)); 
-		Map<String,List<Integer>> map = new HashMap<String, List<Integer>>();
+		Map<String,List<Integer>> map = new HashMap<>();
 		if (!movieList.isEmpty()) {
 			map.put("movies", movieList);
 		}

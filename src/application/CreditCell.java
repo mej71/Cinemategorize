@@ -74,9 +74,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 			@Override
 			public void run() {
 				if (hasEntered) {
-					Platform.runLater(() -> {
-						pOver.show(tempCell);
-					});
+					Platform.runLater(() -> pOver.show(tempCell));
 					this.cancel();
 					hasEntered = false;
 				}				
@@ -184,11 +182,11 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	}
 	
 	public static <T extends PersonCredit> List<CreditCell<T>> createCells(List<T> credits, ListFlowPane<CreditCell<T>,T> pane) {
-		List<CreditCell<T>> cells = new ArrayList<CreditCell<T>>();
+		List<CreditCell<T>> cells = new ArrayList<>();
 		for (T credit : credits) {
-			cells.add(new CreditCell<T>(credit, pane));
+			cells.add(new CreditCell<>(credit, pane));
 		}
-		return null;
+		return cells;
 		
 	}
 }

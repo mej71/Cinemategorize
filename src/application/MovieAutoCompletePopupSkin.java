@@ -47,7 +47,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	@SuppressWarnings("unchecked")
 	public MovieAutoCompletePopupSkin(MovieAutoCompletePopup control) {
 		this.control = control;
-		suggestionList = new ListView<SearchItem>((ObservableList<SearchItem>) control.getFilteredSuggestions());
+		suggestionList = new ListView<>((ObservableList<SearchItem>) control.getFilteredSuggestions());
 		suggestionList.setFixedCellSize(control.getFixedCellSize());
 		control.fixedCellSizeProperty()
 				.addListener(observable -> suggestionList.setFixedCellSize(control.getFixedCellSize()));
@@ -227,8 +227,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 			}
 		}
 		if (item != null) {
-			control.getSelectionHandler().handle(new MovieAutoCompleteEvent<SearchItem>(MovieAutoCompleteEvent.SELECTION,
-					suggestionList.getSelectionModel().getSelectedItem()));
+			control.getSelectionHandler().handle(new MovieAutoCompleteEvent<>(MovieAutoCompleteEvent.SELECTION,
+                    suggestionList.getSelectionModel().getSelectedItem()));
 		}
 	}
 

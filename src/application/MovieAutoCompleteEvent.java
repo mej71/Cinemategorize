@@ -43,5 +43,5 @@ public class MovieAutoCompleteEvent<T> extends Event {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static final EventType<MovieAutoCompleteEvent> SELECTION  =	new EventType<MovieAutoCompleteEvent>(Event.ANY, "JFX_AUTOCOMPLETE_SELECTION");
+	public static final EventType<MovieAutoCompleteEvent> SELECTION  = new EventType<>(Event.ANY, "JFX_AUTOCOMPLETE_SELECTION");
 }

@@ -44,9 +44,9 @@ public class FileCell<T extends MediaItem> extends FlowCell<T> {
 	}
 	
 	public static <T extends MediaItem> List<FileCell<T>> createCells(Set<T> items, ListFlowPane<FileCell<T>, T> pane) {
-		List<FileCell<T>> cells = new ArrayList<FileCell<T>>();
+		List<FileCell<T>> cells = new ArrayList<>();
 		for (T item : items) {
-			cells.add(new FileCell<T>(item, pane));
+			cells.add(new FileCell<>(item, pane));
 		}
 		return cells;		
 	}

@@ -27,12 +27,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>com.eeeeeric</groupId>
-      <artifactId>mpc-hc-api</artifactId>
-      <version>0.1.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>

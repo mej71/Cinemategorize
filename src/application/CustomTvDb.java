@@ -19,17 +19,17 @@ public class CustomTvDb implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	//season, episode num episode.  TreeMap to sort by keys
-	private LinkedHashMap<Integer, LinkedHashMap<Integer, FileInfo>> episodePaths= new LinkedHashMap<Integer, LinkedHashMap<Integer, FileInfo>>();
+	private LinkedHashMap<Integer, LinkedHashMap<Integer, FilePathInfo>> episodePaths= new LinkedHashMap<>();
 	public TvSeries series;
 	public double rating = -1;	
 	public int lastViewedSeason = 0;
 	public int lastViewedEpisode = 0;
-	public transient FileInfo tempFileInfo;
+	public transient FilePathInfo tempFilePathInfo;
 	
 	
 	public CustomTvDb(TvSeries tvs) {
 		series = tvs;
-		//init path list (FileInfo members are null until specific episode is loaded)
+		//init path list (FilePathInfo members are null until specific episode is loaded)
 		for (int i = 0; i < series.getNumberOfSeasons(); ++i) {
 			if (series.getSeasons().get(i) != null) {
 				loadSeason(i+1);
@@ -45,16 +45,16 @@ public class CustomTvDb implements Serializable {
 	}
 	
 	public void setTempFileInfo(String fPath, String fName, String fFolder) {
-		tempFileInfo = new FileInfo(fPath, fName, fFolder);
+		tempFilePathInfo = new FilePathInfo(fPath, fName, fFolder);
 	}
 	
 	//get sorted array of seasons that starts with 1
 	public List<Integer> getSeasonNumbers() {
-		return new ArrayList<Integer>(episodePaths.keySet());
+		return new ArrayList<>(episodePaths.keySet());
 	}
 	
 	public List<Integer> getOwnedSeasonNumbers() {
-		List<Integer> seasons = new ArrayList<Integer>();
+		List<Integer> seasons = new ArrayList<>();
 		for (Integer i : episodePaths.keySet()) {
 			for (Integer k : getEpisodeNumbers(i)) {
 				if (episodePaths.get(i).get(k) != null) {
@@ -67,11 +67,11 @@ public class CustomTvDb implements Serializable {
 	}
 	
 	public List<Integer> getEpisodeNumbers(int seasonNum) {
-		return new ArrayList<Integer>(episodePaths.get(seasonNum).keySet());
+		return new ArrayList<>(episodePaths.get(seasonNum).keySet());
 	}
 	
 	public List<Integer> getOwnedEpisodeNumbers(int seasonNum) {
-		List<Integer> episodes = new ArrayList<Integer>();
+		List<Integer> episodes = new ArrayList<>();
 		for (Integer i : getEpisodeNumbers(seasonNum)) {
 			if (episodePaths.get(seasonNum).get(i) != null) {
 				episodes.add(i);
@@ -107,7 +107,7 @@ public class CustomTvDb implements Serializable {
 		if (season != null) {
 			getSeasons().set(seasonNum-1, season);
 		}
-		episodePaths.put(seasonNum, new LinkedHashMap<Integer, FileInfo>());
+		episodePaths.put(seasonNum, new LinkedHashMap<>());
 	}
 	
 	//loads episode info for single episode
@@ -147,7 +147,7 @@ public class CustomTvDb implements Serializable {
 	}
 	
 	public List<TvEpisode> getAllEpisodes() {
-		List<TvEpisode> episodes = new ArrayList<TvEpisode>();
+		List<TvEpisode> episodes = new ArrayList<>();
 		for (int i : getSeasonNumbers()) {
 			episodes.addAll(getEpisodes(i));
 		}
@@ -173,11 +173,11 @@ public class CustomTvDb implements Serializable {
 	//add file location info and force credit lookup
 	//episode should always be added before calling any episode specific lookups
 	public void addEpisode(int seasonNum, int epNum, String filePath, String fileName, String fileFolder) {
-		FileInfo fInfo = new FileInfo(filePath, fileName, fileFolder);
+		FilePathInfo fInfo = new FilePathInfo(filePath, fileName, fileFolder);
 		if (episodePaths.containsKey(seasonNum)) {
 			episodePaths.get(seasonNum).put(epNum, fInfo);
 		} else {
-			episodePaths.put(seasonNum, new LinkedHashMap<Integer, FileInfo>());
+			episodePaths.put(seasonNum, new LinkedHashMap<>());
 			episodePaths.get(seasonNum).put(epNum, fInfo);
 		}
 		loadEpisode(seasonNum, epNum);
@@ -251,26 +251,50 @@ public class CustomTvDb implements Serializable {
 	public List<Video> getVideos() {
 		return series.getVideos();
 	}
-	
+
 	public String getFilePath() {
-		if (lastViewedSeason == 0 || lastViewedEpisode == 0) {
-			return tempFileInfo.fPath;
-		}
-		return episodePaths.get(lastViewedSeason).get(lastViewedEpisode).fPath;
+		return getFilePath(lastViewedSeason, lastViewedEpisode);
 	}
-	
+
+	public String getFilePath(int seasonNum, int epNum) {
+		if (seasonNum == 0 || epNum == 0) {
+			return tempFilePathInfo.fPath;
+		}
+		if (episodePaths.get(seasonNum).get(epNum) != null) {
+			return episodePaths.get(seasonNum).get(epNum).fPath;
+		} else {
+			return "";
+		}
+	}
+
 	public String getFileName() {
-		if (lastViewedSeason == 0 || lastViewedEpisode == 0) {
-			return tempFileInfo.fName;
-		}
-		return episodePaths.get(lastViewedSeason).get(lastViewedEpisode).fName;
+		return getFileName(lastViewedSeason, lastViewedEpisode);
 	}
-	
-	public String getFileFolder() {
-		if (lastViewedSeason == 0 || lastViewedEpisode == 0) {
-			return tempFileInfo.fFolder;
+
+	public String getFileName(int seasonNum, int epNum) {
+		if (seasonNum == 0 || epNum == 0) {
+			return tempFilePathInfo.fName;
 		}
-		return episodePaths.get(lastViewedSeason).get(lastViewedEpisode).fFolder;
+		if (episodePaths.get(seasonNum).get(epNum) != null) {
+			return episodePaths.get(seasonNum).get(epNum).fName;
+		} else {
+			return "";
+		}
+	}
+
+	public String getFileFolder() {
+		return getFileFolder(lastViewedSeason, lastViewedEpisode);
+	}
+
+	public String getFileFolder(int seasonNum, int epNum) {
+		if (seasonNum == 0 || epNum == 0) {
+			return tempFilePathInfo.fFolder;
+		}
+		if (episodePaths.get(seasonNum).get(epNum) != null) {
+			return episodePaths.get(seasonNum).get(epNum).fFolder;
+		} else {
+			return "";
+		}
 	}
 
 	

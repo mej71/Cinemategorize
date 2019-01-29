@@ -23,7 +23,7 @@ public class MediaResultsPage {
 	
 	//don't do lookups until results are requested
 	public List<ResultsMediaItem> getResults() {
-		List<ResultsMediaItem> results = new ArrayList<ResultsMediaItem>();
+		List<ResultsMediaItem> results = new ArrayList<>();
 		if (tvResults != null) {
 			for (int i = 0; i < tvResults.getResults().size(); ++i) {
 				results.add(new ResultsMediaItem(MediaSearchHandler.getTvInfoById(tvResults.getResults().get(i).getId()).tvShow));

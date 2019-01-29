@@ -1,7 +1,6 @@
 package application;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javafx.animation.TranslateTransition;
@@ -14,7 +13,7 @@ import javafx.scene.Node;
 import javafx.util.Duration;
 
 
-/**
+/*
  * Code is written by Stack Overflow users: Chui Tey and corrected/fixed by jewelsea
  * THIS CLASS IS FROM ->
  * https://gist.github.com/teyc/5668517
@@ -23,7 +22,7 @@ import javafx.util.Duration;
  * Modified by ignoring small movements and variable animation speed
  */
 
-/**
+/*
  * Animates nodes on position change. Ignores very slight movements 
  */
 
@@ -32,7 +31,7 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
   private Map<Node, TranslateTransition> nodeHTransitions = new HashMap<>();
   private Map<Node, TranslateTransition> nodeVTransitions = new HashMap<>();
 
-    public void observe(ObservableList<Node> nodes) {
+  public void observe(ObservableList<Node> nodes) {
     nodes.addListener(this);
   }
   
@@ -90,11 +89,11 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
   public void onChanged(Change<? extends Node> change) {
     while (change.next()) {
       if (change.wasAdded()) {
-        for (Node node : (List<Node>) change.getAddedSubList()) {
+        for (Node node : change.getAddedSubList()) {
           this.observe(node);
         }
       } else if (change.wasRemoved()) {
-        for (Node node : (List<Node>) change.getRemoved()) {
+        for (Node node : change.getRemoved()) {
           this.unobserve(node);
         }
       }

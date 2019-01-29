@@ -48,8 +48,8 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 			titleLabel = new Label();
 			titleLabel.getStyleClass().add("header");
 			descLabel = new Label();
-			seasonBox = new JFXComboBox<Integer>();
-			episodeBox = new JFXComboBox<Integer>();
+			seasonBox = new JFXComboBox<>();
+			episodeBox = new JFXComboBox<>();
 			seasonBox.setPromptText("Season");
 			seasonBox.setLabelFloat(true);
 			episodeBox.setPromptText("Episode");
@@ -99,46 +99,28 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 				seasonBox.setItems(
 						FXCollections.observableArrayList(IntStream.rangeClosed(1,getItem().getNumSeasons()).boxed().collect(Collectors.toList()))
 				);
-				seasonBox.valueProperty().addListener(new ChangeListener<Integer>() {
-
-					@Override
-					public void changed(ObservableValue<? extends Integer> obVal, Integer oldVal, Integer newVal) {
-						episodeBox.setItems(
-					    FXCollections.observableArrayList(IntStream.rangeClosed(1, getItem().getNumEpisodes(newVal)).boxed().collect(Collectors.toList())));
-					}
-					
-				});
+				seasonBox.valueProperty().addListener((obVal, oldVal, newVal) -> episodeBox.setItems(
+				FXCollections.observableArrayList(IntStream.rangeClosed(1, getItem().getNumEpisodes(newVal)).boxed().collect(Collectors.toList()))));
 				
 				//episode box shouldn't be visible unless items have been filled
 				
-				episodeBox.itemsProperty().addListener(new ChangeListener<ObservableList<Integer>>() {
-
-					@Override
-					public void changed(ObservableValue<? extends ObservableList<Integer>> observable,
-							ObservableList<Integer> oldValue, ObservableList<Integer> newValue) {
-						if (newValue != null && !newValue.isEmpty()) {
-							episodeBox.setVisible(true);
-						} else {
-							episodeBox.setVisible(false);
-						}					
+				episodeBox.itemsProperty().addListener((observable, oldValue, newValue) -> {
+					if (newValue != null && !newValue.isEmpty()) {
+						episodeBox.setVisible(true);
+					} else {
+						episodeBox.setVisible(false);
 					}
-				
 				});
 				
-				episodeBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Integer>() {
-
-					@Override
-					public void changed(ObservableValue<? extends Integer> ov, Integer oldVal, Integer newVal) {
-						if (newVal != null) {
-							titleLabel.setText(getItem().getTitle(false) + ": " + getItem().getTitle(true, seasonBox.getValue(), episodeBox.getValue()));
-							descLabel.setText(getItem().getEpisode(seasonBox.getValue(), newVal).getOverview());
-						} else {
-							titleLabel.setText(getItem().getTitle(false));
-							descLabel.setText(getItem().getOverview(false));
-						}
-						
+				episodeBox.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
+					if (newVal != null) {
+						titleLabel.setText(getItem().getTitle(false) + ": " + getItem().getTitle(true, seasonBox.getValue(), episodeBox.getValue()));
+						descLabel.setText(getItem().getEpisode(seasonBox.getValue(), newVal).getOverview());
+					} else {
+						titleLabel.setText(getItem().getTitle(false));
+						descLabel.setText(getItem().getOverview(false));
 					}
-					
+
 				});
 				gridPane.add(seasonBox, 2, 4);
 				gridPane.add(episodeBox, 3, 4);
@@ -181,9 +163,9 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	
 
 	public static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results, ListFlowPane<ResultCell<T>,T> pane) {
-		List<ResultCell<T>> cells = new ArrayList<ResultCell<T>>();
+		List<ResultCell<T>> cells = new ArrayList<>();
 		for (T result : results) {
-			cells.add(new ResultCell<T>(result, pane));
+			cells.add(new ResultCell<>(result, pane));
 		}
 		return cells;
 	}

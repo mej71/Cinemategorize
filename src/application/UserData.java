@@ -45,7 +45,6 @@ import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.layout.StackPane;
 
 public class UserData implements Serializable {
 
@@ -53,28 +52,28 @@ public class UserData implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private List<MediaItem> allMedia = new ArrayList<>();
-	private TreeMap<String, List<Integer>> movieTags = new TreeMap<String, List<Integer>>(String.CASE_INSENSITIVE_ORDER); // cache list of tags for search updating
-	private TreeMap<String, List<Integer>> tvTags = new TreeMap<String, List<Integer>>(String.CASE_INSENSITIVE_ORDER); 
-	private LinkedHashMap<PersonCrew, List<Integer>> directorsMovieList = new LinkedHashMap<PersonCrew, List<Integer>>();
-	private LinkedHashMap<PersonCrew, List<Integer>> writersMovieList = new LinkedHashMap<PersonCrew, List<Integer>>();
-	private LinkedHashMap<PersonCast, List<Integer>> actorsMovieList = new LinkedHashMap<PersonCast, List<Integer>>();
-	private LinkedHashMap<Genre, List<Integer>> genreMovieList = new LinkedHashMap<Genre, List<Integer>>();
-	private LinkedHashMap<String, List<Integer>> userMovieLists = new LinkedHashMap<String, List<Integer>>();
-	private LinkedHashMap<PersonCrew, List<Integer>> directorsTvList = new LinkedHashMap<PersonCrew, List<Integer>>();
-	private LinkedHashMap<PersonCrew, List<Integer>> writersTvList = new LinkedHashMap<PersonCrew, List<Integer>>();
-	private LinkedHashMap<PersonCast, List<Integer>> actorsTvList = new LinkedHashMap<PersonCast, List<Integer>>();
-	private LinkedHashMap<Genre, List<Integer>> genreTvList = new LinkedHashMap<Genre, List<Integer>>();
-	private LinkedHashMap<String, List<Integer>> userTvLists = new LinkedHashMap<String, List<Integer>>();
-	private LinkedHashMap<Integer, PersonPeople> personList = new LinkedHashMap<Integer, PersonPeople>();
-	private LinkedHashMap<Integer, PersonCredits> creditsList = new LinkedHashMap<Integer, PersonCredits>();
-	private List<String> allPaths = new ArrayList<String>();
+	private TreeMap<String, List<Integer>> movieTags = new TreeMap<>(String.CASE_INSENSITIVE_ORDER); // cache list of tags for search updating
+	private TreeMap<String, List<Integer>> tvTags = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+	private LinkedHashMap<PersonCrew, List<Integer>> directorsMovieList = new LinkedHashMap<>();
+	private LinkedHashMap<PersonCrew, List<Integer>> writersMovieList = new LinkedHashMap<>();
+	private LinkedHashMap<PersonCast, List<Integer>> actorsMovieList = new LinkedHashMap<>();
+	private LinkedHashMap<Genre, List<Integer>> genreMovieList = new LinkedHashMap<>();
+	private LinkedHashMap<String, List<Integer>> userMovieLists = new LinkedHashMap<>();
+	private LinkedHashMap<PersonCrew, List<Integer>> directorsTvList = new LinkedHashMap<>();
+	private LinkedHashMap<PersonCrew, List<Integer>> writersTvList = new LinkedHashMap<>();
+	private LinkedHashMap<PersonCast, List<Integer>> actorsTvList = new LinkedHashMap<>();
+	private LinkedHashMap<Genre, List<Integer>> genreTvList = new LinkedHashMap<>();
+	private LinkedHashMap<String, List<Integer>> userTvLists = new LinkedHashMap<>();
+	private LinkedHashMap<Integer, PersonPeople> personList = new LinkedHashMap<>();
+	private LinkedHashMap<Integer, PersonCredits> creditsList = new LinkedHashMap<>();
+	private List<String> allPaths = new ArrayList<>();
 	private double scaleFactor = 1.0;
-	public LinkedHashMap<Integer, MovieDb> seenMovies = new LinkedHashMap<Integer, MovieDb>();
-	public LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<Integer, TvSeries>();
-	public LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<Integer, List<PersonCredit>>();
+	public LinkedHashMap<Integer, MovieDb> seenMovies = new LinkedHashMap<>();
+	public LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<>();
+	public LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<>();
 	public MediaPlaylist userPlaylists = new MediaPlaylist();
-	public LinkedHashMap<Collection, List<MediaItem>> ownedCollections = new LinkedHashMap<Collection, List<MediaItem>>();
-	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<MediaItem, MediaResultsPage>();
+	public LinkedHashMap<Collection, List<MediaItem>> ownedCollections = new LinkedHashMap<>();
+	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<>();
 	public int minYear = 0;
 	public int maxYear = 0;
 	
@@ -131,70 +130,70 @@ public class UserData implements Serializable {
 		if (actorsMovieList.containsKey(actor)) {
 			return actorsMovieList.get(actor);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithActor(PersonCast actor) {
 		if (actorsTvList.containsKey(actor)) {
 			return actorsTvList.get(actor);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	public List<Integer> getMoviesWithDirector(PersonCrew director) {
 		if (directorsMovieList.containsKey(director)) {
 			return directorsMovieList.get(director);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithDirector(PersonCrew director) {
 		if (directorsTvList.containsKey(director)) {
 			return directorsTvList.get(director);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	public List<Integer> getMoviesWithTag(String tag) {
 		if (movieTags.containsKey(tag)) {
 			return movieTags.get(tag);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithTag(String tag) {
 		if (tvTags.containsKey(tag)) {
 			return tvTags.get(tag);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getMoviesWithWriter(PersonCrew writer) {
 		if (writersMovieList.containsKey(writer)) {
 			return writersMovieList.get(writer);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithWriter(PersonCrew writer) {
 		if (writersTvList.containsKey(writer)) {
 			return writersTvList.get(writer);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getMoviesWithGenre(Genre g) {
 		if (genreMovieList.containsKey(g)) {
 			return genreMovieList.get(g);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithGenre(Genre g) {
 		if (genreTvList.containsKey(g)) {
 			return genreTvList.get(g);
 		} 
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 	
 	public boolean ownsMovie(int iD) {
@@ -268,8 +267,6 @@ public class UserData implements Serializable {
 			save.writeObject(this);
 			save.close();
 			saveFile.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -346,6 +343,7 @@ public class UserData implements Serializable {
 	}	
 	
 	final String regExSpecialChars = "<([{\\^-=$!|]})?*+.>";
+	@SuppressWarnings("ReplaceAllDot")
 	final String regExSpecialCharsRE = regExSpecialChars.replaceAll( ".", "\\\\$0");
 	final Pattern reCharsREP = Pattern.compile( "[" + regExSpecialCharsRE + "]");
 
@@ -420,7 +418,7 @@ public class UserData implements Serializable {
 		if (tagList.containsKey(StringTools.capitalize(tag.getName()))) {
 			tagList.get(StringTools.capitalize(tag.getName())).add(mId);
 		} else {
-			tagList.put(StringTools.capitalize(tag.getName()), new ArrayList<>(Arrays.asList(mId)));
+			tagList.put(StringTools.capitalize(tag.getName()), new ArrayList<>(Collections.singletonList(mId)));
 		}
 	}
 	
@@ -467,7 +465,7 @@ public class UserData implements Serializable {
 		if (list.containsKey(g)) {
 			list.get(g).add(mId);
 		} else {
-			list.put(g, new ArrayList<>(Arrays.asList(mId)));
+			list.put(g, new ArrayList<>(Collections.singletonList(mId)));
 		}
 	}
 
@@ -479,22 +477,22 @@ public class UserData implements Serializable {
 		ObservableList<Node> workingCollection = FXCollections.observableArrayList((ControllerMaster.mainController.tilePane.getChildren()));
 		switch (ControllerMaster.mainController.sortCombo.getValue()) {
 		case NAME_ASC:
-			Collections.sort(workingCollection, (o1, o2) -> ((JFXMediaRippler)o1).linkedItem.getTitle().compareTo(((JFXMediaRippler)o2).linkedItem.getTitle()));
+			workingCollection.sort((o1, o2) -> ((JFXMediaRippler) o1).linkedItem.getTitle().compareTo(((JFXMediaRippler) o2).linkedItem.getTitle()));
 			break;
 		case NAME_DESC:
-			Collections.sort(workingCollection, (o2, o1) -> ((JFXMediaRippler)o1).linkedItem.getTitle().compareTo(((JFXMediaRippler)o2).linkedItem.getTitle()));
+			workingCollection.sort((o2, o1) -> ((JFXMediaRippler) o1).linkedItem.getTitle().compareTo(((JFXMediaRippler) o2).linkedItem.getTitle()));
 			break;
 		case ADDED_DATE_ASC:
-			Collections.sort(workingCollection, (o1, o2) -> ((JFXMediaRippler)o1).linkedItem.dateAdded.compareTo(((JFXMediaRippler)o2).linkedItem.dateAdded));
+			workingCollection.sort((o1, o2) -> ((JFXMediaRippler) o1).linkedItem.dateAdded.compareTo(((JFXMediaRippler) o2).linkedItem.dateAdded));
 			break;
 		case ADDED_DATE_DESC:
-			Collections.sort(workingCollection, (o2, o1) -> ((JFXMediaRippler)o1).linkedItem.dateAdded.compareTo(((JFXMediaRippler)o2).linkedItem.dateAdded));
+			workingCollection.sort((o2, o1) -> ((JFXMediaRippler) o1).linkedItem.dateAdded.compareTo(((JFXMediaRippler) o2).linkedItem.dateAdded));
 			break;
 		case RELEASE_DATE_ASC:
-			Collections.sort(workingCollection, (o1, o2) -> ((JFXMediaRippler)o1).linkedItem.getReleaseDate().compareTo(((JFXMediaRippler)o2).linkedItem.getReleaseDate()));
+			workingCollection.sort((o1, o2) -> ((JFXMediaRippler) o1).linkedItem.getReleaseDate().compareTo(((JFXMediaRippler) o2).linkedItem.getReleaseDate()));
 			break;
 		case RELEASE_DATE_DESC:
-			Collections.sort(workingCollection, (o1, o2) -> ((JFXMediaRippler)o2).linkedItem.getReleaseDate().compareTo(((JFXMediaRippler)o1).linkedItem.getReleaseDate()));
+			workingCollection.sort((o1, o2) -> ((JFXMediaRippler) o2).linkedItem.getReleaseDate().compareTo(((JFXMediaRippler) o1).linkedItem.getReleaseDate()));
 			break;
 		default:
 			break;
@@ -503,32 +501,32 @@ public class UserData implements Serializable {
 	}
 
 	public void refreshViewingList(Map<String, List<Integer>> map) {
-		List<Integer> moviesList = new ArrayList<Integer>();
-		List<Integer> tvList = new ArrayList<Integer>();
+		List<Integer> moviesList = new ArrayList<>();
+		List<Integer> tvList = new ArrayList<>();
 		if (map.containsKey("movies")) {
 			moviesList = map.get("movies");
-		} 
+		}
 		if (map.containsKey("tv")) {
 			tvList = map.get("tv");
 		}
 		ObservableList<Node> workingCollection = FXCollections.observableArrayList();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Date startDate = null;
 		Date endDate = null;
 		try {
-			startDate = (ControllerMaster.mainController.startYearComboBox.getValue()==null)? null : formatter.parse(ControllerMaster.mainController.startYearComboBox.getValue() +"-01-01");
-			endDate = (ControllerMaster.mainController.endYearComboBox.getValue()==null)? null : formatter.parse(ControllerMaster.mainController.endYearComboBox.getValue() +"-12-31");
+			startDate = (ControllerMaster.mainController.startYearComboBox.getValue() == null) ? null : formatter.parse(ControllerMaster.mainController.startYearComboBox.getValue() + "-01-01");
+			endDate = (ControllerMaster.mainController.endYearComboBox.getValue() == null) ? null : formatter.parse(ControllerMaster.mainController.endYearComboBox.getValue() + "-12-31");
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		boolean noSearchIds = moviesList.isEmpty() && tvList.isEmpty();
 		boolean canShowMovies = ControllerMaster.mainController.mediaTypeCombo.getValue() != MediaListDisplayType.TVSHOWS;
 		boolean canShowTv = ControllerMaster.mainController.mediaTypeCombo.getValue() != MediaListDisplayType.MOVIES;
-		List<MediaItem> selectedPlaylist = (ControllerMaster.mainController.playlistCombo.getValue() == null) ? 
-				new ArrayList<MediaItem>() : userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue());
-		List<MediaItem> selectedCollection = (ControllerMaster.mainController.collectionsCombo.getValue() == null)? 
-				new ArrayList<MediaItem>() : ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue());
+		List<MediaItem> selectedPlaylist = (ControllerMaster.mainController.playlistCombo.getValue() == null) ?
+				new ArrayList<>() : userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue());
+		List<MediaItem> selectedCollection = (ControllerMaster.mainController.collectionsCombo.getValue() == null) ?
+				new ArrayList<>() : ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue());
 		Date parsedDate = null;
 		JFXMediaRippler mRip;
 		MediaItem mi;
@@ -540,9 +538,9 @@ public class UserData implements Serializable {
 			mi = mRip.linkedItem;
 			mId = mi.getId();
 			//if it fits search criteria
-			if ( noSearchIds || (tvList.contains(mId) && !mi.isMovie()) || (moviesList.contains(mId) && mi.isMovie()) ) {
+			if (noSearchIds || (tvList.contains(mId) && !mi.isMovie()) || (moviesList.contains(mId) && mi.isMovie())) {
 				//if it can be shown
-				if ( (mi.isMovie() && canShowMovies) || (!mi.isMovie() && canShowTv) ) {
+				if ((mi.isMovie() && canShowMovies) || (!mi.isMovie() && canShowTv)) {
 					//if no playlist is selected or it contains this
 					if (selectedPlaylist.isEmpty() || selectedPlaylist.contains(mi)) {
 						if (selectedCollection.isEmpty() || selectedCollection.contains(mi)) {
@@ -550,10 +548,10 @@ public class UserData implements Serializable {
 								parsedDate = formatter.parse(mRip.linkedItem.getReleaseDate());
 							} catch (ParseException e) {
 								//e.printStackTrace(); happens occasionally from improperly maintained db items
-							}	
+							}
 							//if it's in the proper date selection
-							if (startDate==null || parsedDate == null || startDate.before(parsedDate)) {
-								if (endDate==null || parsedDate == null || endDate.after(parsedDate)) {
+							if (startDate == null || parsedDate == null || startDate.before(parsedDate)) {
+								if (endDate == null || parsedDate == null || endDate.after(parsedDate)) {
 									if (mRip.linkedItem.isMovie()) {
 										type = "movie";
 									} else {
@@ -573,14 +571,6 @@ public class UserData implements Serializable {
 		ControllerMaster.mainController.updateScale();
 	}
 	
-	public boolean canAddToList(Date parsedDate, int iD, boolean isMove) {
-		boolean ret = true;
-		
-		return ret;
-	}
-	
-	
-	
 	//check if file has already been added.  Used to avoid unnecessary lookups
 	public boolean hasPath(String path) {
 		return allPaths.contains(path);
@@ -589,7 +579,6 @@ public class UserData implements Serializable {
 	public void addPath(String path) {
 		allPaths.add(path);
 	}
-
 
 	public List<MediaItem> getAllMedia() {
 		return allMedia;

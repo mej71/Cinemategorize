@@ -71,8 +71,8 @@ public class CinemaController implements Initializable {
 	public MovieScrollPane scrollPane;
 	// other variables
 	public final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
-	public List<JFXMediaRippler> allTiles = new ArrayList<JFXMediaRippler>();
-	public LinkedHashMap<String, MediaItem> showingMedia = new LinkedHashMap<String, MediaItem>();
+	public List<JFXMediaRippler> allTiles = new ArrayList<>();
+	public LinkedHashMap<String, MediaItem> showingMedia = new LinkedHashMap<>();
 	public MovieAutoCompletePopup autoCompletePopup;
 	public MovieAutoCompleteEvent<SearchItem> autoEvent;
 	public JFXDialog selectionViewWindow;
@@ -93,66 +93,33 @@ public class CinemaController implements Initializable {
 		mediaTypeCombo.getItems().clear();
 		mediaTypeCombo.setItems(FXCollections.observableArrayList( MediaListDisplayType.values()));
 		mediaTypeCombo.setValue(MediaListDisplayType.ALL);
-		mediaTypeCombo.valueProperty().addListener(new ChangeListener<MediaListDisplayType>() {
-			@Override
-			public void changed(ObservableValue<? extends MediaListDisplayType> ov, MediaListDisplayType oldVal, MediaListDisplayType newVal) {
-				refreshSearch();
-			}
-		});
+		mediaTypeCombo.valueProperty().addListener((ov, oldVal, newVal) -> refreshSearch());
 		
 		sortCombo.getItems().clear();
 		sortCombo.setItems(FXCollections.observableArrayList( SortTypes.values()));
 		sortCombo.setValue(SortTypes.NAME_ASC);
-		sortCombo.valueProperty().addListener(new ChangeListener<SortTypes>() {
-
-			@Override
-			public void changed(ObservableValue<? extends SortTypes> arg0, SortTypes arg1, SortTypes arg2) {
-				ControllerMaster.userData.sortShownItems();
-			}
-			
-		});
+		sortCombo.valueProperty().addListener((arg0, arg1, arg2) -> ControllerMaster.userData.sortShownItems());
 		
 		updatePlaylistCombo();
-		playlistCombo.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
-
-			@Override
-			public PlaylistCell<String> call(ListView<String> param) {
-				return new PlaylistCell();
+		playlistCombo.setCellFactory(param -> new PlaylistCell());
+		playlistCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue!=null) {
+				playlistClearButton.setVisible(true);
+			} else {
+				playlistClearButton.setVisible(false);
 			}
-			
-		});
-		playlistCombo.valueProperty().addListener(new ChangeListener<String>() {
-
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (newValue!=null) {
-					playlistClearButton.setVisible(true);
-	            } else {
-	            	playlistClearButton.setVisible(false);
-	            }
-				refreshSearch();
-			}
+			refreshSearch();
 		});
 
 		updateCollectionCombo();
-		collectionsCombo.setCellFactory(new Callback<ListView<Collection>, ListCell<Collection>>() {
-			@Override
-			public CollectionCell<Collection> call(ListView<Collection> param) {
-				return new CollectionCell();
+		collectionsCombo.setCellFactory(param -> new CollectionCell());
+		collectionsCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue!=null) {
+				collectionsClearButton.setVisible(true);
+			} else {
+				collectionsClearButton.setVisible(false);
 			}
-			
-		});
-		collectionsCombo.valueProperty().addListener(new ChangeListener<Collection>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Collection> observable, Collection oldValue, Collection newValue) {
-				if (newValue!=null) {
-					collectionsClearButton.setVisible(true);
-	            } else {
-	            	collectionsClearButton.setVisible(false);
-	            }
-				refreshSearch();
-			}
+			refreshSearch();
 		});
 		collectionsCombo.setConverter(new StringConverter<Collection>() {
 
@@ -175,14 +142,11 @@ public class CinemaController implements Initializable {
 		tilePane.setHgap(10);
 		TileAnimator tileAnimator = new TileAnimator();
 		tileAnimator.observe(tilePane.getChildren());
-		scaleSlider.valueProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue source, Object oldValue, Object newValue) {
-            	ControllerMaster.userData.setScaleFactor(scaleSlider.getValue()*0.25);
-            	updateScale();
-            	scaleLabel.textProperty().setValue("Image Size: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
-            } 
-        });
+		scaleSlider.valueProperty().addListener((ChangeListener) (source, oldValue, newValue) -> {
+			ControllerMaster.userData.setScaleFactor(scaleSlider.getValue()*0.25);
+			updateScale();
+			scaleLabel.textProperty().setValue("Image Size: " + (Math.round(ControllerMaster.userData.getScaleFactor() * 100.0) / 100.0));
+		});
 		
 		scrollPane = new MovieScrollPane();
 		scrollPane.setFitToWidth(true);
@@ -221,46 +185,37 @@ public class CinemaController implements Initializable {
 	        }
 	    });
 	    
-	    searchField.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent arg0) {
-				if (!autoCompletePopup.getFilteredSuggestions().isEmpty() && !searchField.getText().isEmpty()) {
-                	autoCompletePopup.show(searchField);
-                }				
-			}
-	    });
+	    searchField.setOnMouseClicked(arg0 -> {
+			if (!autoCompletePopup.getFilteredSuggestions().isEmpty() && !searchField.getText().isEmpty()) {
+autoCompletePopup.show(searchField);
+}
+		});
 	    
 	    fillYearCombos(ControllerMaster.userData.minYear, ControllerMaster.userData.maxYear);
 	    //date range validation
-	    startYearComboBox.valueProperty().addListener(new ChangeListener<Integer>() {
-			@Override
-			public void changed(ObservableValue<? extends Integer> ov, Integer oldValue, Integer newValue) {
-				if (newValue!=null) {
-	            	if (endYearComboBox.getValue() != null  && newValue > endYearComboBox.getValue()) {
-	            		endYearComboBox.getSelectionModel().clearSelection();
-	            	}
-	            	startDateClearButton.setVisible(true);
-	            } else {
-	            	startDateClearButton.setVisible(false);
-	            }
-				refreshSearch();
-			}
+	    startYearComboBox.valueProperty().addListener((ov, oldValue, newValue) -> {
+			if (newValue!=null) {
+				if (endYearComboBox.getValue() != null  && newValue > endYearComboBox.getValue()) {
+					endYearComboBox.getSelectionModel().clearSelection();
+				}
+				startDateClearButton.setVisible(true);
+} else {
+				startDateClearButton.setVisible(false);
+}
+			refreshSearch();
 		});
 
-	    endYearComboBox.valueProperty().addListener(new ChangeListener<Integer>() {
- 			@Override
- 			public void changed(ObservableValue<? extends Integer> ov, Integer oldValue, Integer newValue) {
- 				if (newValue!=null) {
- 	            	if (startYearComboBox.getValue()!=null && newValue < startYearComboBox.getValue()) {
- 	            		startYearComboBox.getSelectionModel().clearSelection();
- 	            	}
- 	            	endDateClearButton.setVisible(true);
- 	            } else {
- 	            	endDateClearButton.setVisible(false);
- 	            }
- 				refreshSearch();
- 			}
-	 	});
+	    endYearComboBox.valueProperty().addListener((ov, oldValue, newValue) -> {
+			if (newValue!=null) {
+				if (startYearComboBox.getValue()!=null && newValue < startYearComboBox.getValue()) {
+					startYearComboBox.getSelectionModel().clearSelection();
+				}
+				endDateClearButton.setVisible(true);
+} else {
+				endDateClearButton.setVisible(false);
+}
+			refreshSearch();
+		});
 	    
 	    //set up dialogs
 		try {
@@ -345,7 +300,7 @@ public class CinemaController implements Initializable {
 		if (autoEvent != null) {
 			ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs());
 		} else {
-			ControllerMaster.userData.refreshViewingList(new HashMap<String, List<Integer>>());
+			ControllerMaster.userData.refreshViewingList(new HashMap<>());
 		}
 	}
 	

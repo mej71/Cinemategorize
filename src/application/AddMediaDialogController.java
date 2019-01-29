@@ -16,7 +16,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -122,29 +121,26 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	    dLink.setOverlayClose(false);
 	    preventEscape = true;
 	    new Thread(lookupTask).start();
-	    lookupTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-	    	@Override
-	    	public void handle(WorkerStateEvent t) {
-	    		//update media list in case items were found
-	    		if (ControllerMaster.userData.numMediaItems() > 0) {
-	    			preventEscape = false;
-	    			ControllerMaster.mainController.refreshSearch();
-	    		} 	else {
-	    			uiMode = UIMode.ERRORED;
-	    		}
-	    		updateLayout();
-	    		//if unknown items were found, open manual lookup, if not and some items are owned, close
-	    		if (ControllerMaster.userData.tempManualItems.size() > 0) {
-	    			ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
-		    	} else {
-		    		if (ControllerMaster.userData.numMediaItems() > 0) {
-		    			preventEscape = false;
-		    			dLink.close();
-		    			return;
-		    		}
-		    	}
-	    	}
-	    });
+	    lookupTask.setOnSucceeded(t -> {
+			//update media list in case items were found
+			if (ControllerMaster.userData.numMediaItems() > 0) {
+				preventEscape = false;
+				ControllerMaster.mainController.refreshSearch();
+			} 	else {
+				uiMode = UIMode.ERRORED;
+			}
+			updateLayout();
+			//if unknown items were found, open manual lookup, if not and some items are owned, close
+			if (ControllerMaster.userData.tempManualItems.size() > 0) {
+				ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
+			} else {
+				if (ControllerMaster.userData.numMediaItems() > 0) {
+					preventEscape = false;
+					dLink.close();
+					return;
+				}
+			}
+		});
 	}
 	
 	//same as chooseFile but for folders

@@ -8,38 +8,41 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SettingsController">
-   <rowConstraints>
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-   </rowConstraints>
-   <columnConstraints>
-      <ColumnConstraints minWidth="10.0" percentWidth="50.0" />
-      <ColumnConstraints minWidth="10.0" percentWidth="50.0" />
-   </columnConstraints>
-   <children>
-      <JFXToggleButton fx:id="autoLookupToggle" alignment="BOTTOM_LEFT" contentDisplay="GRAPHIC_ONLY" text="Use Auto Lookup" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="5.0" right="5.0" />
-         </GridPane.margin></JFXToggleButton>
-      <JFXComboBox fx:id="themeComboBox" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="5.0" right="5.0" />
-         </GridPane.margin></JFXComboBox>
-      <Label text="Theme" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="5.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Use AutoLookup" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="5.0" />
-         </GridPane.margin>
-      </Label>
-      <Label styleClass="header" text="Settings" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-   </children>
+<GridPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="application.SettingsController">
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+        <RowConstraints minHeight="10.0" prefHeight="30.0"/>
+    </rowConstraints>
+    <columnConstraints>
+        <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
+        <ColumnConstraints minWidth="10.0" percentWidth="50.0"/>
+    </columnConstraints>
+    <JFXToggleButton fx:id="autoLookupToggle" alignment="BOTTOM_LEFT" contentDisplay="GRAPHIC_ONLY"
+                     text="Use Auto Lookup" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1">
+        <GridPane.margin>
+          <Insets left="5.0" right="5.0"/>
+        </GridPane.margin>
+    </JFXToggleButton>
+    <JFXComboBox fx:id="themeComboBox" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2">
+        <GridPane.margin>
+          <Insets left="5.0" right="5.0"/>
+        </GridPane.margin>
+    </JFXComboBox>
+    <Label text="Theme" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+        <GridPane.margin>
+          <Insets left="5.0"/>
+        </GridPane.margin>
+    </Label>
+    <Label text="Use AutoLookup" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+        <GridPane.margin>
+          <Insets left="5.0"/>
+        </GridPane.margin>
+    </Label>
+    <Label styleClass="header" text="Settings" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+           GridPane.valignment="CENTER"/>
 </GridPane>

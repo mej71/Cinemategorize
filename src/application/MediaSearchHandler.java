@@ -39,19 +39,17 @@ import javafx.scene.image.ImageView;
 public  class MediaSearchHandler {
 
 	private static String personProfileDir = "/people";
-	public static Comparator<Collection> releaseDateComparator = new Comparator<Collection>(){
-	     public int compare(Collection o1, Collection o2){ 
-	    	 String o1Date = (o1.getReleaseDate() != null)? o1.getReleaseDate() : "";
-	    	 String o2Date = (o2.getReleaseDate() != null)? o2.getReleaseDate() : "";
-	    	 if (o1Date.isEmpty() && o2Date.isEmpty()) {
-	    		 return 0;
-	    	 } else if (o1Date.isEmpty() && !o2Date.isEmpty()) {
-	    		 return 1;
-	    	 } else if (!o1Date.isEmpty() && o2Date.isEmpty()) {
-	    		 return -1;
-	    	 }
-	    	 return o1Date.compareTo(o2Date);
-	     }
+	public static Comparator<Collection> releaseDateComparator = (o1, o2) -> {
+		String o1Date = (o1.getReleaseDate() != null)? o1.getReleaseDate() : "";
+		String o2Date = (o2.getReleaseDate() != null)? o2.getReleaseDate() : "";
+		if (o1Date.isEmpty() && o2Date.isEmpty()) {
+			return 0;
+		} else if (o1Date.isEmpty() && !o2Date.isEmpty()) {
+			return 1;
+		} else if (!o1Date.isEmpty() && o2Date.isEmpty()) {
+			return -1;
+		}
+		return o1Date.compareTo(o2Date);
 	};
 	
 	
@@ -81,8 +79,7 @@ public  class MediaSearchHandler {
 				return null;
 			}
 			ControllerMaster.userData.seenMovies.put(m.getId(), m);
-			CustomMovieDb result = new CustomMovieDb(m);
-			return result;
+			return new CustomMovieDb(m);
 		}
 		return null;
 	}
@@ -147,13 +144,12 @@ public  class MediaSearchHandler {
 	
 	
 	public static TvEpisode getEpisodeInfo(int id, int season, int ep) {
-		TvEpisode episode = UserData.apiLinker.getTvEpisodes().getEpisode(id, season, ep, "en", EpisodeMethod.credits, EpisodeMethod.images);
-		return episode;
+		return UserData.apiLinker.getTvEpisodes().getEpisode(id, season, ep, "en", EpisodeMethod.credits, EpisodeMethod.images);
 	}
 	
 	public static MediaItem getFirstFromCollectionMatchesPerson(int collectionId, int personId) {
 		CollectionInfo ci = UserData.apiLinker.getCollections().getCollectionInfo(collectionId, null);
-		Collections.sort(ci.getParts(), releaseDateComparator);
+		ci.getParts().sort(releaseDateComparator);
 		MediaItem mi;
 		for (int i = 0; i < ci.getParts().size(); ++i) {
 			mi = MediaSearchHandler.getMovieInfoById(ci.getParts().get(i).getId());
@@ -281,7 +277,7 @@ public  class MediaSearchHandler {
 		File f = new File(baseFolder+"/"+ id + "_" + size + ".jpg");
 		if (f.exists() && !f.isDirectory()) {
 			try {
-				if (f.toURI().toURL()!=null) {
+				if (!f.toURI().toURL().equals(null)) {
 					BufferedImage b = ImageIO.read(f);
 					iView.setImage(SwingFXUtils.toFXImage(b, null));
 				} 
@@ -341,7 +337,7 @@ public  class MediaSearchHandler {
 		File f = new File(personProfileDir+"/"+ id + ".jpg");
 		if (f.exists() && !f.isDirectory()) {
 			try {
-				if (f.toURI().toURL()!=null) {
+				if (!f.toURI().toURL().equals(null)) {
 					BufferedImage b = ImageIO.read(f);
 					iView.setImage(SwingFXUtils.toFXImage(b, null));
 				} 
@@ -360,7 +356,7 @@ public  class MediaSearchHandler {
 		InputStream in;
 		try {
 			URL url = new URL("https://image.tmdb.org/t/p/h632/" + a.getFilePath());
-			if (url == null) {
+			if (url.equals(null)) {
 				url = new URL("https://image.tmdb.org/t/p/original/" + a.getFilePath());
 			}
 			in = url.openStream();

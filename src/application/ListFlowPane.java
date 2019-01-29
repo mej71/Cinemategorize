@@ -16,7 +16,7 @@ import javafx.scene.layout.FlowPane;
 
 public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 	private SimpleBooleanProperty changed = new SimpleBooleanProperty(false);
-	private List<R> allItems = new ArrayList<R>();
+	private List<R> allItems = new ArrayList<>();
 	public BooleanBinding hasChanged = Bindings.createBooleanBinding(() -> changed.getValue(), changed);	
 	public T selectedCell = null;
 	

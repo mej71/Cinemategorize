@@ -14,12 +14,7 @@ public class FlowCell<T> extends Control {
 	
 	protected T item;
 	protected ListFlowPane pane;
-	protected EventHandler<MouseEvent> clickHandler = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-        	runOnClick();
-        }
-	};
+	protected EventHandler<MouseEvent> clickHandler = event -> runOnClick();
 	
 	public FlowCell(T item, ListFlowPane pane) {
 		super();

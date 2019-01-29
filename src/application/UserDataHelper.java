@@ -60,7 +60,6 @@ public class UserDataHelper {
 			cm = MediaSearchHandler.getMovieInfo("Movie", 0);
 			mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
 					Integer.parseInt(movieParsedInfo[1]));
-			System.out.println("a");
 			ControllerMaster.userData.tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
 			return false;
 		} else if (series != null) {
@@ -141,7 +140,7 @@ public class UserDataHelper {
 			//add movie to known collections if there is one
 			if (isMovie && mi.belongsToCollection()) {
 				if (!ControllerMaster.userData.ownedCollections.containsKey(mi.getCollection())) {
-					ControllerMaster.userData.ownedCollections.put(mi.getCollection(), new ArrayList<MediaItem>());
+					ControllerMaster.userData.ownedCollections.put(mi.getCollection(), new ArrayList<>());
 				}
 				ControllerMaster.userData.ownedCollections.get(mi.getCollection()).add(mi);
 				ControllerMaster.mainController.updateCollectionCombo();

@@ -17,7 +17,7 @@ public class Main extends Application {
 	    }
 
 	    @Override
-	    public void start(Stage primaryStage) throws Exception {
+	    public void start(Stage primaryStage) {
 	        try {
 	            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("CinemaMainController.fxml"));
 	            Scene scene = new Scene(root, 1110, 720);
@@ -32,15 +32,7 @@ public class Main extends Application {
 	            primaryStage.setScene(scene);
 	            primaryStage.show();
 	            //save all data when closing
-	            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-
-					@Override
-					public void handle(WindowEvent arg0) {
-						ControllerMaster.userData.saveAll();
-						
-					}
-	            	
-	            });
+	            primaryStage.setOnCloseRequest(arg0 -> ControllerMaster.userData.saveAll());
 	        } catch(Exception e) {
 	            e.printStackTrace();
 	        }

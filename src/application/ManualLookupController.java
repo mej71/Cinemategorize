@@ -46,23 +46,18 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		mediaTypeComboBox.setItems( FXCollections.observableArrayList( MediaTypeOptions.values()));
 		mediaTypeComboBox.setValue(MediaTypeOptions.MOVIE);
 		
-		fileFlowPane.hasChanged.addListener(new ChangeListener<Boolean>() {
+		fileFlowPane.hasChanged.addListener((observable, oldValue, newValue) -> {
+			if (oldValue != newValue && newValue != null && newValue) {
+				fileFlowPane.setChanged(false);
+				resultsFlowPane.getChildren().clear();
+				MediaItem item = fileFlowPane.selectedCell.getItem();
+				if (mediaList.get(item) != null) {
+					resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(item).getResults(), resultsFlowPane));
+					resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
+				}
 
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if (oldValue != newValue && newValue != null && newValue) {
-					fileFlowPane.setChanged(false);
-		    		resultsFlowPane.getChildren().clear();
-		    		MediaItem item = fileFlowPane.selectedCell.getItem();
-			    	if (mediaList.get(item) != null) {
-			    		resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(item).getResults(), resultsFlowPane));
-			    		resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
-			    	}
-			    	
-			    	noResultsLabel.setVisible(resultsFlowPane.getChildren().size() == 0);
-		    	}				
+				noResultsLabel.setVisible(resultsFlowPane.getChildren().size() == 0);
 			}
-			
 		});
 		
 		RequiredFieldValidator titleValidator = new RequiredFieldValidator();
@@ -74,9 +69,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
         		titleField.validate();
         	}
         });
-        titleField.textProperty().addListener((o, oldVal, newVal) -> {
-        	titleField.validate();
-        });
+        titleField.textProperty().addListener((o, oldVal, newVal) -> titleField.validate());
        
         yearField.setMaxChars(4);
         fileFlowPane.bindWidthToNode(fileScrollPane);
@@ -100,15 +93,10 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 
 	public void openDialog(JFXDialog dLink) {
 		setDialogLink(dLink, false);	
-		dLink.setOnDialogClosed(new EventHandler<JFXDialogEvent>() {
-
-			@Override
-			public void handle(JFXDialogEvent event) {
-				if (ControllerMaster.userData.numMediaItems() > 0) {
-					ControllerMaster.mainController.addMediaWindow.close();
-				}
+		dLink.setOnDialogClosed(event -> {
+			if (ControllerMaster.userData.numMediaItems() > 0) {
+				ControllerMaster.mainController.addMediaWindow.close();
 			}
-			
 		});
 		dLink.show();  
 		
@@ -154,21 +142,12 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		confirmDialog.setTransitionType(DialogTransition.CENTER);
 		JFXButton confirmButton = new JFXButton("Confirm");
 		JFXButton cancelButton = new JFXButton("Cancel");
-		confirmButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				confirmDialog.close();
-				addMediaItem();
-				
-			}        	
-        });
-		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				confirmDialog.close();
-				
-			}        	
-        });
+		confirmButton.setOnAction(event -> {
+			confirmDialog.close();
+			addMediaItem();
+
+		});
+		cancelButton.setOnAction(event -> confirmDialog.close());
 		confirmLayout.setActions(confirmButton, cancelButton);
 		confirmDialog.show();
 	}
@@ -218,15 +197,13 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
         Task<Object> searchTask = new Task<Object>() {
 
             @Override
-            protected Object call() throws Exception {
+            protected Object call()  {
                 searchSuggestionLookup();
                 succeeded();
                 return null;
             }
         };
-		searchTask.setOnSucceeded(e -> {
-			successTasks();
-		});
+		searchTask.setOnSucceeded(e -> successTasks());
 		searchTask.run();
 	}
 	

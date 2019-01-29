@@ -32,7 +32,6 @@ dependencies {
     compile fileTree(dir: 'local_repos', include: '*.jar')
     compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.14'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile group: 'com.eeeeeric', name: 'mpc-hc-api', version: '0.1.0'
 }
 
 task createPom  {

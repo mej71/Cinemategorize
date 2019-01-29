@@ -23,16 +23,14 @@ public class EscapableBase implements Initializable {
 	
 	protected void setDialogLink(JFXDialog dLink) {
 		this.dLink = dLink;
-		Platform.runLater(() -> determinePrimaryStage());
+		Platform.runLater(this::determinePrimaryStage);
 	}
 
 	//check for esc 
 	//have to use listener because scene is null for a bit
 	private void determinePrimaryStage() {
 		if (dLink.getScene() == null) {
-			dLink.sceneProperty().addListener((observableScene, oldScene, newScene) -> {             
-				addKeyListener(newScene);
-	        });
+			dLink.sceneProperty().addListener((observableScene, oldScene, newScene) -> addKeyListener(newScene));
 		} else {
 			addKeyListener(dLink.getScene());
 		}
