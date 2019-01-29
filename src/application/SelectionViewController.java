@@ -39,11 +39,9 @@ import javafx.scene.text.Text;
 
 @SuppressWarnings("rawtypes")
 public class SelectionViewController extends LoadingControllerBase implements Initializable {
-	
-	private final int numDirectorsAllowed = 5;
+
 	private final int numWritersAllowed = 5;
-	private final int numActorsAllowed = 15;
-	
+
 	@FXML private ImageView posterImageView;
     @FXML private Text descLabel;
     @FXML private GridPane canResumeGridPane;
@@ -79,9 +77,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
-    private FXMLLoader loader;
-	private GridPane personView;
-	private PersonViewController personViewController;
 	private JFXDialog personViewDialog;
 	private List<JFXPersonRippler> actorTiles = new ArrayList<JFXPersonRippler>();	
 	private List<JFXPersonRippler> directorTiles = new ArrayList<JFXPersonRippler>();
@@ -93,12 +88,14 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	public void initialize(URL url, ResourceBundle rb) {
 		super.initialize(url, rb);
 		JFXScrollPane.smoothScrolling(infoScrollPane);
+		int numDirectorsAllowed = 5;
 		for (int i = 0; i < numDirectorsAllowed; ++i) {
 			directorTiles.add(JFXPersonRippler.createBasicRippler());
 		}
 		for (int i = 0; i < numWritersAllowed; ++i) {
 			writerTiles.add(JFXPersonRippler.createBasicRippler());
 		}
+		int numActorsAllowed = 15;
 		for (int i = 0; i < numActorsAllowed; ++i) {
 			actorTiles.add(JFXPersonRippler.createBasicRippler());
 		}
@@ -175,9 +172,9 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		}
 		if (personViewDialog == null) {
 			try {
-				loader = new FXMLLoader(getClass().getClassLoader().getResource("PersonViewContent.fxml"));
-				personView = loader.load();
-				personViewController = loader.getController();
+				FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("PersonViewContent.fxml"));
+				GridPane personView = loader.load();
+				PersonViewController personViewController = loader.getController();
 				personViewDialog = new JFXDialog(ControllerMaster.mainController.getBackgroundStackPane(), personView,
 						JFXDialog.DialogTransition.CENTER);
 				personView.prefWidthProperty().bind(ControllerMaster.mainController.mainGrid.widthProperty().divide(1.35));
@@ -344,6 +341,9 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		Platform.runLater(() -> actorFlowPane.requestLayout());		
 	}
 	
+	@FXML public void playVideo() {
+		//MediaPlayerClassicHomeCinema mpc = new MediaPlayerClassicHomeCinema("127.0.0.1", 55555);
+	}
 	
 	
 	

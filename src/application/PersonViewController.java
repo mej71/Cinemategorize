@@ -31,13 +31,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 
 public class PersonViewController extends LoadingControllerBase implements Initializable {
-	
-	private final int minKnownMovies = 4;  //try and get at least this many movies for person, including lesser known if they have to
+
 	private final int maxKnownMovies = 8;
-	private final int episodeCountThreshold = 5; //number of episodes someone must be involved in to count as "Known For"
-	private final int castPositionThreshold = 5; //order in the cast list in which to be credited
-	private final int popularityThreshold = 3;
-	private final int voteCountThreshold = 100;
 	//resize tiles to fill the space
 	private final float scaleWFactor = 0.83f;
 	private final float scaleHFactor = 0.7f;
@@ -66,8 +61,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
     private PersonPeople person;
     private List<PersonCredit> crewCredits;
     private List<PersonCredit> castCredits;
-    private List<PersonCredit> knownForList;
-    private Comparator<PersonCredit> dateComparator;
+	private Comparator<PersonCredit> dateComparator;
     private Comparator<PersonCredit> knownComprator;
     private List<JFXMediaRippler> knownForRipplers;
     
@@ -176,10 +170,10 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	}
 	
 	public void enableTabs() {
-		directorTab.setDisable( (dirFlowPane.getItems().size() == 0)? true : false);
-		writerTab.setDisable( (writFlowPane.getItems().size() == 0)? true : false);
-		actorTab.setDisable( (actFlowPane.getItems().size() == 0)? true : false);
-		producerTab.setDisable( (prodFlowPane.getItems().size() == 0)? true : false);		
+		directorTab.setDisable(dirFlowPane.getItems().size() == 0);
+		writerTab.setDisable(writFlowPane.getItems().size() == 0);
+		actorTab.setDisable(actFlowPane.getItems().size() == 0);
+		producerTab.setDisable(prodFlowPane.getItems().size() == 0);
 	}
 	
 	public void setCredits() {
@@ -219,8 +213,8 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		
 		ObservableList<Node> workingKnownForCollection = FXCollections.observableArrayList();
 		if (!ControllerMaster.userData.knownFor.containsKey(person.getId())) {
-			List<Integer> tempKnownList = new ArrayList<Integer>(); 
-			knownForList = new ArrayList<PersonCredit>(crewCredits);
+			List<Integer> tempKnownList = new ArrayList<Integer>();
+			List<PersonCredit> knownForList = new ArrayList<PersonCredit>(crewCredits);
 			knownForList.addAll(castCredits);
 			Collections.sort(knownForList, knownComprator);
 			int known = 0;
@@ -232,6 +226,9 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			for (int i = 0; i < knownForList.size(); ++i) {
 				tempCredit = knownForList.get(i);
 				isKnownDep = ( (tempCredit.getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (tempCredit.getDepartment() != null && tempCredit.getDepartment().equals(knownDep)) )? true : false;
+				int voteCountThreshold = 100;
+				int popularityThreshold = 3;//number of episodes someone must be involved in to count as "Known For"
+				int episodeCountThreshold = 5;
 				if (tempCredit.getPopularity() > popularityThreshold && tempCredit.getVoteCount() > voteCountThreshold &&
 						(tempCredit.getEpisodeCount()==0 || tempCredit.getEpisodeCount() > episodeCountThreshold) && 
 						tempCredit.getReleaseDate() != null && isKnownDep ) {
@@ -250,6 +247,8 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 				//item credit should match what the person is known for, been released already, and bias against being in a low count of episodes for a series
 				if (mi!=null && !tempKnownList.contains(mi.getId())) {
 					//prefer people higher up in the cast bill and in full features or tv shows (bias against short films)
+					//order in the cast list in which to be credited
+					int castPositionThreshold = 5;
 					if ( (!knownDep.equalsIgnoreCase("Acting") || mi.getCreditPosition(person.getId()) < castPositionThreshold) && mi.isFullLength())  {
 						knownForRipplers.get(known).setItem(mi);
 						workingKnownForCollection.add(knownForRipplers.get(known));
@@ -283,6 +282,8 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 						}
 						tempKnownList.add( lesserKnown.get(credit).getId() );
 						++known;
+						//try and get at least this many movies for person, including lesser known if they have to
+						int minKnownMovies = 4;
 						if (known == maxKnownMovies || known == minKnownMovies) {
 							break;
 						}

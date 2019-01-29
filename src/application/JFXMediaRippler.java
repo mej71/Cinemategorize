@@ -25,27 +25,26 @@ import javafx.util.Duration;
 
 public class JFXMediaRippler extends JFXRippler { 
 	
-	public static GridPane gridPane;
-	public static PopOver pOver;
-	public static Label titleLabel;
-	public static Label descLabel;
-	public static Label directorsLabel;
-	public static Label actorsLabel;
-	public static boolean hasEntered = false;
-	public static final int taskMiliSeconds = 500;
-	public static Timer timer;
+	private static GridPane gridPane;
+	private static PopOver pOver;
+	private static Label titleLabel;
+	private static Label descLabel;
+	private static Label directorsLabel;
+	private static Label actorsLabel;
+	private static boolean hasEntered = false;
+	private static final int taskMiliSeconds = 500;
+	private static Timer timer;
 	
-	public static StackPane tempPane;
-	public static ImageView tempIView;
-	public static EventHandler<MouseEvent> handler = MouseEvent::consume;
+	private static StackPane tempPane;
+	private static ImageView tempIView;
+	private static final EventHandler<MouseEvent> handler = MouseEvent::consume;
 	
 	
 	
 	public MediaItem linkedItem;
-	public ImageView iView;
-	public StackPane paneChild;
+	private final ImageView iView;
 	
-	public static void init() {
+	private static void init() {
 		gridPane = new GridPane();
 		final int numCols = 5;
         final int numRows = 11;
@@ -120,7 +119,7 @@ public class JFXMediaRippler extends JFXRippler {
 		return pOver.isShowing();
 	}
 	
-	public JFXMediaRippler(StackPane control, ImageView iv){
+	private JFXMediaRippler(StackPane control, ImageView iv){
 		super(control, RipplerMask.RECT, RipplerPos.FRONT);
 		if (gridPane == null) {
 			init();
@@ -157,7 +156,7 @@ public class JFXMediaRippler extends JFXRippler {
 		
 		JFXMediaRippler rippler = new JFXMediaRippler(paneChild, iView);
 		rippler.setRipplerFill((Paint.valueOf("black")));
-		rippler.setMaskType(JFXRippler.RipplerMask.RECT);
+		rippler.setMaskType(RipplerMask.RECT);
 		rippler.setPosition(RipplerPos.FRONT);
 		paneChild.setMaxWidth(139);
 		paneChild.setMaxHeight(208);
@@ -177,15 +176,15 @@ public class JFXMediaRippler extends JFXRippler {
             	}
         		JFXMediaRippler.directorsLabel.setText(mi.getNumSeasons() + " seasons");
         	} else {
-        		String directors = "";
+        		StringBuilder directors = new StringBuilder();
 	        	PersonCrew crew;
 	        	for (int i = 0; i < mi.getCrew().size(); ++i) {
 	        		crew = mi.getCrew().get(i);
 	        		if (crew.getJob().equalsIgnoreCase("Director")) {
-	        			if (directors.equals("")) {
-	        				directors+=crew.getName();
+	        			if (directors.toString().equals("")) {
+	        				directors.append(crew.getName());
 	        			} else {
-	        				directors+=", "+crew.getName();
+	        				directors.append(", ").append(crew.getName());
 	        			}
 	        		}
 	        	}
@@ -198,15 +197,15 @@ public class JFXMediaRippler extends JFXRippler {
         	JFXMediaRippler.titleLabel.setText(mi.getTitle()+ " (" + releaseDate + lastDate + ")");
         	JFXMediaRippler.descLabel.setText(mi.getOverview());
         	
-        	String cast = "";
+        	StringBuilder cast = new StringBuilder();
         	for (int i = 0; i<4; ++i) {
         		if (i==mi.getCast().size()) {
         			break;
         		}
         		if (i==0) {
-        			cast+=mi.getCast().get(i).getName();
+        			cast.append(mi.getCast().get(i).getName());
         		} else {
-        			cast+=", " + mi.getCast().get(i).getName();
+        			cast.append(", ").append(mi.getCast().get(i).getName());
         		}
         	}
         	JFXMediaRippler.actorsLabel.setText("Starring: " + cast);		
@@ -257,9 +256,7 @@ public class JFXMediaRippler extends JFXRippler {
 					timer.cancel();
 					hasEntered = false;
 				}
-				Platform.runLater(() -> {
-					ControllerMaster.mainController.showSelectionDialog(rippler.linkedItem);
-				});
+				Platform.runLater(() -> ControllerMaster.mainController.showSelectionDialog(rippler.linkedItem));
 			}
 			e.consume();
 		});

@@ -540,7 +540,7 @@ public class UserData implements Serializable {
 			mi = mRip.linkedItem;
 			mId = mi.getId();
 			//if it fits search criteria
-			if ( noSearchIds || tvList.contains(mId) || moviesList.contains(mId)) {
+			if ( noSearchIds || (tvList.contains(mId) && !mi.isMovie()) || (moviesList.contains(mId) && mi.isMovie()) ) {
 				//if it can be shown
 				if ( (mi.isMovie() && canShowMovies) || (!mi.isMovie() && canShowTv) ) {
 					//if no playlist is selected or it contains this

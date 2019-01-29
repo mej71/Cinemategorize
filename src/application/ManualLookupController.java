@@ -29,9 +29,7 @@ import javafx.scene.control.ScrollPane;
 
 
 public class ManualLookupController extends LoadingControllerBase implements Initializable {
-	
-	@FXML private JFXButton confirmButton;
-	@FXML private JFXButton searchButton;
+
 	@FXML private JFXTextField titleField;
 	@FXML private JFXNumberTextField yearField;
 	@FXML private JFXComboBox<MediaTypeOptions> mediaTypeComboBox;
@@ -42,9 +40,8 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	@FXML private Label noResultsLabel;
 	
 	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
-	private Task<Object> searchTask;
 
-	@Override
+    @Override
 	public void initialize(URL url, ResourceBundle rb) {
 		mediaTypeComboBox.setItems( FXCollections.observableArrayList( MediaTypeOptions.values()));
 		mediaTypeComboBox.setValue(MediaTypeOptions.MOVIE);
@@ -127,7 +124,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		
 		private final String toString;
 		
-		private MediaTypeOptions(String toString) {
+		MediaTypeOptions(String toString) {
 			this.toString = toString;
 		}
 		
@@ -218,15 +215,15 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	
 	@FXML public void searchSuggestion() {
 		showLoadingPane();
-		searchTask = new Task<Object>() {
+        Task<Object> searchTask = new Task<Object>() {
 
-			@Override
-			protected Object call() throws Exception {
-				searchSuggestionLookup();
-				succeeded();
-				return null;
-			}
-		};
+            @Override
+            protected Object call() throws Exception {
+                searchSuggestionLookup();
+                succeeded();
+                return null;
+            }
+        };
 		searchTask.setOnSucceeded(e -> {
 			successTasks();
 		});

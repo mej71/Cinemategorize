@@ -37,10 +37,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public  class MediaSearchHandler {
-	
-	private static String moviePosterDir = "images/movie_posters";
-	private static String tvPosterDir = "images/tv_posters";
-	private static String personProfileDir = "images/people";
+
+	private static String personProfileDir = "/people";
 	public static Comparator<Collection> releaseDateComparator = new Comparator<Collection>(){
 	     public int compare(Collection o1, Collection o2){ 
 	    	 String o1Date = (o1.getReleaseDate() != null)? o1.getReleaseDate() : "";
@@ -252,11 +250,13 @@ public  class MediaSearchHandler {
 	public static ImageView getItemPoster(MovieDb m, CustomTvDb tv, int size) {
 		ImageView iView = new ImageView();
 		if (m != null && m.getPosterPath() != null) {
+			String moviePosterDir = "/movie_posters";
 			getPosterFromFilePath(iView, size, moviePosterDir, String.valueOf(m.getId()));
 			if (iView.getImage()==null && m.getPosterPath()!=null && !m.getPosterPath().isEmpty()) {
 				getPosterFromURL(iView, size, m.getPosterPath(), moviePosterDir, String.valueOf(m.getId()));
 			}
 		} else if (tv != null && tv.series != null){
+			String tvPosterDir = "/tv_posters";
 			getPosterFromFilePath(iView, size, tvPosterDir, String.valueOf(tv.getId()));
 			if (iView.getImage()==null && tv.getPosterPath() != null) {
 				getPosterFromURL(iView, size, tv.getPosterPath(), tvPosterDir, String.valueOf(tv.getId()));

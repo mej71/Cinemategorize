@@ -64,14 +64,9 @@ public class CinemaController implements Initializable {
 	@FXML JFXComboBox<String> playlistCombo;
 	@FXML JFXComboBox<Collection> collectionsCombo;
 	@FXML JFXComboBox<MediaListDisplayType> mediaTypeCombo;
-	
-	private FXMLLoader loader;
-	private GridPane selectionView;
+
 	private Window window;
-	private GridPane manualLookupView;
-	private JFXDialogLayout addMediaDialogView;
-	private GridPane settingsView;
-	
+
 	public TilePane tilePane;	
 	public MovieScrollPane scrollPane;
 	// other variables
@@ -80,7 +75,6 @@ public class CinemaController implements Initializable {
 	public LinkedHashMap<String, MediaItem> showingMedia = new LinkedHashMap<String, MediaItem>();
 	public MovieAutoCompletePopup autoCompletePopup;
 	public MovieAutoCompleteEvent<SearchItem> autoEvent;
-	public boolean isScrolling = false;
 	public JFXDialog selectionViewWindow;
 	public JFXDialog manualLookupWindow;	
 	public JFXDialog addMediaWindow;
@@ -139,7 +133,7 @@ public class CinemaController implements Initializable {
 				refreshSearch();
 			}
 		});
-		
+
 		updateCollectionCombo();
 		collectionsCombo.setCellFactory(new Callback<ListView<Collection>, ListCell<Collection>>() {
 			@Override
@@ -270,27 +264,27 @@ public class CinemaController implements Initializable {
 	    
 	    //set up dialogs
 		try {
-			loader = new FXMLLoader(getClass().getClassLoader().getResource("SelectionViewContent.fxml"));
-			selectionView = loader.load();
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SelectionViewContent.fxml"));
+			GridPane selectionView = loader.load();
 			ControllerMaster.selectionViewController = loader.getController();
 			selectionViewWindow = new JFXDialog(getBackgroundStackPane(), selectionView,
 					JFXDialog.DialogTransition.CENTER);
 			selectionView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
 			selectionView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.3));
 			loader = new FXMLLoader(getClass().getClassLoader().getResource("ManualLookupContent.fxml"));
-			manualLookupView = loader.load();
+			GridPane manualLookupView = loader.load();
 			ControllerMaster.manualController = loader.getController();			
 			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
 					JFXDialog.DialogTransition.TOP);
 			manualLookupView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
 			manualLookupView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.15));
 			loader = new FXMLLoader(getClass().getClassLoader().getResource("AddMoviesDialogContent.fxml"));
-			addMediaDialogView = loader.load();
+			JFXDialogLayout addMediaDialogView = loader.load();
 			ControllerMaster.addMediaDialogController = loader.getController();
 			addMediaWindow = new JFXDialog(getBackgroundStackPane(), addMediaDialogView,
 					JFXDialog.DialogTransition.TOP);
 			loader = new FXMLLoader(getClass().getClassLoader().getResource("SettingsContent.fxml"));
-			settingsView = loader.load();
+			GridPane settingsView = loader.load();
 			ControllerMaster.settingsController = loader.getController();
 			settingsWindow = new JFXDialog(getBackgroundStackPane(), settingsView,
 					JFXDialog.DialogTransition.TOP);
@@ -476,7 +470,7 @@ public class CinemaController implements Initializable {
 		
 		private final String toString;
 		
-		private SortTypes(String toString) {
+		SortTypes(String toString) {
 			this.toString = toString;
 		}
 		

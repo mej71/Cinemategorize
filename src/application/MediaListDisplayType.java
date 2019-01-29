@@ -9,7 +9,7 @@ public enum MediaListDisplayType implements Serializable {
 	
 	private final String toString;
 	
-	private MediaListDisplayType(String toString) {
+	MediaListDisplayType(String toString) {
 		this.toString = toString;
 	}
 	

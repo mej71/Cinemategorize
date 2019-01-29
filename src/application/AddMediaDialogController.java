@@ -10,7 +10,6 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXProgressBar;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -25,13 +24,11 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class AddMediaDialogController extends EscapableBase implements Initializable {
 	
 	@FXML private JFXDialogLayout dialogLayout;
-	@FXML private GridPane dialogGrid;
 	@FXML private Label welcomeLabel;
 	@FXML private JFXButton chooseFileButton;
 	@FXML private JFXButton chooseFolderButton;
 	@FXML private Label orLabel;
 	@FXML private Label cancelLabel;
-	@FXML private Label directoryEmptyLabel;
 	@FXML private Label addLabel;
 	@FXML private Label progressLabel;
 	@FXML private Label searchingLabel;
@@ -63,10 +60,10 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		updateLayout();
 		
 		dLink.show(); 
-		extFilter = new FileChooser.ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
+		extFilter = new ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
 	}
 	
-	//Filechooser and DirectoryChooser are forceably seperate in Java for some reason, so making two different methods
+	//Filechooser and DirectoryChooser are forcibly sseparatein Java for some reason, so making two different methods
 	//Let's user choose a file, and updates progress bar while doing so
 	@FXML
 	public void chooseFile() {

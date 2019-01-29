@@ -22,8 +22,6 @@ import javafx.scene.layout.RowConstraints;
 public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	
 	public static int prefCellHeight = 139;
-	private GridPane gridPane;
-	private ImageView iView;
 	private Label titleLabel;
 	private Label descLabel;
 	//private Label directorLabel;
@@ -45,8 +43,8 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	public void updateItem() {
 		super.updateItem();
 		if (getItem() != null) {
-			gridPane = new GridPane();
-			iView = new ImageView();
+			GridPane gridPane = new GridPane();
+			ImageView iView = new ImageView();
 			titleLabel = new Label();
 			titleLabel.getStyleClass().add("header");
 			descLabel = new Label();

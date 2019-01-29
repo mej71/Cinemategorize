@@ -31,9 +31,8 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
 
   private Map<Node, TranslateTransition> nodeHTransitions = new HashMap<>();
   private Map<Node, TranslateTransition> nodeVTransitions = new HashMap<>();
-  private final int transitionSpeed = 150;
 
-  public void observe(ObservableList<Node> nodes) {
+    public void observe(ObservableList<Node> nodes) {
     nodes.addListener(this);
   }
   
@@ -63,28 +62,27 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
 
     
     TranslateTransition t;
-    switch (doubleProperty.getName()) {
-      case  "layoutX":
-        t = nodeHTransitions.get(node);
-        if (t == null) {
-          t = new TranslateTransition(Duration.millis(transitionSpeed), node);
-          t.setToX(0);
-          nodeHTransitions.put(node, t);
-        }
-        t.setFromX(node.getTranslateX() - delta);
-        node.setTranslateX(node.getTranslateX() - delta);
-        break;
-
-      default: // "layoutY"
-        t = nodeVTransitions.get(node);
-        if (t == null) {
-          t = new TranslateTransition(Duration.millis(transitionSpeed), node);
-          t.setToY(0);
-          nodeVTransitions.put(node, t);
-        }
-        t.setFromY(node.getTranslateY() - delta);
-        node.setTranslateY(node.getTranslateY() - delta);
-    }
+      int transitionSpeed = 150;
+      // "layoutY"
+      if ("layoutX".equals(doubleProperty.getName())) {
+          t = nodeHTransitions.get(node);
+          if (t == null) {
+              t = new TranslateTransition(Duration.millis(transitionSpeed), node);
+              t.setToX(0);
+              nodeHTransitions.put(node, t);
+          }
+          t.setFromX(node.getTranslateX() - delta);
+          node.setTranslateX(node.getTranslateX() - delta);
+      } else {
+          t = nodeVTransitions.get(node);
+          if (t == null) {
+              t = new TranslateTransition(Duration.millis(transitionSpeed), node);
+              t.setToY(0);
+              nodeVTransitions.put(node, t);
+          }
+          t.setFromY(node.getTranslateY() - delta);
+          node.setTranslateY(node.getTranslateY() - delta);
+      }
     t.play();
   }
 

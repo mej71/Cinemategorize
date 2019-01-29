@@ -31,8 +31,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
     private static final int taskMiliSeconds = 500;
 	private static Timer timer;
 	public static int prefCellHeight = 22;
-	private Label label;
-	
+
 	private static CreditCell<?> tempCell;
 	
 	private static void init() {
@@ -152,7 +151,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 			hbox.minWidthProperty().bind(getPane().widthProperty());
 			hbox.prefWidthProperty().bind(getPane().widthProperty());
 			hbox.maxWidthProperty().bind(getPane().widthProperty());
-			label = new Label();
+			Label label = new Label();
 			label.setText(getCellString(item));
 			hbox.setAlignment(Pos.CENTER_LEFT);
 			
