@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane fx:id="backgroundStackPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CinemaController">
+<StackPane fx:id="backgroundStackPane" styleClass="grid-pane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CinemaController">
     <GridPane fx:id="mainGrid">
         <rowConstraints>
             <RowConstraints minHeight="10.0" percentHeight="10.0"/>
@@ -78,13 +78,12 @@
                     <Insets left="5.0"/>
                 </opaqueInsets>
                 <HBox alignment="BOTTOM_LEFT" fillHeight="false" spacing="2.0">
-                    <JFXComboBox fx:id="playlistCombo" labelFloat="true" maxWidth="100.0" promptText="Playlist"/>
+                    <JFXComboBox fx:id="playlistCombo" labelFloat="true" maxWidth="90.0" promptText="Playlist"/>
                     <JFXButton fx:id="playlistClearButton" onAction="#clearPlaylistSelection"
                                styleClass="clear-button" visible="false"/>
-                    <JFXButton fx:id="playlistAddButton" onAction="#addPlaylist" styleClass="add-button"/>
                 </HBox>
                 <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="2.0">
-                    <JFXComboBox fx:id="collectionsCombo" labelFloat="true" maxWidth="100.0"
+                    <JFXComboBox fx:id="collectionsCombo" labelFloat="true" maxWidth="90.0"
                                  promptText="Collection"/>
                     <JFXButton fx:id="collectionsClearButton" onAction="#clearCollectionSelection"
                                styleClass="clear-button" visible="false"/>

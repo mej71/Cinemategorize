@@ -150,14 +150,21 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	@Override 
 	protected void runOnClick() {
 		super.runOnClick();
-		if (getItem().isTvShow()) {
+		ResultsMediaItem mi = getItem();
+		if (mi.isTvShow()) {
     		if (seasonBox.getValue() != null && seasonBox.getValue() > 0 &&
     				episodeBox.getValue() != null && episodeBox.getValue() > 0 ) {
-    			getItem().setTvEp(seasonBox.getValue(), episodeBox.getValue());
+				mi.setTvEp(seasonBox.getValue(), episodeBox.getValue());
     		} else {
     			return;
     		}
-    	}  
+    	}
+		//if already owned, ignore but alert user
+		if ( (mi.isTvShow() && ControllerMaster.userData.ownsShow(mi.getId()) && ControllerMaster.userData.ownsEpisode(mi.getId(), getSeason(), getEpisode())) ||
+				(mi.isMovie() && ControllerMaster.userData.ownsMovie(mi.getId()))) {
+			ControllerMaster.manualController.informAlreadyOwns();
+			return;
+		}
     	ControllerMaster.manualController.confirmMediaItem();
 	}
 	

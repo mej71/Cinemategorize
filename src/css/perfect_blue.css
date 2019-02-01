@@ -10,10 +10,12 @@
     
 
 .root {
-	-fx-background-color: #051b27;
 	background-blend-mode: screen;
 	-fx-font-family: 'Raleway', sans-serif;
-	
+}
+
+.grid-pane {
+	-fx-background-color: #051b27;
 }
 
 .label {
@@ -73,7 +75,12 @@
 }
 
 .jfx-rippler {
-      -jfx-rippler-fill: #ff3946;
+      -jfx-rippler-fill: #dee5ed;
+      -jfx-mask-type: RECT;
+}
+
+.jfx-fit-rippler {
+      -jfx-mask-type: FIT;
 }
 
 .selectable {
@@ -96,7 +103,15 @@
     -fx-font-size: 0.75em;
 }
 
+.jfx-options-burger StackPane {
+    -fx-pref-width: 4px;
+    -fx-background-color: #ff565c;
+}
 
+.hamburger-rippler {
+    -jfx-mask-type: CIRCLE;
+    -fx-cursor: hand;
+}
 
 /*******************************************************************************
  *                                                                             *
@@ -177,10 +192,7 @@
  *                                                                             *
  * ListView			                                                    	   *
  *                                                                             *
- ******************************************************************************/ 
-.list-view .jfx-list-cell .jfx-rippler {
-    -jfx-rippler-fill: #ff3946;
-}
+ ******************************************************************************/
 
 .list-view .scroll-bar:vertical {
     -fx-scale-x: 1;
@@ -289,9 +301,13 @@
  *                                                                             *
  ******************************************************************************/
 .autocomplete-list{
-    -fx-fixed-cell-size: 35;
+    -fx-fixed-cell-size: 45;
 }
 
+.jfx-autocomplete-popup .list-view {
+    -fx-border-color: #dee5ed;
+    -fx-border-width: 0px 1px 1px 1px;
+}
 
 /*******************************************************************************
  *                                                                             *

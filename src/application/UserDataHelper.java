@@ -57,7 +57,6 @@ public class UserDataHelper {
 					return false;
 				}
 			}
-			cm = MediaSearchHandler.getMovieInfo("Movie", 0);
 			mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
 					Integer.parseInt(movieParsedInfo[1]));
 			ControllerMaster.userData.tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));

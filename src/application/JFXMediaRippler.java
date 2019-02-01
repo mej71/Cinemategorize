@@ -94,7 +94,9 @@ public class JFXMediaRippler extends JFXRippler {
 					if (tempPane != null) {
 						Platform.runLater(() -> {
 							pOver.setAnchorX(-300);
-							pOver.show(tempPane);
+							if (!ControllerMaster.mainController.autoCompletePopup.isShowing()) {
+								pOver.show(tempPane);
+							}
 						});
 					}
 					this.cancel();
@@ -155,9 +157,7 @@ public class JFXMediaRippler extends JFXRippler {
 		
 		
 		JFXMediaRippler rippler = new JFXMediaRippler(paneChild, iView);
-		rippler.setRipplerFill((Paint.valueOf("black")));
-		rippler.setMaskType(RipplerMask.RECT);
-		rippler.setPosition(RipplerPos.FRONT);
+		rippler.getStyleClass().add("jfx-media-rippler");
 		paneChild.setMaxWidth(139);
 		paneChild.setMaxHeight(208);
 		paneChild.resize(139, 208);

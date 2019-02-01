@@ -12,6 +12,10 @@ public final class PlaylistCell<String> extends ComboMovieCell<String> {
 	protected void updateItem(String item, boolean empty) {
 		super.updateItem(item, empty);
 		if (!empty && item != null) {
+			if (item.equals(CinemaController.manageName)) {
+				setGraphic(new Label(item.toString()));
+				return;
+			}
 			GridPane gp = new GridPane();
 			Label title = new Label(item.toString());
 			gp.add(title, 0, 0, 2, 1);

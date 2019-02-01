@@ -47,9 +47,7 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 		paneChild.getChildren().add(reference);
 		paneChild.getStyleClass().add("person_pane");
 		JFXPersonRippler<?> rippler = new JFXPersonRippler<>(paneChild, reference, iView);
-		rippler.setRipplerFill((Paint.valueOf("black")));
-		rippler.setMaskType(RipplerMask.FIT);
-		rippler.setPosition(RipplerPos.FRONT);
+		rippler.getStyleClass().add("jfx-fit-rippler");
 		return rippler;
 	}
 	

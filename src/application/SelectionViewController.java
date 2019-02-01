@@ -1,6 +1,27 @@
 package application;
 
-import java.awt.Desktop;
+import com.jfoenix.controls.*;
+import info.movito.themoviedbapi.model.people.PersonCast;
+import info.movito.themoviedbapi.model.people.PersonCrew;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import org.controlsfx.control.Rating;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -8,34 +29,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import org.controlsfx.control.Rating;
-
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXScrollPane;
-
-import info.movito.themoviedbapi.model.people.PersonCast;
-import info.movito.themoviedbapi.model.people.PersonCrew;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 
 @SuppressWarnings("rawtypes")
 public class SelectionViewController extends LoadingControllerBase implements Initializable {
@@ -66,6 +59,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private Label writLabel;
     @FXML private Label episodeTitleLabel;
     @FXML private JFXButton playAllEpisodesButton;
+    @FXML private JFXRippler optionsRippler;
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
@@ -74,6 +68,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	private List<JFXPersonRippler> directorTiles = new ArrayList<>();
 	private List<JFXPersonRippler> writerTiles = new ArrayList<>();
 	private TileAnimator tileAnimator = new TileAnimator();
+	private JFXListView<SelectionOptions.SelectionOptionTitles> optionList;
     
     
 	@Override
@@ -119,6 +114,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				startTask();
 			}
 		});
+
 		infoScrollPane.prefWidthProperty().bind(mainGrid.widthProperty().multiply(0.64));
 		infoScrollPane.prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.70));
 		directorFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
@@ -135,21 +131,126 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		tileAnimator.observe(writerFlowPane.getChildren());
 		tileAnimator.observe(tagsFlowPane.getChildren());
 		playAllEpisodesButton.managedProperty().bindBidirectional(playAllEpisodesButton.visibleProperty());
+		optionList = new JFXListView<>();
+        optionList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		JFXPopup optionsPopup = new JFXPopup(optionList);
+		optionsRippler.setOnMouseClicked(e -> {
+            //hack to make selection clear (bug in Javafx)
+		    List<SelectionOptions.SelectionOptionTitles> options = FXCollections.observableArrayList(optionList.getItems());
+            optionList.getItems().clear();
+            optionList.getItems().setAll(options);
+            optionsPopup.show(optionsRippler, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.RIGHT);
+		});
+		optionList.setOnMouseClicked( e -> {
+		    if (e.getTarget() != null) {
+		        if (e.getTarget() instanceof JFXListCell) {
+		            JFXListCell<SelectionOptions.SelectionOptionTitles> target = (JFXListCell)e.getTarget();
+                    switch (target.getItem()) {
+                        case ADDTOPLAYLIST:
+                            System.out.println("a");
+                            break;
+                        case CHANGELOCATION:
+							FileChooser chooser = new FileChooser();
+							chooser.getExtensionFilters().add(AddMediaDialogController.extFilter);
+							chooser.setTitle("Choose replacement file");
+							File file = chooser.showOpenDialog(dLink.getScene().getWindow());
+							if (file != null) {
+								for (int j = 0; j < AddMediaDialogController.extFilter.getExtensions().size(); ++j) {
+									if (file.getName().endsWith(AddMediaDialogController.extFilter.getExtensions().get(j).substring(1))) {
+										if (mediaItem.isMovie()) {
+											mediaItem.setFilePathInfo(new FilePathInfo(file.getAbsolutePath(), file.getName(), file.getParentFile().getName()));
+										} else {
+											mediaItem.tvShow.setFilePathInfo(new FilePathInfo(file.getAbsolutePath(), file.getName(), file.getParentFile().getName()), getSelectedSeason(), getSelectedEpisode());
+										}
+									}
+								}
+							}
+							break;
+                        case MANUALEDIT:
+							MediaResultsPage mRes;
+							if (mediaItem.isMovie()) {
+								mRes = new MediaResultsPage(MediaSearchHandler.getMovieResults(mediaItem.getTitle(), 0));
+							} else {
+								mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(mediaItem.getTitle(false)));
+							}
+							MediaItem tempItem = new MediaItem(mediaItem.tvShow, mediaItem.cMovie, mediaItem.getFullFilePath(), mediaItem.getFileName(), mediaItem.getFolder());
+							ControllerMaster.userData.tempManualItems.put(tempItem, mRes);
+                        	ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems, mediaItem.getId(), getSelectedSeason(), getSelectedEpisode());
+                            break;
+                        case REMOVEEPISODE:
+							confirmDelete("Are you sure you want to delete " + mediaItem.getTitle() + "?\nYou cannot undo this action",true);
+                            break;
+                        case REMOVESHOW: //remove show and movie do the same thing, but different names for context
+                        case REMOVEMOVIE:
+							confirmDelete("Are you sure you want to delete " + mediaItem.getTitle(false) + "?\nYou cannot undo this action", false);
+                            break;
+                        default:
+                             break;
+                    }
+                    Platform.runLater(() ->{
+                        optionsPopup.hide();
+                    });
+                }
+            }
+        });
 	}
-	
-	public void showMediaItem(JFXDialog d, MediaItem mi) {
+
+	public void confirmDelete(String message, boolean episodeOnly) {
+		JFXDialogLayout confirmLayout = new JFXDialogLayout();
+		confirmLayout.setBody(new Label(message));
+		JFXDialog confirmDialog = new JFXDialog();
+		confirmDialog.setDialogContainer(ControllerMaster.mainController.getBackgroundStackPane());
+		confirmDialog.setContent(confirmLayout);
+		confirmDialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+		JFXButton confirmButton = new JFXButton("Confirm");
+		confirmButton.getStyleClass().add("delete-button");
+		JFXButton cancelButton = new JFXButton("Cancel");
+		confirmButton.setOnAction(event -> {
+			confirmDialog.close();
+			boolean refreshDialog = false;
+			if (episodeOnly) {
+				refreshDialog = ControllerMaster.userData.removeTvEpisode(mediaItem, getSelectedSeason(), getSelectedEpisode());
+			} else {
+				ControllerMaster.userData.removeMedia(mediaItem);
+			}
+			//refresh selection view on change or close if removed entirely
+			if (refreshDialog) { //
+				updateComboBoxes();
+			} else {
+				dLink.close();
+			}
+		});
+		cancelButton.setOnAction(event -> confirmDialog.close());
+		confirmLayout.setActions(confirmButton, cancelButton);
+		confirmDialog.show();
+	}
+
+	private int getSelectedSeason() {
+		return (mediaItem.isTvShow())? Integer.parseInt(seasonComboBox.getValue()) : 0;
+	}
+
+	private int getSelectedEpisode() {
+		return (mediaItem.isTvShow())? Integer.parseInt(episodeComboBox.getValue()) : 0;
+	}
+
+	void updateComboBoxes() {
+		seasonComboBox.getItems().clear();
+		for (Integer i : mediaItem.tvShow.getOwnedSeasonNumbers()) {
+			seasonComboBox.getItems().add(i.toString());
+		}
+		seasonComboBox.getSelectionModel().select(String.valueOf(mediaItem.tvShow.lastViewedSeason));
+		episodeComboBox.getSelectionModel().select(String.valueOf(mediaItem.tvShow.lastViewedEpisode));
+	}
+
+	void showMediaItem(JFXDialog d, MediaItem mi) {
 		super.setDialogLink(d, !mi.hasLoaded());
 		mediaItem = mi;
 		tvTitleGridPane.setVisible(!mediaItem.isMovie());
 		movieTitleGridPane.setVisible(mediaItem.isMovie());
 		playAllEpisodesButton.setVisible(!mediaItem.isMovie());
-		if (!mi.isMovie() ) {
-			seasonComboBox.getItems().clear();
-			for (Integer i : mediaItem.tvShow.getOwnedSeasonNumbers()) {
-				seasonComboBox.getItems().add(i.toString());
-			}
-			seasonComboBox.getSelectionModel().select(String.valueOf(mediaItem.tvShow.lastViewedSeason));
-			episodeComboBox.getSelectionModel().select(String.valueOf(mediaItem.tvShow.lastViewedEpisode));
+        optionList.getItems().setAll( (mediaItem.isMovie())? SelectionOptions.getMovieOptions() : SelectionOptions.getTvOptions());
+		if (!mediaItem.isMovie() ) {
+			updateComboBoxes();
 		}
 		if (personViewDialog == null) {
 			try {
@@ -167,14 +268,14 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		}
 		dLink.show();
 	}
-	
+
 	@Override
 	protected void runTasks() {
 		super.runTasks();
 		fillMainInfo();
-		fillInfo();	
+		fillInfo();
 	}
-	
+
 	@Override
 	protected void successTasks() {
 		super.successTasks();

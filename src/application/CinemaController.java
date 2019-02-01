@@ -9,18 +9,15 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXScrollPane;
-import com.jfoenix.controls.JFXSlider;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 
 import info.movito.themoviedbapi.model.Collection;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -56,7 +53,6 @@ public class CinemaController implements Initializable {
 	@FXML private JFXButton startDateClearButton;
 	@FXML private JFXButton endDateClearButton;
 	@FXML private JFXButton playlistClearButton;
-	@FXML private JFXButton playlistAddButton;
 	@FXML private JFXButton collectionsClearButton;
 
 	@FXML JFXComboBox<Integer> startYearComboBox;
@@ -103,7 +99,18 @@ public class CinemaController implements Initializable {
 		updatePlaylistCombo();
 		playlistCombo.setCellFactory(param -> new PlaylistCell());
 		playlistCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue!=null) {
+			if (newValue != null) {
+				if (newValue.equals(CinemaController.manageName)) {
+					System.out.println("Show Playlist Manager");
+					Platform.runLater(() ->{
+						if (oldValue == null) {
+							playlistCombo.getSelectionModel().clearSelection();
+						} else {
+							playlistCombo.getSelectionModel().select(oldValue);
+						}
+					});
+					return;
+				}
 				playlistClearButton.setVisible(true);
 			} else {
 				playlistClearButton.setVisible(false);
@@ -181,14 +188,16 @@ public class CinemaController implements Initializable {
 	            	}
 	            }             
 	        } else {
+                JFXMediaRippler.forceHidePopOver();
 	            autoCompletePopup.show(searchField);
 	        }
 	    });
 	    
 	    searchField.setOnMouseClicked(arg0 -> {
 			if (!autoCompletePopup.getFilteredSuggestions().isEmpty() && !searchField.getText().isEmpty()) {
-autoCompletePopup.show(searchField);
-}
+                JFXMediaRippler.forceHidePopOver();
+			    autoCompletePopup.show(searchField);
+            }
 		});
 	    
 	    fillYearCombos(ControllerMaster.userData.minYear, ControllerMaster.userData.maxYear);
@@ -199,9 +208,9 @@ autoCompletePopup.show(searchField);
 					endYearComboBox.getSelectionModel().clearSelection();
 				}
 				startDateClearButton.setVisible(true);
-} else {
+            } else {
 				startDateClearButton.setVisible(false);
-}
+            }
 			refreshSearch();
 		});
 
@@ -210,10 +219,10 @@ autoCompletePopup.show(searchField);
 				if (startYearComboBox.getValue()!=null && newValue < startYearComboBox.getValue()) {
 					startYearComboBox.getSelectionModel().clearSelection();
 				}
-				endDateClearButton.setVisible(true);
-} else {
-				endDateClearButton.setVisible(false);
-}
+				    endDateClearButton.setVisible(true);
+                } else {
+				    endDateClearButton.setVisible(false);
+                }
 			refreshSearch();
 		});
 	    
@@ -312,9 +321,13 @@ autoCompletePopup.show(searchField);
 	    		FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
 	    ); 
 	}
-	
+
+	public static final String manageName = "Manage Playlists";
 	public void updatePlaylistCombo() {
-		playlistCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists.getPlaylistNames()));
+		playlistCombo.getItems().clear();
+		ObservableList<String> list = FXCollections.observableArrayList(manageName);
+		list.addAll(ControllerMaster.userData.userPlaylists.getPlaylistNames());
+		playlistCombo.setItems(list);
 	}
 	
 	public void updateCollectionCombo() {
@@ -357,11 +370,15 @@ autoCompletePopup.show(searchField);
 	public Window getMainWindow() {
 		return window;
 	}
-	
-	public void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList) {
+
+	void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList) {
+		showManualLookupDialog(mediaList, 0, 0, 0);
+	}
+
+	public void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList, int mId, int seasonNum, int epNum) {
+        JFXMediaRippler.forceHidePopOver();
 		ControllerMaster.manualController.setData(mediaList);
-		ControllerMaster.manualController.openDialog(manualLookupWindow);
-		JFXMediaRippler.forceHidePopOver();
+		ControllerMaster.manualController.openDialog(manualLookupWindow, mId, seasonNum, epNum);
 	}
 	
 	@FXML

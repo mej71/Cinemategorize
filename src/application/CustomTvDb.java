@@ -86,7 +86,7 @@ public class CustomTvDb implements Serializable {
 				return getEpisode(seasonNum, i);
 			}
 		}
-		return null; //should never return null
+		return null; //should never return null unless all episodes have been manually removed
 	}
 	
 	//returns first available season
@@ -182,6 +182,16 @@ public class CustomTvDb implements Serializable {
 		}
 		loadEpisode(seasonNum, epNum);
 	}
+
+	//nulls fileinfo
+	void removeEpisode(int seasonNum, int epNum) {
+		if (episodePaths.containsKey(seasonNum)) {
+			episodePaths.get(seasonNum).put(epNum, null);
+		} else {
+			episodePaths.put(seasonNum, new LinkedHashMap<>());
+			episodePaths.get(seasonNum).put(epNum, null);
+		}
+	}
 	
 	public String getName() {
 		return series.getName();
@@ -250,6 +260,23 @@ public class CustomTvDb implements Serializable {
 
 	public List<Video> getVideos() {
 		return series.getVideos();
+	}
+
+	void setFilePathInfo(FilePathInfo fpi, int seasonNum, int epNum) {
+		episodePaths.get(seasonNum).put(epNum, fpi);
+	}
+
+	List<String> getAllFullPaths() {
+		List<String> allPaths = new ArrayList<>();
+		List<Integer> seasons = getOwnedSeasonNumbers();
+		List<Integer> episodes;
+		for (int season : seasons) {
+			episodes = getOwnedEpisodeNumbers(season);
+			for (int episode : episodes) {
+				allPaths.add(getFilePath(season, episode));
+			}
+		}
+		return allPaths;
 	}
 
 	public String getFilePath() {

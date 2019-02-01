@@ -38,3 +38,4 @@ bin/
 gradle/
 local_repos/
 out/
+*.m3u

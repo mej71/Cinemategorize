@@ -1,50 +1,28 @@
 package application;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.xml.sax.InputSource;
-
 import application.SearchItem.SearchTypes;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.Collection;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.keywords.Keyword;
-import info.movito.themoviedbapi.model.people.Person;
-import info.movito.themoviedbapi.model.people.PersonCast;
-import info.movito.themoviedbapi.model.people.PersonCredit;
-import info.movito.themoviedbapi.model.people.PersonCredits;
-import info.movito.themoviedbapi.model.people.PersonCrew;
-import info.movito.themoviedbapi.model.people.PersonPeople;
+import info.movito.themoviedbapi.model.people.*;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import org.xml.sax.InputSource;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.*;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserData implements Serializable {
 
@@ -469,8 +447,83 @@ public class UserData implements Serializable {
 		}
 	}
 
-	public void removeMovie(MovieDb m) {
+	public void removeTag(TreeMap<String, List<Integer>> tagList, int mId) {
+		List<String> tagsToRemove = new ArrayList<>();
+		for (String tag : tagList.keySet()) {
+			if (tagList.get(tag).contains(mId)) {
+				tagsToRemove.add(tag);
+			}
+		}
+		for (String tag : tagsToRemove) {
+			tagList.get(tag).removeAll(Arrays.asList(mId));
+			if (tagList.get(tag).isEmpty()) {
+				tagList.remove(tag);
+			}
+		}
+	}
 
+
+	public <T> void removeFromList(LinkedHashMap<T, List<Integer>> list, int mId) {
+		List<T> itemsToRemove = new ArrayList<>();
+		for (T item : list.keySet()) {
+			if (list.get(item).contains(mId)) {
+				itemsToRemove.add(item);
+			}
+		}
+		for (T item : itemsToRemove) {
+			list.get(item).removeAll(Arrays.asList(mId));
+			if (list.get(item).isEmpty()) {
+				list.remove(item);
+			}
+		}
+	}
+
+	//remove movie from media list and from tilepane
+	void removeMedia(MediaItem m) {
+		removePath(m.getFullFilePath());
+		if (m.isTvShow()) {
+			List<String> paths = m.tvShow.getAllFullPaths();
+			for (String path : paths) {
+				removePath(path);
+			}
+		}
+		allMedia.remove(m);
+		for (JFXMediaRippler mRip: ControllerMaster.mainController.allTiles) {
+			if (mRip.linkedItem == m) {
+				ControllerMaster.mainController.allTiles.remove(mRip);
+				ControllerMaster.mainController.refreshSearch();
+				break;
+			}
+		}
+		//remove search results
+		int mId = m.getId();
+		if (m.isMovie()) {
+			removeTag(movieTags, mId);
+			removeFromList(actorsMovieList, mId);
+			removeFromList(directorsMovieList, mId);
+			removeFromList(writersMovieList, mId);
+			removeFromList(genreMovieList, mId);
+		} else {
+			removeTag(tvTags, mId);
+			removeFromList(actorsTvList, mId);
+			removeFromList(directorsTvList, mId);
+			removeFromList(writersTvList, mId);
+			removeFromList(genreTvList, mId);
+		}
+		if (m.belongsToCollection()) {
+			ownedCollections.get(m.getCollection()).remove(m);
+		}
+	}
+
+	boolean removeTvEpisode(MediaItem m, int seasonNum, int epNum) {
+		removePath(m.getFullFilePath(seasonNum, epNum));
+		getTvById(m.getId()).tvShow.removeEpisode(seasonNum, epNum);
+		//remove show if no episodes are left
+		if (m.tvShow.getFirstAvailableSeason() == null) {
+			removeMedia(m);
+			return false;
+		}
+		return true;
 	}
 	
 	public void sortShownItems() {
@@ -577,7 +630,13 @@ public class UserData implements Serializable {
 	}
 	
 	public void addPath(String path) {
-		allPaths.add(path);
+		if (!hasPath(path)) {
+			allPaths.add(path);
+		}
+	}
+
+	public void removePath(String path) {
+		allPaths.remove(path);
 	}
 
 	public List<MediaItem> getAllMedia() {

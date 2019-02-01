@@ -1,18 +1,10 @@
 package application;
 
-import java.io.File;
-import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
-
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXProgressBar;
-
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -20,8 +12,15 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+
 public class AddMediaDialogController extends EscapableBase implements Initializable {
-	
+
+	static ExtensionFilter extFilter = new ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
+
 	@FXML private JFXDialogLayout dialogLayout;
 	@FXML private Label welcomeLabel;
 	@FXML private JFXButton chooseFileButton;
@@ -32,8 +31,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	@FXML private Label progressLabel;
 	@FXML private Label searchingLabel;
 	@FXML private JFXProgressBar progressBar;
-	
-	private ExtensionFilter extFilter;
+
 	private Task<?> lookupTask;
 	private UIMode uiMode;
 	
@@ -58,8 +56,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		preventEscape = initial;
 		updateLayout();
 		
-		dLink.show(); 
-		extFilter = new ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
+		dLink.show();
 	}
 	
 	//Filechooser and DirectoryChooser are forcibly sseparatein Java for some reason, so making two different methods

@@ -15,6 +15,7 @@ import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.validation.RequiredFieldValidator;
 
 import info.movito.themoviedbapi.model.tv.TvEpisode;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,6 +41,9 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	@FXML private Label noResultsLabel;
 	
 	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
+	private int oldId = 0;
+	private int oldSeason = 0;
+	private int oldEpisode = 0;
 
     @Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -76,7 +80,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
         resultsFlowPane.bindWidthToNode(resultsScrollPane);
         noResultsLabel.setVisible(false);
 	}
-	
+
 	public void setData(LinkedHashMap<MediaItem, MediaResultsPage> mList) {
 		mediaList = mList;
 		fileFlowPane.getChildren().clear();
@@ -91,19 +95,44 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		resetValidations();
 	}
 
-	public void openDialog(JFXDialog dLink) {
-		setDialogLink(dLink, false);	
+	void openDialog(JFXDialog dLink) {
+    	openDialog(dLink, 0, 0, 0);
+	}
+
+	public void openDialog(JFXDialog dLink, int oi, int seasonNum, int epNum) {
+		setDialogLink(dLink, false);
+		oldId = oi;
+		oldSeason = seasonNum;
+		oldEpisode = epNum;
 		dLink.setOnDialogClosed(event -> {
 			if (ControllerMaster.userData.numMediaItems() > 0) {
 				ControllerMaster.mainController.addMediaWindow.close();
 			}
+			//remove manual edits
+			if (oldId != 0) {
+				MediaItem mi = null;
+				if (oldId != 0) {
+					if (oldSeason != 0) { //
+						mi = ControllerMaster.userData.getTvById(oldId);
+					} else {
+						mi = ControllerMaster.userData.getMovieById(oldId);
+					}
+					for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
+						if ((mi.isMovie() && mik.isMovie() && mi.getId()==mik.getId()) ||
+								(mi.isTvShow() && mik.isTvShow() && mi.getId()==mik.getId())) {
+							ControllerMaster.userData.tempManualItems.remove(mik);
+							break;
+						}
+					}
+				}
+
+			}
 		});
-		dLink.show();  
-		
+		dLink.show();
 	}
 	
 	public void resetValidations() {
-		//titleField.resetValidation();
+		titleField.resetValidation();
 	}
 	
 	enum MediaTypeOptions {
@@ -133,7 +162,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		String text = "The file\n" + fileFlowPane.selectedCell.getItem().getFullFilePath() + "\nis " + 
 				resultsFlowPane.selectedCell.getItem().getTitle(false) + releaseDate;
 		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
-			text += " Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
+			text += ": Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
 		} 
 		confirmLayout.setBody(new Label(text + "?"));
 		JFXDialog confirmDialog = new JFXDialog();
@@ -151,30 +180,71 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		confirmLayout.setActions(confirmButton, cancelButton);
 		confirmDialog.show();
 	}
+
+	public void informAlreadyOwns() {
+		JFXDialogLayout confirmLayout = new JFXDialogLayout();
+		String releaseDate = "";
+		if (resultsFlowPane.selectedCell.getItem().getReleaseDate(false) != null && resultsFlowPane.selectedCell.getItem().getReleaseDate(false).length()>3) {
+			releaseDate = " (" + resultsFlowPane.selectedCell.getItem().getReleaseDate(false).substring(0, 4) + ")";
+		} else {
+			releaseDate += " (N/A)";
+		}
+		String text = "The file item " +
+				resultsFlowPane.selectedCell.getItem().getTitle(false) + releaseDate;
+		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
+			text += ": Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
+		}
+		confirmLayout.setBody(new Label(text + " is already owned.\nPlease select a different item or change that one first"));
+		JFXDialog confirmDialog = new JFXDialog();
+		confirmDialog.setDialogContainer(ControllerMaster.mainController.getBackgroundStackPane());
+		confirmDialog.setContent(confirmLayout);
+		confirmDialog.setTransitionType(DialogTransition.CENTER);
+		JFXButton okayButton = new JFXButton("Okay");
+		okayButton.setOnAction(event -> {
+			confirmDialog.close();
+		});
+		confirmLayout.setActions(okayButton);
+		confirmDialog.show();
+	}
 	
 	@FXML
 	public void addMediaItem() {
 		MediaItem fileItem = fileFlowPane.selectedCell.getItem();
 		ResultsMediaItem resultItem = resultsFlowPane.selectedCell.getItem();
+
+		//if editing manually, remove old item
+		MediaItem mi = null;
+		if (oldId != 0) {
+			if (oldSeason != 0) { //
+				mi = ControllerMaster.userData.getTvById(oldId);
+			} else {
+				mi = ControllerMaster.userData.getMovieById(oldId);
+			}
+			if (mi.isMovie()) {
+				ControllerMaster.userData.removeMedia(mi);
+			} else {
+				ControllerMaster.userData.removeTvEpisode(mi, oldSeason, oldEpisode);
+			}
+		}
 		//set choice to proper media result
 		if (resultItem.isMovie()) {
 			fileItem.setMovie(resultItem.cMovie);
 		} else {
 			fileItem.setTvShow(resultItem.tvShow);
 		}
-		
+
 		if (fileItem.isMovie()) {
-			UserDataHelper.addMovie( fileItem.cMovie, new File(fileItem.getFullFilePath()) );
+			UserDataHelper.addMovie( fileItem.cMovie, new File(fileItem.getTempFilePath()) );
 		} else {
 			TvEpisode episode = MediaSearchHandler.getEpisodeInfo(fileItem.getId(), resultItem.getTempSeasonNum(), 
 					resultItem.getTempEpisodeNum());
-			UserDataHelper.addTvShow(fileItem.tvShow, episode.getSeasonNumber(), episode.getEpisodeNumber(), new File(fileItem.getFullFilePath()));
+			UserDataHelper.addTvShow(fileItem.tvShow, episode.getSeasonNumber(), episode.getEpisodeNumber(), new File(fileItem.getTempFilePath()));
 		}
 		
 		//cleanup
-		for (MediaItem mi : ControllerMaster.userData.tempManualItems.keySet()) {
-			if (mi.getFullFilePath().equals(fileItem.getFullFilePath())) {
-				ControllerMaster.userData.tempManualItems.remove(mi);
+		for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
+			if (mik.getTempFilePath().equals(fileItem.getTempFilePath())) {
+				ControllerMaster.userData.tempManualItems.remove(mik);
 				break;
 			}
 		}
@@ -186,6 +256,15 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		//close manual dialog if empty
 		if (fileFlowPane.getChildren().size()==0) {
 			dLink.close();
+			//force refresh after manual update
+			if (oldId != 0) {
+				if (!fileItem.isMovie()) { //
+					mi = ControllerMaster.userData.getTvById(fileItem.getId());
+				} else {
+					mi = ControllerMaster.userData.getMovieById(fileItem.getId());
+				}
+				ControllerMaster.mainController.showSelectionDialog(mi);
+			}
 		} else {
 			fileFlowPane.selectedCell = (FileCell<MediaItem>)fileFlowPane.getChildren().get(0);
 			fileFlowPane.setChanged(true);

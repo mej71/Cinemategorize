@@ -187,19 +187,19 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		}
 		
 		switch (person.getKnownForDepartment()) {
-		default:
-		case "Acting":
-			tabPane.getSelectionModel().select(actorTab);
-			break;
-		case "Writing":
-			tabPane.getSelectionModel().select(writerTab);
-			break;
-		case "Directing":
-			tabPane.getSelectionModel().select(directorTab);
-			break;
-		case "Production":
-			tabPane.getSelectionModel().select(producerTab);
-			break;
+			case "Writing":
+				tabPane.getSelectionModel().select(writerTab);
+				break;
+			case "Directing":
+				tabPane.getSelectionModel().select(directorTab);
+				break;
+			case "Production":
+				tabPane.getSelectionModel().select(producerTab);
+				break;
+			case "Acting":  //use acting as default in future prep
+			default	:
+				tabPane.getSelectionModel().select(actorTab);
+				break;
 		}
 	}
 	

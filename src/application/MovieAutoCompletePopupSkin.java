@@ -2,6 +2,7 @@ package application;
 
 import com.jfoenix.controls.JFXAutoCompletePopup;
 
+import com.jfoenix.controls.JFXListView;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.animation.Animation.Status;
@@ -38,7 +39,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	public static final int prefCellHeight = 90;	
 
 	MovieAutoCompletePopup control;
-	ListView<SearchItem> suggestionList;
+	JFXListView<SearchItem> suggestionList;
 	final StackPane pane = new StackPane();
 	Scale scale;
 	Timeline showTransition;
@@ -47,7 +48,8 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	@SuppressWarnings("unchecked")
 	public MovieAutoCompletePopupSkin(MovieAutoCompletePopup control) {
 		this.control = control;
-		suggestionList = new ListView<>((ObservableList<SearchItem>) control.getFilteredSuggestions());
+		suggestionList = new JFXListView<>();
+		suggestionList.getItems().setAll((ObservableList<SearchItem>) control.getFilteredSuggestions());
 		suggestionList.setFixedCellSize(control.getFixedCellSize());
 		control.fixedCellSizeProperty()
 				.addListener(observable -> suggestionList.setFixedCellSize(control.getFixedCellSize()));

@@ -18,7 +18,7 @@ public class MediaResultsPage {
 	}
 	
 	public MediaResultsPage(MovieResultsPage m) {
-		movieResults = m;
+		this.movieResults = m;
 	}
 	
 	//don't do lookups until results are requested

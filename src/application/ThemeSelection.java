@@ -9,7 +9,7 @@ public class ThemeSelection implements Serializable {
 	public static List<ThemeSelection> themes = new ArrayList<ThemeSelection>() {{
 		add(new ThemeSelection("Perfect Blue", "perfect_blue.css"));
 	}};
-	
+
 	//set new theme and refresh css
 	//just refresh if theme is null (used for inital loading)
 	public static void updateTheme(ThemeSelection theme) {

@@ -104,8 +104,17 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		}
 		return "";
 	}
+
+	void setFilePathInfo(FilePathInfo fpi) {
+		this.filePathInfo = fpi;
+	}
+
 	public String getFullFilePath() {
 		return (isMovie() || tvShow == null)? filePathInfo.fPath : tvShow.getFilePath();
+	}
+
+	public String getTempFilePath() {
+		return filePathInfo.fPath;
 	}
 
 	public String getFileName(int seasonNum, int epNum) {
