@@ -1,5 +1,6 @@
 package application;
 
+import com.jfoenix.controls.JFXRippler;
 import javafx.css.PseudoClass;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -39,17 +40,17 @@ public class FlowCell<T> extends Control {
 		return pane;
 	}
 	
-	public <R extends Node> void setGraphic(R graphic) {
+	protected <R extends Node> void setGraphic(R graphic) {
 		this.getChildren().clear();
-		this.getChildren().add(graphic);
+		JFXRippler rippler = new JFXRippler(graphic);
+		this.getChildren().add(rippler);
 	}
-	
-	//must be overriden in child classes
-	protected <R extends Node> R getGraphic() {
+
+	private JFXRippler getGraphic() {
 		if (this.getChildren().isEmpty()) {
 			return null;
 		}
-		return (R)this.getChildren().get(0);
+		return (JFXRippler)this.getChildren().get(0);
 	}
 	
 	public void setText(String text) {

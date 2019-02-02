@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,17 +37,50 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+@SuppressWarnings("ALL")
 public  class MediaSearchHandler {
 
-	private static String personProfileDir = "/people";
+	static String getPersonDir() {
+		String base = "";
+		try {
+			base = new File(".").getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String personBase = base + "/images/people";
+		return personBase;
+	}
+
+	static String getMoviePosterDir() {
+		String base = "";
+		try {
+			base = new File(".").getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String moviePosterDir = base + "/images/movie_posters";
+		return moviePosterDir;
+	}
+
+	static String getTvPosterDir() {
+		String base = "";
+		try {
+			base = new File(".").getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String tvPosterDir = base + "/images/tv_posters";
+		return tvPosterDir;
+	}
+
 	public static Comparator<Collection> releaseDateComparator = (o1, o2) -> {
 		String o1Date = (o1.getReleaseDate() != null)? o1.getReleaseDate() : "";
 		String o2Date = (o2.getReleaseDate() != null)? o2.getReleaseDate() : "";
 		if (o1Date.isEmpty() && o2Date.isEmpty()) {
 			return 0;
-		} else if (o1Date.isEmpty() && !o2Date.isEmpty()) {
+		} else if (o1Date.isEmpty()) {
 			return 1;
-		} else if (!o1Date.isEmpty() && o2Date.isEmpty()) {
+		} else if (o2Date.isEmpty()) {
 			return -1;
 		}
 		return o1Date.compareTo(o2Date);
@@ -153,7 +187,7 @@ public  class MediaSearchHandler {
 		MediaItem mi;
 		for (int i = 0; i < ci.getParts().size(); ++i) {
 			mi = MediaSearchHandler.getMovieInfoById(ci.getParts().get(i).getId());
-			for (int j = 0; j < mi.getCredits().size(); ++j) {
+			for (int j = 0; j < Objects.requireNonNull(mi).getCredits().size(); ++j) {
 				if (mi.getCredits().get(j).getId() == personId) {
 					return mi;
 				}
@@ -164,7 +198,7 @@ public  class MediaSearchHandler {
 	
 	public static String[] parseTVShowName(String filename, String foldername) {
 		String tempFileName = filename.replaceAll("\\.(?=.*\\.)", " "); //remove all .'s and replace with spaces
-		String tvTitle = null, episodeNum = null, seasonNum = null;
+		String tvTitle = null, episodeNum, seasonNum;
 		//Look for TV show first, then movies.  TV show regex is more formulaic, so 
 		//First try Title S0XE0X or Title Season 04 Episode 05
 		Matcher tvTitleMatcher = Pattern.compile("^.*?(?=(Season|S)((\\s)|(-)|(_))?\\d{1,2}((\\s)|(-)|(_))?(Episode|Ep|E)((\\s)|(-)|(_))?\\d{1,3}+(?!\\d))", Pattern.CASE_INSENSITIVE).matcher(tempFileName);
@@ -246,16 +280,15 @@ public  class MediaSearchHandler {
 	public static ImageView getItemPoster(MovieDb m, CustomTvDb tv, int size) {
 		ImageView iView = new ImageView();
 		if (m != null && m.getPosterPath() != null) {
-			String moviePosterDir = "/movie_posters";
-			getPosterFromFilePath(iView, size, moviePosterDir, String.valueOf(m.getId()));
+
+			getPosterFromFilePath(iView, size, getMoviePosterDir(), String.valueOf(m.getId()));
 			if (iView.getImage()==null && m.getPosterPath()!=null && !m.getPosterPath().isEmpty()) {
-				getPosterFromURL(iView, size, m.getPosterPath(), moviePosterDir, String.valueOf(m.getId()));
+				getPosterFromURL(iView, size, m.getPosterPath(), getMoviePosterDir(), String.valueOf(m.getId()));
 			}
 		} else if (tv != null && tv.series != null){
-			String tvPosterDir = "/tv_posters";
-			getPosterFromFilePath(iView, size, tvPosterDir, String.valueOf(tv.getId()));
+			getPosterFromFilePath(iView, size, getTvPosterDir(), String.valueOf(tv.getId()));
 			if (iView.getImage()==null && tv.getPosterPath() != null) {
-				getPosterFromURL(iView, size, tv.getPosterPath(), tvPosterDir, String.valueOf(tv.getId()));
+				getPosterFromURL(iView, size, tv.getPosterPath(), getTvPosterDir(), String.valueOf(tv.getId()));
 			}
 		}	
 		//if all failed, use default poster
@@ -263,7 +296,7 @@ public  class MediaSearchHandler {
 			URL url = MediaSearchHandler.class.getClassLoader().getResource("unknown_poster.png");
 			BufferedImage image;
 			try {
-				image = ImageIO.read(url);
+				image = ImageIO.read(Objects.requireNonNull(url));
 				iView.setImage(SwingFXUtils.toFXImage(image, null));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -277,11 +310,9 @@ public  class MediaSearchHandler {
 		File f = new File(baseFolder+"/"+ id + "_" + size + ".jpg");
 		if (f.exists() && !f.isDirectory()) {
 			try {
-				if (!f.toURI().toURL().equals(null)) {
-					BufferedImage b = ImageIO.read(f);
-					iView.setImage(SwingFXUtils.toFXImage(b, null));
-				} 
-				return;
+				f.toURI().toURL();
+				BufferedImage b = ImageIO.read(f);
+				iView.setImage(SwingFXUtils.toFXImage(b, null));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}		
@@ -304,8 +335,7 @@ public  class MediaSearchHandler {
 				BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
 				ImageIO.write(b, "jpg", file);
 			}
-			in.close();
-			return;
+			Objects.requireNonNull(in).close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -321,8 +351,9 @@ public  class MediaSearchHandler {
 			URL url = MediaSearchHandler.class.getClassLoader().getResource("unknown_poster.png");
 			
 			try {
-				File file = new File(personProfileDir + "/" + p.getId()+ ".jpg");	
-				BufferedImage image = ImageIO.read(url);
+
+				File file = new File(getPersonDir() + "/" + p.getId()+ ".jpg");
+				BufferedImage image = ImageIO.read(Objects.requireNonNull(url));
 				iView.setImage(SwingFXUtils.toFXImage(image, null));
 				ImageIO.write(image, "jpg", file);
 			} catch (IOException e) {
@@ -333,15 +364,13 @@ public  class MediaSearchHandler {
 	}
 	
 	public static void getProfilePictureFromFile(ImageView iView, int id) {
-		new File(personProfileDir).mkdirs();
-		File f = new File(personProfileDir+"/"+ id + ".jpg");
+		new File(getPersonDir()).mkdirs();
+		File f = new File(getPersonDir()+"/"+ id + ".jpg");
 		if (f.exists() && !f.isDirectory()) {
 			try {
-				if (!f.toURI().toURL().equals(null)) {
-					BufferedImage b = ImageIO.read(f);
-					iView.setImage(SwingFXUtils.toFXImage(b, null));
-				} 
-				return;
+				f.toURI().toURL();
+				BufferedImage b = ImageIO.read(f);
+				iView.setImage(SwingFXUtils.toFXImage(b, null));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}		
@@ -356,17 +385,14 @@ public  class MediaSearchHandler {
 		InputStream in;
 		try {
 			URL url = new URL("https://image.tmdb.org/t/p/h632/" + a.getFilePath());
-			if (url.equals(null)) {
-				url = new URL("https://image.tmdb.org/t/p/original/" + a.getFilePath());
-			}
 			in = url.openStream();
 			if (in!=null) {
 				iView.setImage(new Image(in));
-				File file = new File(personProfileDir + "/" + id+ ".jpg");	
+				File file = new File(getPersonDir() + "/" + id+ ".jpg");
 				BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
 				ImageIO.write(b, "jpg", file);
 			}
-			in.close();
+			Objects.requireNonNull(in).close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

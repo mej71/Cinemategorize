@@ -1,5 +1,6 @@
 package application;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -132,8 +133,10 @@ public class JFXMediaRippler extends JFXRippler {
 	
 	public void setItem(MediaItem item) {
 		linkedItem = item;
-		if ( (linkedItem.isMovie() && ControllerMaster.userData.ownsMovie(linkedItem.getId())) || 
-				(!linkedItem.isMovie() && ControllerMaster.userData.ownsShow(linkedItem.getId()))) {
+		boolean isMovie = linkedItem.isMovie();
+		int mId = linkedItem.getId();
+		if ( (isMovie && ControllerMaster.userData.ownsMovie(mId)) ||
+				(!isMovie && ControllerMaster.userData.ownsShow(mId))) {
 			getControl().getStyleClass().add("selectable");
 		} else {
 			getControl().getStyleClass().removeAll("selectable");
@@ -177,14 +180,15 @@ public class JFXMediaRippler extends JFXRippler {
         		JFXMediaRippler.directorsLabel.setText(mi.getNumSeasons() + " seasons");
         	} else {
         		StringBuilder directors = new StringBuilder();
-	        	PersonCrew crew;
-	        	for (int i = 0; i < mi.getCrew().size(); ++i) {
-	        		crew = mi.getCrew().get(i);
-	        		if (crew.getJob().equalsIgnoreCase("Director")) {
+        		List<PersonCrew> crew = mi.getCrew();
+        		PersonCrew crewMember;
+	        	for (int i = 0; i < crew.size(); ++i) {
+					crewMember = crew.get(i);
+	        		if (crewMember.getJob().equalsIgnoreCase("Director")) {
 	        			if (directors.toString().equals("")) {
-	        				directors.append(crew.getName());
+	        				directors.append(crewMember.getName());
 	        			} else {
-	        				directors.append(", ").append(crew.getName());
+	        				directors.append(", ").append(crewMember.getName());
 	        			}
 	        		}
 	        	}
@@ -246,9 +250,10 @@ public class JFXMediaRippler extends JFXRippler {
 			
 		});
 		paneChild.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-
-			if ( (rippler.linkedItem.isMovie() && ControllerMaster.userData.ownsMovie(rippler.linkedItem.getId())) || 
-					(!rippler.linkedItem.isMovie() && ControllerMaster.userData.ownsShow(rippler.linkedItem.getId())) ) {
+			boolean isMovie = rippler.linkedItem.isMovie();
+			int mId = rippler.linkedItem.getId();
+			if ( (isMovie && ControllerMaster.userData.ownsMovie(mId)) ||
+					(!isMovie && ControllerMaster.userData.ownsShow(mId)) ) {
 				if (pOver.isShowing()) {
 					pOver.hide();
 				}

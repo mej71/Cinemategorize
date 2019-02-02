@@ -11,9 +11,9 @@ import javafx.scene.layout.HBox;
 
 public class FileCell<T extends MediaItem> extends FlowCell<T> {
 	
-	public static int prefCellHeight = 110;
+	static int prefCellHeight = 110;
 	
-	public FileCell(T item, ListFlowPane<FileCell<T>, T> pane) {
+	FileCell(T item, ListFlowPane<FileCell<T>, T> pane) {
 		super(item, pane);
 	}
 	
@@ -35,12 +35,6 @@ public class FileCell<T extends MediaItem> extends FlowCell<T> {
 			Tooltip.install(this, new Tooltip(item.getFullFilePath()));
 			setGraphic(new HBox(gridPane));
 		} 
-	}
-	
-	//must be overriden in child classes
-	@Override
-	protected HBox getGraphic() {
-		return super.getGraphic();
 	}
 	
 	public static <T extends MediaItem> List<FileCell<T>> createCells(Set<T> items, ListFlowPane<FileCell<T>, T> pane) {

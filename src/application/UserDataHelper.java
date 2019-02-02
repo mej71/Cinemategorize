@@ -6,9 +6,14 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import info.movito.themoviedbapi.TvResultsPage;
+import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
+import info.movito.themoviedbapi.model.keywords.Keyword;
+import info.movito.themoviedbapi.model.people.PersonCast;
+import info.movito.themoviedbapi.model.people.PersonCrew;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 
 public class UserDataHelper {
@@ -21,10 +26,10 @@ public class UserDataHelper {
 		if (tvParsedInfo[2].isEmpty()) {
 			tvParsedInfo[2] = "2";
 		}
-		CustomTvDb series = null;
-		TvEpisode episode = null;
-		TvResultsPage tRes = null;
-		MovieResultsPage mRes = null;
+		CustomTvDb series;
+		TvEpisode episode;
+		TvResultsPage tRes;
+		MovieResultsPage mRes;
 		Integer tvDistance = 100;
 		series = MediaSearchHandler.getTVInfo(tvParsedInfo[0]);
 		if (series != null) {
@@ -85,7 +90,7 @@ public class UserDataHelper {
 			ControllerMaster.userData.tempManualItems.put(new MediaItem(series, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(tRes));
 			return false;
 			
-		} else if (cm != null) {
+		} else {
 			if (movieDistance < 3) {
 				addMovie(cm, file);
 				return true;
@@ -101,7 +106,6 @@ public class UserDataHelper {
 				return false;
 			}
 		}
-		return true;
 	}
 	
 	public static void addMovie(CustomMovieDb m, File filePath) {
@@ -146,23 +150,29 @@ public class UserDataHelper {
 			}
 		}
 
-		
-		for (int i = 0; i < mi.getKeywords().size(); ++i) {
-			ControllerMaster.userData.addTag(mi.getKeywords().get(i), mi.getId(), isMovie);
+		List<Keyword> keywords = mi.getKeywords();
+		for (int i = 0; i < keywords.size(); ++i) {
+			ControllerMaster.userData.addTag(keywords.get(i), mi.getId(), isMovie);
 		}
-		if (mi.getCrew() != null) {
-			for (int i = 0; i < mi.getCrew().size(); ++i) {
-				ControllerMaster.userData.addPerson(mi.getCrew().get(i), mi.getId(), isMovie);
+
+		List<PersonCrew> crew = mi.getCrew();
+		if (crew != null) {
+
+			for (int i = 0; i < crew.size(); ++i) {
+				ControllerMaster.userData.addPerson(crew.get(i), mi.getId(), isMovie);
 			}
 		}
-		if (mi.getCast() != null) {
-			for (int i = 0; i<mi.getCast().size() && i<15; ++i) {
-				 ControllerMaster.userData.addPerson(mi.getCast().get(i), mi.getId(), isMovie);
+
+		List<PersonCast> cast = mi.getCast();
+		if (cast != null) {
+			for (int i = 0; i < cast.size() && i < 15; ++i) {
+				 ControllerMaster.userData.addPerson(cast.get(i), mi.getId(), isMovie);
 			}
 		}
-		if (mi.getGenres() != null) {
-			for (int i = 0; i < mi.getGenres().size(); ++i) {
-				ControllerMaster.userData.addGenre(mi.getGenres().get(i), mi.getId(), isMovie);
+		List<Genre> genres = mi.getGenres();
+		if (genres != null) {
+			for (int i = 0; i < genres.size(); ++i) {
+				ControllerMaster.userData.addGenre(genres.get(i), mi.getId(), isMovie);
 			}
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 

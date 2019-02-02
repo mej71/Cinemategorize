@@ -5,20 +5,20 @@ import java.util.List;
 
 public class SelectionOptions {
 
-    public static List<SelectionOptionTitles> getTvOptions() {
+    static List<SelectionOptionTitles> getTvOptions() {
         List<SelectionOptionTitles> options = new ArrayList<>(getBaseOptions());
         options.add(SelectionOptionTitles.REMOVEEPISODE);
         options.add(SelectionOptionTitles.REMOVESHOW);
         return options;
     }
 
-    public static List<SelectionOptionTitles> getMovieOptions() {
+    static List<SelectionOptionTitles> getMovieOptions() {
         List<SelectionOptionTitles> options = new ArrayList<>(getBaseOptions());
         options.add(SelectionOptionTitles.REMOVEMOVIE);
         return options;
     }
 
-    public static List<SelectionOptionTitles> getBaseOptions() {
+    static List<SelectionOptionTitles> getBaseOptions() {
         List<SelectionOptionTitles> options = new ArrayList<>();
         options.add(SelectionOptionTitles.ADDTOPLAYLIST);
         options.add(SelectionOptionTitles.CHANGELOCATION);

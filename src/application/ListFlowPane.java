@@ -36,6 +36,9 @@ public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 	
 	//highlights cell, but doesn't trigger click.  Use for external selection to prevent null selections
 	public void selectCell(T cell) {
+		if (selectedCell == cell) {
+			return;
+		}
 		if (selectedCell != null) {
     		selectedCell.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
     	}

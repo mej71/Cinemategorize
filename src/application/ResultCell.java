@@ -21,7 +21,7 @@ import javafx.scene.layout.RowConstraints;
 
 public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	
-	public static int prefCellHeight = 139;
+	static int prefCellHeight = 139;
 	private Label titleLabel;
 	private Label descLabel;
 	//private Label directorLabel;
@@ -30,11 +30,11 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	private JFXComboBox<Integer> episodeBox;
 	
 	
-	public ResultCell(T item, ListFlowPane<ResultCell<T>, T> pane) {
+	ResultCell(T item, ListFlowPane<ResultCell<T>, T> pane) {
 		super(item, pane);
 	}
 	
-	public void setItem(T item) {
+	void setItem(T item) {
 		this.item = item;
 		updateItem();
 	}
@@ -87,7 +87,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 			gridPane.setMaxHeight(prefCellHeight);
 			gridPane.prefWidthProperty().bind(getPane().widthProperty());
 			gridPane.maxWidthProperty().bind(getPane().widthProperty());
-			String releaseDate = "";
+			String releaseDate;
 	    	if (item.getReleaseDate(false) != null && item.getReleaseDate(false).length()>3) {
 	    		releaseDate = " (" + item.getReleaseDate(false).substring(0, 4) + ")";
 	    	} else {
@@ -138,13 +138,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 			setGraphic(new HBox(gridPane));
 		}
 	}
-	
-	//must be overriden in child classes
-	@SuppressWarnings("unchecked")
-	@Override
-	protected HBox getGraphic() {
-		return super.getGraphic();
-	}
+
 	
 	
 	@Override 
@@ -169,7 +163,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	}
 	
 
-	public static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results, ListFlowPane<ResultCell<T>,T> pane) {
+	static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results, ListFlowPane<ResultCell<T>,T> pane) {
 		List<ResultCell<T>> cells = new ArrayList<>();
 		for (T result : results) {
 			cells.add(new ResultCell<>(result, pane));
@@ -177,11 +171,11 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 		return cells;
 	}
 	
-	public int getSeason() {
+	int getSeason() {
 		return seasonBox.getValue();
 	}
 	
-	public int getEpisode() {
+	int getEpisode() {
 		return episodeBox.getValue();
 	}
 

@@ -24,9 +24,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UserData implements Serializable {
+class UserData implements Serializable {
 
-	public final transient static TmdbApi apiLinker = new TmdbApi(getAPIKey("THE_MOVIE_DB_API_TOKEN"));  //your key goes in api_keys.xml
+	final transient static TmdbApi apiLinker = new TmdbApi(getAPIKey("THE_MOVIE_DB_API_TOKEN"));  //your key goes in api_keys.xml
 	
 	private static final long serialVersionUID = 1L;
 	private List<MediaItem> allMedia = new ArrayList<>();
@@ -46,28 +46,26 @@ public class UserData implements Serializable {
 	private LinkedHashMap<Integer, PersonCredits> creditsList = new LinkedHashMap<>();
 	private List<String> allPaths = new ArrayList<>();
 	private double scaleFactor = 1.0;
-	public LinkedHashMap<Integer, MovieDb> seenMovies = new LinkedHashMap<>();
-	public LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<>();
-	public LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<>();
-	public MediaPlaylist userPlaylists = new MediaPlaylist();
-	public LinkedHashMap<Collection, List<MediaItem>> ownedCollections = new LinkedHashMap<>();
-	public transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<>();
-	public int minYear = 0;
-	public int maxYear = 0;
+	LinkedHashMap<Integer, MovieDb> seenMovies = new LinkedHashMap<>();
+	LinkedHashMap<Integer, TvSeries> seenTv = new LinkedHashMap<>();
+	LinkedHashMap<Integer, List<PersonCredit>> knownFor = new LinkedHashMap<>();
+	List<MediaPlaylist> userPlaylists = new ArrayList<>();
+	LinkedHashMap<Collection, List<MediaItem>> ownedCollections = new LinkedHashMap<>();
+	transient LinkedHashMap<MediaItem, MediaResultsPage> tempManualItems = new LinkedHashMap<>();
+	int minYear = 0;
+	int maxYear = 0;
 	
 	//settings
-	public boolean useAutoLookup = true;
-	public ThemeSelection themeSelection = ThemeSelection.themes.get(0);
+	boolean useAutoLookup = true;
+	ThemeSelection themeSelection = ThemeSelection.themes.get(0);
 
-	
-	
 	//get key from api_keys.xml by name
 	public static String getAPIKey(String keyname) {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		InputSource inputSource;
 		try {
 			URL url = UserData.class.getClassLoader().getResource("api_keys.xml");
-			inputSource = new InputSource(url.openStream());
+			inputSource = new InputSource(Objects.requireNonNull(url).openStream());
 			return xpath.evaluate("/resources/" + keyname, inputSource);
 		} catch (IOException | XPathExpressionException e) {
 			System.out.println("Invalid key in api_keys.xml for " + keyname);
@@ -236,7 +234,13 @@ public class UserData implements Serializable {
 
 
 	public void saveAll() {
-		new File("save_data").mkdirs();
+		String base = "";
+		try {
+			base = new File(".").getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		new File(base + "/save_data").mkdirs();
 		File file = new File("save_data/userdata.dat");
 
 		try {
@@ -251,14 +255,14 @@ public class UserData implements Serializable {
 	}
 	
 	public void tryLoadFile() {
-		InputStream inputStream = null;
-		ObjectInputStream objectInputStream = null;
+		InputStream inputStream;
+		ObjectInputStream objectInputStream;
 		new File("save_data").mkdirs();
 		File file = new File("save_data/userdata.dat");
 		URL url;
 		try {
 			url = file.toURI().toURL();
-			if (url!=null && file.exists()) {
+			if (file.exists()) {
 				inputStream = url.openStream();
 				objectInputStream = new ObjectInputStream(inputStream);
 				UserData tempDat = (UserData)objectInputStream.readObject();
@@ -288,8 +292,7 @@ public class UserData implements Serializable {
 				ownedCollections = tempDat.ownedCollections;
 				useAutoLookup = tempDat.useAutoLookup;
 				themeSelection = tempDat.themeSelection;
-			} 
-			return;
+			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}		
@@ -356,7 +359,6 @@ public class UserData implements Serializable {
 			addPeopleSuggestion(writersMovieList.keySet(), pattern, suggestions, SearchTypes.WRITER);
 			addPeopleSuggestion(writersTvList.keySet(), pattern, suggestions, SearchTypes.WRITER);
 		}
-
 		return suggestions;
 	}
 	
@@ -430,8 +432,8 @@ public class UserData implements Serializable {
 			}
 		}
 	}
-	
-	public void addGenre(Genre g, int mId, boolean isMovie) {
+
+	void addGenre(Genre g, int mId, boolean isMovie) {
 		if (isMovie) {
 			addToList(genreMovieList, g, mId);
 		} else {
@@ -439,7 +441,7 @@ public class UserData implements Serializable {
 		}
 	}
 	
-	public <T> void addToList(LinkedHashMap<T, List<Integer>> list, T g, int mId) {
+	<T> void addToList(LinkedHashMap<T, List<Integer>> list, T g, int mId) {
 		if (list.containsKey(g)) {
 			list.get(g).add(mId);
 		} else {
@@ -447,7 +449,7 @@ public class UserData implements Serializable {
 		}
 	}
 
-	public void removeTag(TreeMap<String, List<Integer>> tagList, int mId) {
+	private void removeTag(TreeMap<String, List<Integer>> tagList, int mId) {
 		List<String> tagsToRemove = new ArrayList<>();
 		for (String tag : tagList.keySet()) {
 			if (tagList.get(tag).contains(mId)) {
@@ -463,7 +465,7 @@ public class UserData implements Serializable {
 	}
 
 
-	public <T> void removeFromList(LinkedHashMap<T, List<Integer>> list, int mId) {
+	private <T> void removeFromList(LinkedHashMap<T, List<Integer>> list, int mId) {
 		List<T> itemsToRemove = new ArrayList<>();
 		for (T item : list.keySet()) {
 			if (list.get(item).contains(mId)) {
@@ -495,7 +497,7 @@ public class UserData implements Serializable {
 				break;
 			}
 		}
-		//remove search results
+		//remove search results, collections, and playlists
 		int mId = m.getId();
 		if (m.isMovie()) {
 			removeTag(movieTags, mId);
@@ -510,8 +512,14 @@ public class UserData implements Serializable {
 			removeFromList(writersTvList, mId);
 			removeFromList(genreTvList, mId);
 		}
+		for (MediaPlaylist playlist : userPlaylists) {
+			playlist.removeMedia(m);
+		}
 		if (m.belongsToCollection()) {
 			ownedCollections.get(m.getCollection()).remove(m);
+			if (ownedCollections.get(m.getCollection()).isEmpty()) {
+				ownedCollections.remove(m.getCollection());
+			}
 		}
 	}
 
@@ -526,7 +534,7 @@ public class UserData implements Serializable {
 		return true;
 	}
 	
-	public void sortShownItems() {
+	void sortShownItems() {
 		ObservableList<Node> workingCollection = FXCollections.observableArrayList((ControllerMaster.mainController.tilePane.getChildren()));
 		switch (ControllerMaster.mainController.sortCombo.getValue()) {
 		case NAME_ASC:
@@ -553,7 +561,7 @@ public class UserData implements Serializable {
 		ControllerMaster.mainController.tilePane.getChildren().setAll(workingCollection);
 	}
 
-	public void refreshViewingList(Map<String, List<Integer>> map) {
+	void refreshViewingList(Map<String, List<Integer>> map) {
 		List<Integer> moviesList = new ArrayList<>();
 		List<Integer> tvList = new ArrayList<>();
 		if (map.containsKey("movies")) {
@@ -577,7 +585,7 @@ public class UserData implements Serializable {
 		boolean canShowMovies = ControllerMaster.mainController.mediaTypeCombo.getValue() != MediaListDisplayType.TVSHOWS;
 		boolean canShowTv = ControllerMaster.mainController.mediaTypeCombo.getValue() != MediaListDisplayType.MOVIES;
 		List<MediaItem> selectedPlaylist = (ControllerMaster.mainController.playlistCombo.getValue() == null) ?
-				new ArrayList<>() : userPlaylists.getPlaylist(ControllerMaster.mainController.playlistCombo.getValue());
+				new ArrayList<>() : ControllerMaster.mainController.playlistCombo.getValue().getItems();
 		List<MediaItem> selectedCollection = (ControllerMaster.mainController.collectionsCombo.getValue() == null) ?
 				new ArrayList<>() : ownedCollections.get(ControllerMaster.mainController.collectionsCombo.getValue());
 		Date parsedDate = null;
@@ -625,21 +633,21 @@ public class UserData implements Serializable {
 	}
 	
 	//check if file has already been added.  Used to avoid unnecessary lookups
-	public boolean hasPath(String path) {
+	boolean hasPath(String path) {
 		return allPaths.contains(path);
 	}
 	
-	public void addPath(String path) {
+	void addPath(String path) {
 		if (!hasPath(path)) {
 			allPaths.add(path);
 		}
 	}
 
-	public void removePath(String path) {
+	void removePath(String path) {
 		allPaths.remove(path);
 	}
 
-	public List<MediaItem> getAllMedia() {
+	List<MediaItem> getAllMedia() {
 		return allMedia;
 	}
 	

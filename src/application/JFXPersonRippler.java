@@ -73,7 +73,7 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 		if (person != null) {
 			Platform.runLater(() -> {
 				//split into first/middle name + last name
-				String text = "";
+				String text;
 				String name = person.getName();
 				if (person.getName().split("\\w+").length > 1) {
 					text = name.substring(0, name.lastIndexOf(' ')) + "\n" + name.substring(name.lastIndexOf(' ') + 1);

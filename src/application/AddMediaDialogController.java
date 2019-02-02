@@ -15,6 +15,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class AddMediaDialogController extends EscapableBase implements Initializable {
@@ -134,7 +135,6 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 				if (ControllerMaster.userData.numMediaItems() > 0) {
 					preventEscape = false;
 					dLink.close();
-					return;
 				}
 			}
 		});
@@ -158,7 +158,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 					int skippedFiles = 0;
 					int failedFiles = 0;
 					boolean added = false;
-		            for (File file : dirFile.listFiles()) {
+		            for (File file : Objects.requireNonNull(Objects.requireNonNull(dirFile.listFiles()))) {
 		            	if (ControllerMaster.userData.hasPath(file.getPath())) { //skip files already saved
 		            		++skippedFiles;
 		            		continue;
@@ -178,8 +178,8 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		            		++skippedFiles;
 		            	}
 		            	added = false;
-		            	this.updateProgress(((double)skippedFiles+failedFiles+addedFiles)/(double)dirFile.listFiles().length, dirFile.listFiles().length);
-            			this.updateMessage(skippedFiles+failedFiles+addedFiles + " out of " + dirFile.listFiles().length + " completed");
+		            	this.updateProgress(((double)skippedFiles+failedFiles+addedFiles)/(double) Objects.requireNonNull(dirFile.listFiles()).length, Objects.requireNonNull(dirFile.listFiles()).length);
+            			this.updateMessage(skippedFiles+failedFiles+addedFiles + " out of " + Objects.requireNonNull(dirFile.listFiles()).length + " completed");
 		            }
 		        } 
 				succeeded();

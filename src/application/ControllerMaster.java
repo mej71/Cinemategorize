@@ -15,4 +15,6 @@ public class ControllerMaster {
 	public static AddMediaDialogController addMediaDialogController;
 	
 	public static SettingsController settingsController;
+
+	static TileAnimator tileAnimator = new TileAnimator();
 }

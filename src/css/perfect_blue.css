@@ -415,11 +415,11 @@
  ******************************************************************************/ 
  
 .rating > .container > .button {
-	-fx-pref-height: 24px;
-	-fx-max-height: 24px;
-	-fx-pref-width: 24px;
-	-fx-max-width: 24px;
-  	-fx-background-size: 24px;   
+	-fx-pref-height: 36px;
+	-fx-max-height: 36px;
+	-fx-pref-width: 36px;
+	-fx-max-width: 36px;
+  	-fx-background-size: 36px;
   	-fx-background-image: url("unselected_star.png");
   	-fx-background-color: transparent;
   	-fx-background-repeat: no-repeat;
@@ -427,11 +427,11 @@
 }
 
 .rating > .container > .button.strong {
-	-fx-pref-height: 24px;
-	-fx-max-height: 24px;
-	-fx-pref-width: 24px;
-	-fx-max-width: 24px;
-  	-fx-background-size: 24px;  
+	-fx-pref-height: 36px;
+	-fx-max-height: 36px;
+	-fx-pref-width: 36px;
+	-fx-max-width: 36px;
+  	-fx-background-size: 36px;
   	-fx-background-image: url("selected_star_base.png");
   	-fx-background-color: transparent;
   	-fx-background-repeat: no-repeat;
@@ -439,11 +439,11 @@
 }
 
 .rating.loaded > .container > .button.strong {
-	-fx-pref-height: 24px;
-	-fx-max-height: 24px;
-	-fx-pref-width: 24px;
-	-fx-max-width: 24px;
-  	-fx-background-size: 24px;  
+	-fx-pref-height: 36px;
+	-fx-max-height: 36px;
+	-fx-pref-width: 36px;
+	-fx-max-width: 36px;
+  	-fx-background-size: 36px;
   	-fx-background-image: url("selected_star_perfect_blue.png");
   	-fx-background-color: transparent;
   	-fx-background-repeat: no-repeat;

@@ -1,6 +1,10 @@
 package application;
 
 import com.jfoenix.controls.*;
+import info.movito.themoviedbapi.model.ContentRating;
+import info.movito.themoviedbapi.model.ReleaseDate;
+import info.movito.themoviedbapi.model.ReleaseInfo;
+import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.application.Platform;
@@ -67,9 +71,8 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	private List<JFXPersonRippler> actorTiles = new ArrayList<>();
 	private List<JFXPersonRippler> directorTiles = new ArrayList<>();
 	private List<JFXPersonRippler> writerTiles = new ArrayList<>();
-	private TileAnimator tileAnimator = new TileAnimator();
 	private JFXListView<SelectionOptions.SelectionOptionTitles> optionList;
-    
+	private boolean observing = false;
     
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -96,7 +99,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			}
 		});
 		seasonComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null && newValue != oldValue) {
+			if (newValue != null && !newValue.equals(oldValue)) {
 				int season = Integer.parseInt(newValue);
 				mediaItem.tvShow.lastViewedSeason = season;
 				episodeComboBox.getItems().clear();
@@ -109,7 +112,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			}
 		});
 		episodeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null && newValue != oldValue) {
+			if (newValue != null && !newValue.equals(oldValue)) {
 				mediaItem.tvShow.lastViewedEpisode= Integer.parseInt(newValue);
 				startTask();
 			}
@@ -125,11 +128,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
 		posterImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
 		descLabel.wrappingWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
-		tileAnimator.observe(genreFlowPane.getChildren());
-		tileAnimator.observe(directorFlowPane.getChildren());
-		tileAnimator.observe(actorFlowPane.getChildren());
-		tileAnimator.observe(writerFlowPane.getChildren());
-		tileAnimator.observe(tagsFlowPane.getChildren());
 		playAllEpisodesButton.managedProperty().bindBidirectional(playAllEpisodesButton.visibleProperty());
 		optionList = new JFXListView<>();
         optionList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -279,11 +277,40 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	@Override
 	protected void successTasks() {
 		super.successTasks();
+		observeNodes();
 		fillControlls();
 		mediaItem.setLoaded();
 	}
-	
-	public void fillControlls() {
+
+	@Override
+	protected void closeTasks() {
+		super.closeTasks();
+		unobserveNodes();
+		System.gc();
+	}
+
+	private void observeNodes() {
+		if (observing) {
+			unobserveNodes();
+		}
+		ControllerMaster.tileAnimator.observe(genreFlowPane.getChildren());
+		ControllerMaster.tileAnimator.observe(directorFlowPane.getChildren());
+		ControllerMaster.tileAnimator.observe(actorFlowPane.getChildren());
+		ControllerMaster.tileAnimator.observe(writerFlowPane.getChildren());
+		ControllerMaster.tileAnimator.observe(tagsFlowPane.getChildren());
+		observing = true;
+	}
+
+	private void unobserveNodes() {
+		ControllerMaster.tileAnimator.unobserve(genreFlowPane.getChildren());
+		ControllerMaster.tileAnimator.unobserve(directorFlowPane.getChildren());
+		ControllerMaster.tileAnimator.unobserve(actorFlowPane.getChildren());
+		ControllerMaster.tileAnimator.unobserve(writerFlowPane.getChildren());
+		ControllerMaster.tileAnimator.unobserve(tagsFlowPane.getChildren());
+		observing = false;
+	}
+
+	private void fillControlls() {
 		for (JFXPersonRippler<?> rip : actorTiles) {
 			rip.updateImage();
 		}
@@ -297,9 +324,9 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	}
 	
 	//does any info not specific to episode
-	public void fillMainInfo() {
+	private void fillMainInfo() {
 		infoScrollPane.setVvalue(0);
-		String releaseDate = "";
+		String releaseDate;
     	if (mediaItem.getReleaseDate() != null && mediaItem.getReleaseDate().length()>3) {
     		releaseDate = " (" + mediaItem.getReleaseDate().substring(0, 4) + ")";
     	} else {
@@ -326,22 +353,26 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				rating.getStyleClass().add("loaded");
 			}
 		}
-		
-		tagsLabel.setText( (mediaItem.getKeywords().size()>1)? "Tags:" : "Tag:" );
+
+		List<Keyword> keywords = mediaItem.getKeywords();
+		tagsLabel.setText( (keywords.size()>1)? "Tags:" : "Tag:" );
 		tagsFlowPane.getChildren().clear();
-		for (int i = 0; i < mediaItem.getKeywords().size(); ++i) {
-			tagsFlowPane.getChildren().add(JFXCustomChips.getTagChip(mediaItem.getKeywords().get(i).getName()));
+		for (int i = 0; i < keywords.size(); ++i) {
+			tagsFlowPane.getChildren().add(JFXCustomChips.getTagChip(keywords.get(i).getName()));
 		}
 		tagsLabel.setVisible(tagsFlowPane.getChildren().size()>0);
 		
 		//movie ratings are stored in releases, tv in content rating
 		boolean found = false;
 		if (mediaItem.isMovie()) {
-			for (int i = 0; i < mediaItem.getReleases().size(); ++i) {
-				if (mediaItem.getReleases().get(i).getCountry().equalsIgnoreCase("US")) {
-					for (int j = 0; j < mediaItem.getReleases().get(i).getReleaseDates().size(); ++j) {
-						if (mediaItem.getReleases().get(i).getReleaseDates().get(j).getCertification()!=null && !mediaItem.getReleases().get(i).getReleaseDates().get(j).getCertification().isEmpty()) {
-							ratingLabel.setText(mediaItem.getReleases().get(i).getReleaseDates().get(j).getCertification());
+			List<ReleaseInfo> releases = mediaItem.getReleases();
+			List<ReleaseDate> releaseDates;
+			for (int i = 0; i < releases.size(); ++i) {
+				if (releases.get(i).getCountry().equalsIgnoreCase("US")) {
+					releaseDates = releases.get(i).getReleaseDates();
+					for (int j = 0; j < releaseDates.size(); ++j) {
+						if (releaseDates.get(j).getCertification()!=null && !releaseDates.get(j).getCertification().isEmpty()) {
+							ratingLabel.setText(releaseDates.get(j).getCertification());
 							found = true;
 							break;
 						}
@@ -352,10 +383,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				}
 			}
 		} else {
-			for (int i = 0; i < mediaItem.getContentRating().size(); ++i) {
-				if (mediaItem.getContentRating().get(i).getLocale().equalsIgnoreCase("US")) {
+			List<ContentRating> contentRatings = mediaItem.getContentRating();
+			ContentRating contentRating;
+			for (int i = 0; i < contentRatings.size(); ++i) {
+				contentRating = contentRatings.get(i);
+				if (contentRating.getLocale().equalsIgnoreCase("US")) {
 					found = true;
-					ratingLabel.setText(mediaItem.getContentRating().get(i).getRating());
+					ratingLabel.setText(contentRating.getRating());
 					break;
 				}
 			}
@@ -368,7 +402,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void fillInfo() {		
+	private void fillInfo() {
 		int dirCount = 0;
 		int writCount = 0;
 		ObservableList<Node> workingDirectorCollection = FXCollections.observableArrayList();
@@ -376,8 +410,9 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		ObservableList<Node> workingActorCollection = FXCollections.observableArrayList();
 		PersonCrew pCrew;
 		List<Integer> writerIds = new ArrayList<>();
-		for (int i = 0; i < mediaItem.getCrew().size(); ++i) {
-			pCrew = mediaItem.getCrew().get(i);
+		List<PersonCrew> crew = mediaItem.getCrew();
+		for (int i = 0; i < crew.size(); ++i) {
+			pCrew = crew.get(i);
 			if (pCrew.getJob().equalsIgnoreCase("Director")) {
 				directorTiles.get(dirCount).setPerson(pCrew, mediaItem);
 				workingDirectorCollection.add(directorTiles.get(dirCount));
@@ -393,10 +428,11 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				++writCount;
 			}
 		}
-		
+
+		List<PersonCast> cast = mediaItem.getCast();
 		PersonCast pCast;
-		for (int i = 0; i < mediaItem.getCast().size() && i<13; ++i) {
-			pCast = mediaItem.getCast().get(i);
+		for (int i = 0; i < cast.size() && i<13; ++i) {
+			pCast = cast.get(i);
 			actorTiles.get(i).setPerson(pCast, mediaItem);
 			workingActorCollection.add(actorTiles.get(i));				
 		}
@@ -416,9 +452,11 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		//use runtime 
 		String runtimeString = (mediaItem.isMovie())? "Runtime: " : "Episode Avg: ";
 		runTimeLabel.setText(runtimeString + String.format("%d", mediaItem.getRuntime()/60) + ":" + String.format("%02d", mediaItem.getRuntime()%60));
-		Platform.runLater(() -> directorFlowPane.requestLayout());
-		Platform.runLater(() -> writerFlowPane.requestLayout());
-		Platform.runLater(() -> actorFlowPane.requestLayout());		
+		Platform.runLater(() -> {
+			directorFlowPane.requestLayout();
+			writerFlowPane.requestLayout();
+			actorFlowPane.requestLayout();
+		});
 	}
 	
 	@FXML public void playMedia() {
@@ -430,7 +468,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	@FXML public void playShow() {
 		List<String> previousFilePaths = new ArrayList<>();
 		List<String> filePaths = new ArrayList<>();
-		String tempPath = "";
+		String tempPath;
 		for (int i = 1; i <= mediaItem.getNumSeasons(); ++i) {
 			for (int j = 1; j < mediaItem.getEpisodes(i).size(); ++j) {
 				tempPath = mediaItem.getFullFilePath(i, j);

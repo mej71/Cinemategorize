@@ -23,82 +23,74 @@
    <rowConstraints>
       <RowConstraints vgrow="ALWAYS"/>
    </rowConstraints>
-   <GridPane GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.valignment="BOTTOM">
-      <columnConstraints>
-         <ColumnConstraints hgrow="NEVER" percentWidth="35.0"/>
-         <ColumnConstraints hgrow="SOMETIMES" percentWidth="28.0"/>
-         <ColumnConstraints hgrow="SOMETIMES" percentWidth="22.0"/>
-         <ColumnConstraints hgrow="SOMETIMES" percentWidth="15.0"/>
-      </columnConstraints>
-      <rowConstraints>
-         <RowConstraints percentHeight="85.0" vgrow="SOMETIMES"/>
-         <RowConstraints percentHeight="15.0" vgrow="SOMETIMES"/>
-      </rowConstraints>
-      <children>
-         <JFXTextField fx:id="titleField" alignment="CENTER" onAction="#searchSuggestion"
-                       promptText="Movie or show title" GridPane.columnSpan="2" GridPane.halignment="CENTER"
-                       GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
-            <padding>
+    <GridPane GridPane.columnIndex="1" GridPane.hgrow="NEVER" GridPane.valignment="BOTTOM">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" percentWidth="35.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="28.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="22.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="15.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints percentHeight="85.0" vgrow="SOMETIMES"/>
+            <RowConstraints percentHeight="15.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <JFXTextField fx:id="titleField" alignment="CENTER" onAction="#searchSuggestion"
+                      promptText="Movie or show title" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+                      GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+           <padding>
                <Insets left="5.0" right="5.0"/>
-            </padding>
-            <GridPane.margin>
+           </padding>
+           <GridPane.margin>
                <Insets bottom="20.0"/>
-            </GridPane.margin>
-         </JFXTextField>
-         <Label text="Double click your correct item, or search for..." GridPane.columnSpan="4"
-                GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="TOP">
-            <GridPane.margin>
+           </GridPane.margin>
+        </JFXTextField>
+        <Label text="Double click your correct item, or search for..." GridPane.columnSpan="4"
+               GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="TOP">
+           <GridPane.margin>
                <Insets top="2.0"/>
-            </GridPane.margin>
-         </Label>
-         <JFXNumberTextField fx:id="yearField" alignment="CENTER" onAction="#searchSuggestion" prefColumnCount="4"
-                             promptText="Year" GridPane.columnIndex="2" GridPane.halignment="RIGHT"
-                             GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
-            <padding>
+           </GridPane.margin>
+        </Label>
+        <JFXNumberTextField fx:id="yearField" alignment="CENTER" onAction="#searchSuggestion" prefColumnCount="4"
+                            promptText="Year" GridPane.columnIndex="2" GridPane.halignment="RIGHT"
+                            GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+           <padding>
                <Insets left="3.0" right="3.0"/>
-            </padding>
-            <GridPane.margin>
+           </padding>
+           <GridPane.margin>
                <Insets bottom="20.0"/>
-            </GridPane.margin>
-         </JFXNumberTextField>
-         <JFXButton fx:id="searchButton" alignment="CENTER" buttonType="RAISED" onAction="#searchSuggestion"
-                    text="Search" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER"
-                    GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
-            <padding>
+           </GridPane.margin>
+        </JFXNumberTextField>
+        <JFXButton fx:id="searchButton" alignment="CENTER" buttonType="RAISED" onAction="#searchSuggestion"
+                   text="Search" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER"
+                   GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+           <padding>
                <Insets right="3.0"/>
-            </padding>
-            <GridPane.margin>
+           </padding>
+           <GridPane.margin>
                <Insets bottom="20.0"/>
-            </GridPane.margin>
-         </JFXButton>
-         <JFXComboBox fx:id="mediaTypeComboBox" GridPane.columnIndex="2" GridPane.columnSpan="2"
-                      GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP">
-            <GridPane.margin>
+           </GridPane.margin>
+        </JFXButton>
+        <JFXComboBox fx:id="mediaTypeComboBox" GridPane.columnIndex="2" GridPane.columnSpan="2"
+                     GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP">
+           <GridPane.margin>
                <Insets right="5.0" top="2.0"/>
-            </GridPane.margin>
-         </JFXComboBox>
-         <ScrollPane fx:id="resultsScrollPane" fitToWidth="true" GridPane.columnSpan="4">
+           </GridPane.margin>
+        </JFXComboBox>
+        <ScrollPane fx:id="resultsScrollPane" fitToWidth="true" GridPane.columnSpan="4">
             <GridPane.margin>
-               <Insets left="5.0" right="5.0" top="5.0"/>
+                <Insets left="5.0" right="5.0" top="5.0"/>
             </GridPane.margin>
-            <content>
-               <ListFlowPane fx:id="resultsFlowPane" orientation="VERTICAL"/>
-            </content>
-         </ScrollPane>
-         <Label fx:id="noResultsLabel" text="No Results Found" GridPane.columnSpan="4" GridPane.halignment="CENTER"/>
-         <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="4">
-            <children>
-               <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER"/>
-            </children>
-         </StackPane>
-      </children>
-   </GridPane>
-   <ScrollPane fx:id="fileScrollPane">
-      <GridPane.margin>
-         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-      </GridPane.margin>
-      <content>
-         <ListFlowPane fx:id="fileFlowPane" orientation="VERTICAL"/>
-      </content>
-   </ScrollPane>
+            <ListFlowPane fx:id="resultsFlowPane" orientation="VERTICAL"/>
+        </ScrollPane>
+        <Label fx:id="noResultsLabel" text="No Results Found" GridPane.columnSpan="4" GridPane.halignment="CENTER"/>
+        <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="4">
+            <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER"/>
+        </StackPane>
+    </GridPane>
+    <ScrollPane fx:id="fileScrollPane">
+        <GridPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </GridPane.margin>
+        <ListFlowPane fx:id="fileFlowPane" orientation="VERTICAL"/>
+    </ScrollPane>
 </GridPane>

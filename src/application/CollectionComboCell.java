@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 
-public class CollectionCell<T extends Collection> extends ComboMovieCell<Collection> {
+public class CollectionComboCell<T extends Collection> extends ComboMovieCell<Collection> {
 
 	@Override
 	protected void updateItem(Collection item, boolean empty) {

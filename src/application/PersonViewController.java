@@ -1,13 +1,7 @@
 package application;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import org.apache.commons.lang3.SerializationUtils;
 
@@ -64,6 +58,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	private Comparator<PersonCredit> dateComparator;
     private Comparator<PersonCredit> knownComprator;
     private List<JFXMediaRippler> knownForRipplers;
+    private boolean observing = false;
     
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -74,9 +69,9 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			String o2Date = (o2.getReleaseDate() != null)? o2.getReleaseDate() : (o2.getFirstAirDate() != null)? o2.getFirstAirDate() : "";
 			if (o1Date.isEmpty() && o2Date.isEmpty()) {
 				return 0;
-			} else if (o1Date.isEmpty() && !o2Date.isEmpty()) {
+			} else if (o1Date.isEmpty()) {
 				return -1;
-			} else if (!o1Date.isEmpty() && o2Date.isEmpty()) {
+			} else if (o2Date.isEmpty()) {
 				return 1;
 			}
 			return o2Date.compareTo(o1Date);
@@ -99,17 +94,14 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		writFlowPane.bindWidthToNode(writScrollPane);
 		actFlowPane.bindWidthToNode(actScrollPane);
 		prodFlowPane.bindWidthToNode(prodScrollPane);
-		TileAnimator tileAnimator = new TileAnimator();
-		tileAnimator.observe(famousTilePane.getChildren());
-		
 	}
 	
-	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
+	<T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
 		person = ControllerMaster.userData.getPerson(pc.getId());
 		showPerson(d);
 	}
 	
-	public void showPerson(JFXDialog d) {
+	void showPerson(JFXDialog d) {
 		nameLabel.setText(person.getName());
 		if (person.getBiography()!=null && !person.getBiography().equals("")) {
 			bioLabel.setText(person.getBiography());
@@ -124,6 +116,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	@Override
 	protected void runTasks() {
 		super.runTasks();
+		observeNodes();
 		personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
 		creditSort();
 		setCredits();
@@ -131,8 +124,27 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		loadInfo();
 		resizeTiles();
 	}
-	
-	public void resetCreditTabs() {
+
+	@Override
+	protected void closeTasks() {
+		super.closeTasks();
+		unobserveNodes();
+	}
+
+	private void observeNodes() {
+		if (observing) {
+			unobserveNodes();
+		}
+		ControllerMaster.tileAnimator.observe(famousTilePane.getChildren());
+		observing = true;
+	}
+
+	private void unobserveNodes() {
+		ControllerMaster.tileAnimator.unobserve(famousTilePane.getChildren());
+		observing = false;
+	}
+
+	private void resetCreditTabs() {
 		dirFlowPane.getItems().clear();
 		writFlowPane.getItems().clear();
 		actFlowPane.getItems().clear();
@@ -147,30 +159,30 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		prodScrollPane.setVvalue(0);
 		bioScrollPane.setVvalue(0);
 	}
-	
-	public void creditSort() {
+
+	private void creditSort() {
 		crewCredits = ControllerMaster.userData.getCredits(person.getId()).getCrew();
 		castCredits = ControllerMaster.userData.getCredits(person.getId()).getCast();
 		
 		crewCredits.sort(dateComparator);
 		castCredits.sort(dateComparator);
 	}
-	
-	
-	public void addToList(ListFlowPane<CreditCell<PersonCredit>, PersonCredit> listFlowPane, PersonCredit credit) {
+
+
+	private void addToList(ListFlowPane<CreditCell<PersonCredit>, PersonCredit> listFlowPane, PersonCredit credit) {
 		listFlowPane.addItem(credit);
 		listFlowPane.getChildren().add(new CreditCell<>(credit, listFlowPane));
 		listFlowPane.setPrefHeight(listFlowPane.getChildren().size() * CreditCell.prefCellHeight);
 	}
-	
-	public void enableTabs() {
+
+	private void enableTabs() {
 		directorTab.setDisable(dirFlowPane.getItems().size() == 0);
 		writerTab.setDisable(writFlowPane.getItems().size() == 0);
 		actorTab.setDisable(actFlowPane.getItems().size() == 0);
 		producerTab.setDisable(prodFlowPane.getItems().size() == 0);
 	}
-	
-	public void setCredits() {
+
+	private void setCredits() {
 		for (PersonCredit crewCredit : crewCredits) {
 			if (crewCredit.getDepartment().equalsIgnoreCase("Directing")) {
 				addToList(dirFlowPane, crewCredit);
@@ -203,7 +215,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		}
 	}
 	
-	public void loadInfo() {
+	private void loadInfo() {
 		
 		ObservableList<Node> workingKnownForCollection = FXCollections.observableArrayList();
 		if (!ControllerMaster.userData.knownFor.containsKey(person.getId())) {
@@ -213,6 +225,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			knownForList.sort(knownComprator);
 			int known = 0;
 			MediaItem mi;
+			int mId;
 			boolean isKnownDep;
 			final String knownDep = person.getKnownForDepartment();
 			HashMap<PersonCredit, MediaItem> lesserKnown = new HashMap<>();
@@ -229,17 +242,18 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 					if (personCredit.getMediaType().equalsIgnoreCase("movie")) {
 						mi = SerializationUtils.clone(MediaSearchHandler.getMovieInfoById(personCredit.getMediaId()));
 						//if part of collection, just use first
-						if (mi.belongsToCollection()) {
+						if (Objects.requireNonNull(mi).belongsToCollection()) {
 							mi = SerializationUtils.clone(MediaSearchHandler.getFirstFromCollectionMatchesPerson(mi.getCollection().getId(), person.getId()));
 						}
 					} else {
 						mi = SerializationUtils.clone(MediaSearchHandler.getTvInfoById(personCredit.getMediaId()));
 					}
+					mId = Objects.requireNonNull(mi).getId();
 				} else {
 					continue;
 				}
 				//item credit should match what the person is known for, been released already, and bias against being in a low count of episodes for a series
-				if (mi != null && !tempKnownList.contains(mi.getId())) {
+				if (!tempKnownList.contains(mId)) {
 					//prefer people higher up in the cast bill and in full features or tv shows (bias against short films)
 					//order in the cast list in which to be credited
 					int castPositionThreshold = 5;
@@ -252,7 +266,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 						} else {
 							ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Arrays.asList(personCredit)));
 						}
-						tempKnownList.add(mi.getId());
+						tempKnownList.add(mId);
 						++known;
 					} else {
 						lesserKnown.put(personCredit, mi);
@@ -305,8 +319,8 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		famousTilePane.getChildren().setAll(workingKnownForCollection);
 		famousLabel.setVisible(famousTilePane.getChildren().size()>0);
 	}
-	
-	public void resizeTiles() {
+
+	private void resizeTiles() {
 		//keep tilepane from getting taller than two rows
 		StackPane n;
 		for (int i = 0; i < famousTilePane.getChildren().size(); ++i) {

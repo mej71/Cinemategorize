@@ -3,6 +3,7 @@ package application;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ThemeSelection implements Serializable {
 		
@@ -15,10 +16,10 @@ public class ThemeSelection implements Serializable {
 	public static void updateTheme(ThemeSelection theme) {
 		if (theme != null) {
 			//remove last stylesheet so small modifications aren't overridden by it
-			ControllerMaster.mainController.cinemaScene.getStylesheets().remove(theme.getClass().getClassLoader().getResource(ControllerMaster.userData.themeSelection.getFileName()).toExternalForm());
+			ControllerMaster.mainController.cinemaScene.getStylesheets().remove(Objects.requireNonNull(theme.getClass().getClassLoader().getResource(ControllerMaster.userData.themeSelection.getFileName())).toExternalForm());
 			ControllerMaster.userData.themeSelection = theme;
 		}
-		ControllerMaster.mainController.cinemaScene.getStylesheets().add(ControllerMaster.userData.getClass().getClassLoader().getResource(ControllerMaster.userData.themeSelection.getFileName()).toExternalForm());
+		ControllerMaster.mainController.cinemaScene.getStylesheets().add(Objects.requireNonNull(ControllerMaster.userData.getClass().getClassLoader().getResource(ControllerMaster.userData.themeSelection.getFileName())).toExternalForm());
 	}
 	
 	private static final long serialVersionUID = 1L;

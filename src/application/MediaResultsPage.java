@@ -2,6 +2,7 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import info.movito.themoviedbapi.TvResultsPage;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
@@ -26,12 +27,12 @@ public class MediaResultsPage {
 		List<ResultsMediaItem> results = new ArrayList<>();
 		if (tvResults != null) {
 			for (int i = 0; i < tvResults.getResults().size(); ++i) {
-				results.add(new ResultsMediaItem(MediaSearchHandler.getTvInfoById(tvResults.getResults().get(i).getId()).tvShow));
+				results.add(new ResultsMediaItem(Objects.requireNonNull(MediaSearchHandler.getTvInfoById(tvResults.getResults().get(i).getId())).tvShow));
 			}
 			return results;
 		} else if (movieResults != null){
 			for (int i = 0; i < movieResults.getResults().size(); ++i) {
-				results.add( new ResultsMediaItem(MediaSearchHandler.getMovieInfoById(movieResults.getResults().get(i).getId()).cMovie));
+				results.add( new ResultsMediaItem(Objects.requireNonNull(MediaSearchHandler.getMovieInfoById(movieResults.getResults().get(i).getId())).cMovie));
 			}
 		}
 		return results;

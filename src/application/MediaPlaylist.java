@@ -2,50 +2,43 @@ package application;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class MediaPlaylist implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	private LinkedHashMap<String, List<MediaItem>> playlists;
-	
-	public MediaPlaylist() {
-		playlists = new LinkedHashMap<>();
-	}
-	
-	public boolean nameAlreadyUsed(String name) {
-		return playlists.containsKey(name);
-	}
-	
-	public void addPlaylist(String name, List<MediaItem> items) {
-		if (items == null || items.isEmpty()) { //no empty playlists
-			return;
-		}
-		playlists.put(name, items);
-	}
-	
-	public void addItemToPlaylist(String name, MediaItem item) {
-		if (!playlists.containsKey(name)) {
-			playlists.put(name, new ArrayList<>());
-		}
-		playlists.get(name).add(item);
-	}
-	
-	public LinkedHashMap<String, List<MediaItem>> getPlaylists() {
-		return playlists;
-	}
-	
-	public List<MediaItem> getPlaylist(String name) {
-		return playlists.get(name);
-	}
-	
-	public List<String> getPlaylistNames() {
-		return new ArrayList<>(playlists.keySet());
-	}
-	
-	public void clear() {
-		playlists.clear();
-	}
+
+    private static final long serialVersionUID = 1L;
+
+    private String name = "";
+    private boolean isFavorite = false;
+    private List<MediaItem> items = new ArrayList<>();
+
+    public MediaPlaylist(String name, MediaItem mi) {
+        this.name = name;
+        items.add(mi);
+    }
+
+    String getName() {
+        return name;
+    }
+
+    void removeMedia(MediaItem mi) {
+        for (Iterator<MediaItem> iterator = items.iterator(); iterator.hasNext();) {
+            MediaItem mik = iterator.next();
+            if (mik.equals(mi)) {
+                // Remove the current element from the iterator and the list.
+                iterator.remove();
+            }
+        }
+    }
+
+    List<MediaItem> getItems() {
+        return items;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 
 }

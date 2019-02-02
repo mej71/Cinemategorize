@@ -3,6 +3,7 @@ package application;
 import com.jfoenix.controls.JFXAutoCompletePopup;
 
 import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXRippler;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.animation.Animation.Status;
@@ -49,7 +50,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 	public MovieAutoCompletePopupSkin(MovieAutoCompletePopup control) {
 		this.control = control;
 		suggestionList = new JFXListView<>();
-		suggestionList.getItems().setAll((ObservableList<SearchItem>) control.getFilteredSuggestions());
+		suggestionList.setItems((ObservableList<SearchItem>) control.getFilteredSuggestions());
 		suggestionList.setFixedCellSize(control.getFixedCellSize());
 		control.fixedCellSizeProperty()
 				.addListener(observable -> suggestionList.setFixedCellSize(control.getFixedCellSize()));
@@ -133,8 +134,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 					hbox.setMaxHeight(prefCellHeight);
 					hbox.setMinWidth(0);
 					hbox.setPrefWidth(1);
-					setGraphic(hbox);
-					setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+					setGraphic(new JFXRippler(hbox));
 				}				
 			}
 			

@@ -14,29 +14,23 @@ import com.jfoenix.controls.*;
 import info.movito.themoviedbapi.model.Collection;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Window;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 public class CinemaController implements Initializable {
@@ -57,11 +51,13 @@ public class CinemaController implements Initializable {
 
 	@FXML JFXComboBox<Integer> startYearComboBox;
 	@FXML JFXComboBox<Integer> endYearComboBox;
-	@FXML JFXComboBox<String> playlistCombo;
+	@FXML JFXComboBox<MediaPlaylist> playlistCombo;
 	@FXML JFXComboBox<Collection> collectionsCombo;
 	@FXML JFXComboBox<MediaListDisplayType> mediaTypeCombo;
+	@FXML private JFXRippler optionsRippler;
 
 	private Window window;
+	private JFXListView optionList;
 
 	public TilePane tilePane;	
 	public MovieScrollPane scrollPane;
@@ -97,29 +93,10 @@ public class CinemaController implements Initializable {
 		sortCombo.valueProperty().addListener((arg0, arg1, arg2) -> ControllerMaster.userData.sortShownItems());
 		
 		updatePlaylistCombo();
-		playlistCombo.setCellFactory(param -> new PlaylistCell());
-		playlistCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null) {
-				if (newValue.equals(CinemaController.manageName)) {
-					System.out.println("Show Playlist Manager");
-					Platform.runLater(() ->{
-						if (oldValue == null) {
-							playlistCombo.getSelectionModel().clearSelection();
-						} else {
-							playlistCombo.getSelectionModel().select(oldValue);
-						}
-					});
-					return;
-				}
-				playlistClearButton.setVisible(true);
-			} else {
-				playlistClearButton.setVisible(false);
-			}
-			refreshSearch();
-		});
+		playlistCombo.setCellFactory(param -> new PlaylistComboCell());
 
 		updateCollectionCombo();
-		collectionsCombo.setCellFactory(param -> new CollectionCell());
+		collectionsCombo.setCellFactory(param -> new CollectionComboCell());
 		collectionsCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue!=null) {
 				collectionsClearButton.setVisible(true);
@@ -147,8 +124,7 @@ public class CinemaController implements Initializable {
 		tilePane.setPadding(new Insets(5, 5, 5, 5));
 		tilePane.setVgap(15);
 		tilePane.setHgap(10);
-		TileAnimator tileAnimator = new TileAnimator();
-		tileAnimator.observe(tilePane.getChildren());
+		ControllerMaster.tileAnimator.observe(tilePane.getChildren());
 		scaleSlider.valueProperty().addListener((ChangeListener) (source, oldValue, newValue) -> {
 			ControllerMaster.userData.setScaleFactor(scaleSlider.getValue()*0.25);
 			updateScale();
@@ -225,6 +201,40 @@ public class CinemaController implements Initializable {
                 }
 			refreshSearch();
 		});
+
+		optionList = new JFXListView<>();
+		optionList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		JFXPopup optionsPopup = new JFXPopup(optionList);
+		optionsRippler.setOnMouseClicked(e -> {
+			//hack to make selection clear (bug in Javafx)
+			List<MainOptions.MainOptionTitles> options = FXCollections.observableArrayList(MainOptions.getOptions());
+			optionList.getItems().clear();
+			optionList.getItems().setAll(options);
+			optionsPopup.show(optionsRippler, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.RIGHT);
+		});
+		optionList.setOnMouseClicked( e -> {
+			if (e.getTarget() != null) {
+				if (e.getTarget() instanceof JFXListCell) {
+					JFXListCell<MainOptions.MainOptionTitles> target = (JFXListCell) e.getTarget();
+					switch (target.getItem()) {
+						case ADDMOVIE:
+							showAddMediaDialog();
+							break;
+						case SETTINGS:
+							showSettingsDialog();
+							break;
+						case ABOUT:
+							showAboutDialog();
+							break;
+						default:
+							break;
+					}
+					Platform.runLater(() ->{
+						optionsPopup.hide();
+					});
+				}
+			}
+		});
 	    
 	    //set up dialogs
 		try {
@@ -284,10 +294,6 @@ public class CinemaController implements Initializable {
 		mainGrid.requestFocus();
 	}
 	
-	@FXML private void addPlaylist() {
-		
-	}
-	
 	@FXML private void clearCollectionSelection() {
 		collectionsCombo.getSelectionModel().clearSelection();
 		mainGrid.requestFocus();
@@ -322,12 +328,8 @@ public class CinemaController implements Initializable {
 	    ); 
 	}
 
-	public static final String manageName = "Manage Playlists";
 	public void updatePlaylistCombo() {
-		playlistCombo.getItems().clear();
-		ObservableList<String> list = FXCollections.observableArrayList(manageName);
-		list.addAll(ControllerMaster.userData.userPlaylists.getPlaylistNames());
-		playlistCombo.setItems(list);
+		playlistCombo.setItems(FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists));
 	}
 	
 	public void updateCollectionCombo() {

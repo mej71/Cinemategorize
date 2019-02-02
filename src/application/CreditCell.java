@@ -30,7 +30,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
     private static boolean hasEntered = false;
     private static final int taskMiliSeconds = 500;
 	private static Timer timer;
-	public static int prefCellHeight = 22;
+	static int prefCellHeight = 22;
 
 	private static CreditCell<?> tempCell;
 	
@@ -74,7 +74,11 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 			@Override
 			public void run() {
 				if (hasEntered) {
-					Platform.runLater(() -> pOver.show(tempCell));
+					Platform.runLater(() -> {
+						if (tempCell != null) {
+							pOver.show(tempCell);
+						}
+					});
 					this.cancel();
 					hasEntered = false;
 				}				
@@ -83,8 +87,8 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	}
 	
 	private String getCellString(T item) {
-    	String title = "";
-    	String year = "";
+    	String title;
+    	String year;
     	if (item.getMovieTitle() != null && !item.getMovieTitle().isEmpty()) {
 			title = item.getMovieTitle();
 			year = item.getReleaseDate();
@@ -106,7 +110,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 		return title + year + role;
     }
 	
-	public CreditCell(T item, ListFlowPane<CreditCell<T>, T> pane) {
+	CreditCell(T item, ListFlowPane<CreditCell<T>, T> pane) {
 		super(item, pane);
 		if (gridPane == null) {
 			init();
@@ -163,11 +167,6 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 			hbox.getChildren().add(label);
             setGraphic(hbox);
 		}
-	}
-	
-	@Override
-	protected Label getGraphic() {
-		return super.getGraphic();
 	}
 	
 	@Override

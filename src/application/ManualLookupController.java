@@ -1,32 +1,21 @@
 package application;
 
-import java.io.File;
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.ResourceBundle;
-
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.*;
 import com.jfoenix.controls.JFXDialog.DialogTransition;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
-import com.jfoenix.controls.events.JFXDialogEvent;
 import com.jfoenix.validation.RequiredFieldValidator;
-
 import info.movito.themoviedbapi.model.tv.TvEpisode;
-import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+
+import java.io.File;
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.ResourceBundle;
 
 
 public class ManualLookupController extends LoadingControllerBase implements Initializable {
@@ -110,19 +99,18 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 			}
 			//remove manual edits
 			if (oldId != 0) {
-				MediaItem mi = null;
-				if (oldId != 0) {
-					if (oldSeason != 0) { //
-						mi = ControllerMaster.userData.getTvById(oldId);
-					} else {
-						mi = ControllerMaster.userData.getMovieById(oldId);
-					}
-					for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
-						if ((mi.isMovie() && mik.isMovie() && mi.getId()==mik.getId()) ||
-								(mi.isTvShow() && mik.isTvShow() && mi.getId()==mik.getId())) {
-							ControllerMaster.userData.tempManualItems.remove(mik);
-							break;
-						}
+				MediaItem mi;
+				if (oldSeason != 0) { //
+					mi = ControllerMaster.userData.getTvById(oldId);
+				} else {
+					mi = ControllerMaster.userData.getMovieById(oldId);
+				}
+				boolean miIsMovie = mi.isMovie();
+				int miId = mi.getId();
+				for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
+					if (mi.equals(mik)) {
+						ControllerMaster.userData.tempManualItems.remove(mik);
+						break;
 					}
 				}
 
@@ -213,7 +201,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		ResultsMediaItem resultItem = resultsFlowPane.selectedCell.getItem();
 
 		//if editing manually, remove old item
-		MediaItem mi = null;
+		MediaItem mi;
 		if (oldId != 0) {
 			if (oldSeason != 0) { //
 				mi = ControllerMaster.userData.getTvById(oldId);

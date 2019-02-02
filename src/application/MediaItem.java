@@ -58,6 +58,24 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		filePathInfo = new FilePathInfo(fPath, fName, fFolder);
 		dateAdded = LocalDateTime.now();
 	}
+
+	@Override
+	public boolean equals(Object mi) {
+		if (!(mi instanceof MediaItem)) {
+			return false;
+		}
+		return equalsMediaItem((MediaItem)mi);
+	}
+
+	private boolean equalsMediaItem(MediaItem mi) {
+		if (this.isMovie() && mi.isMovie() && this.getId() == mi.getId()) {
+			return true;
+		}
+		if (this.isTvShow() && mi.isTvShow() && this.getId() == mi.getId()) {
+			return true;
+		}
+		return false;
+	}
 	
 	public void setMovie(CustomMovieDb m) {
 		cMovie = m;
@@ -247,28 +265,34 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public int getCreditPosition(int personId, boolean useEpisode) {
+		List<PersonCrew> crew;
+		List<PersonCast> cast;
 		if (isMovie()) {
 			if (cMovie != null && cMovie.movie != null) {
-				for (int i = 0; i < cMovie.getCast().size(); ++i) {
-					if (cMovie.getCast().get(i).getId() == personId) {
+				cast = cMovie.getCast();
+				for (int i = 0; i < cast.size(); ++i) {
+					if (cast.get(i).getId() == personId) {
 						return i;
 					}
 				}
-				for (int i = 0; i < cMovie.getCrew().size(); ++i) {
-					if (cMovie.getCrew().get(i).getId() == personId) {
+				crew = cMovie.getCrew();
+				for (int i = 0; i < crew.size(); ++i) {
+					if (crew.get(i).getId() == personId) {
 						return i;
 					}
 				}
 			}
 		} else {
-			Credits credits = (useEpisode)? tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits() : tvShow.getCredits(); 
-			for (int i = 0; i < credits.getCast().size(); ++i) {
-				if (credits.getCast().get(i).getId() == personId) {
+			Credits credits = (useEpisode)? tvShow.getEpisode(tvShow.lastViewedSeason, tvShow.lastViewedEpisode).getCredits() : tvShow.getCredits();
+			cast = credits.getCast();
+			for (int i = 0; i < cast.size(); ++i) {
+				if (cast.get(i).getId() == personId) {
 					return i;
 				}
 			}
-			for (int i = 0; i < credits.getCrew().size(); ++i) {
-				if (credits.getCrew().get(i).getId() == personId) {
+			crew = credits.getCrew();
+			for (int i = 0; i < crew.size(); ++i) {
+				if (crew.get(i).getId() == personId) {
 					return i;
 				}
 			}

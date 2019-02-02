@@ -49,6 +49,10 @@ public class LoadingControllerBase extends EscapableBase implements Initializabl
 			startTask();
 			event.consume();
 		});
+		this.dLink.setOnDialogClosed(event -> {
+			closeTasks();
+			event.consume();
+		});
 	}
 	
 	protected void startTask() {
@@ -70,5 +74,9 @@ public class LoadingControllerBase extends EscapableBase implements Initializabl
 	protected void successTasks() {
 		overlayPane.setVisible(false);
 		overlayPane.setDisable(true);
+	}
+
+	protected void closeTasks() {
+
 	}
 }
