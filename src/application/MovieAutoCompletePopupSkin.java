@@ -1,23 +1,16 @@
 package application;
 
 import com.jfoenix.controls.JFXAutoCompletePopup;
-
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXRippler;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.animation.Animation.Status;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.ParallelTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.beans.InvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -134,7 +127,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 					hbox.setMaxHeight(prefCellHeight);
 					hbox.setMinWidth(0);
 					hbox.setPrefWidth(1);
-					setGraphic(new JFXRippler(hbox));
+					setGraphic(hbox);
 				}				
 			}
 			

@@ -19,6 +19,7 @@ import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class MediaItem extends RecursiveTreeObject<MediaItem> implements Serializable {
 	/**
@@ -123,12 +124,12 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		return "";
 	}
 
-	void setFilePathInfo(FilePathInfo fpi) {
-		this.filePathInfo = fpi;
-	}
-
 	public String getFullFilePath() {
 		return (isMovie() || tvShow == null)? filePathInfo.fPath : tvShow.getFilePath();
+	}
+
+	void setFilePathInfo(FilePathInfo fpi) {
+		this.filePathInfo = fpi;
 	}
 
 	public String getTempFilePath() {

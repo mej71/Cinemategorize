@@ -71,6 +71,7 @@ public class CinemaController implements Initializable {
 	public JFXDialog manualLookupWindow;	
 	public JFXDialog addMediaWindow;
 	public JFXDialog settingsWindow;
+	JFXDialog playlistWindow;
 	public Scene cinemaScene;
 	
 
@@ -135,7 +136,7 @@ public class CinemaController implements Initializable {
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
 		scrollPane.setContent(tilePane);
-		JFXScrollPane.smoothScrolling(scrollPane);
+		JFXSmoothScroll.smoothScrolling(scrollPane);
 		scrollPane.getStyleClass().add("movie-scroll-pane");
 		stackPane.getChildren().add(scrollPane);
 		
@@ -220,6 +221,9 @@ public class CinemaController implements Initializable {
 						case ADDMOVIE:
 							showAddMediaDialog();
 							break;
+						case MANAGEPLAYLISTS:
+							showPlaylistDialog();
+							break;
 						case SETTINGS:
 							showSettingsDialog();
 							break;
@@ -264,6 +268,13 @@ public class CinemaController implements Initializable {
 					JFXDialog.DialogTransition.TOP);
 			settingsView.prefWidthProperty().bind(backgroundStackPane.widthProperty().multiply(0.25));
 			settingsView.prefHeightProperty().bind(backgroundStackPane.heightProperty().multiply(0.30));
+			loader = new FXMLLoader(getClass().getClassLoader().getResource("PlaylistManagerContent.fxml"));
+			GridPane playlistView = loader.load();
+			ControllerMaster.playlistController = loader.getController();
+			playlistWindow = new JFXDialog(getBackgroundStackPane(), playlistView,
+					JFXDialog.DialogTransition.TOP);
+			playlistView.prefWidthProperty().bind(backgroundStackPane.widthProperty().multiply(0.70));
+			playlistView.prefHeightProperty().bind(backgroundStackPane.heightProperty().multiply(0.85));
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -398,6 +409,11 @@ public class CinemaController implements Initializable {
 	public void showSettingsDialog() {
 		JFXMediaRippler.forceHidePopOver();
 		ControllerMaster.settingsController.show(settingsWindow);
+	}
+
+	void showPlaylistDialog() {
+		JFXMediaRippler.forceHidePopOver();
+		ControllerMaster.playlistController.show(playlistWindow);
 	}
 	
 	@FXML

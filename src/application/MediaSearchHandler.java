@@ -181,15 +181,23 @@ public  class MediaSearchHandler {
 		return UserData.apiLinker.getTvEpisodes().getEpisode(id, season, ep, "en", EpisodeMethod.credits, EpisodeMethod.images);
 	}
 	
-	public static MediaItem getFirstFromCollectionMatchesPerson(int collectionId, int personId) {
+	public static MediaItem getFirstFromCollectionMatchesPerson(int collectionId, int personId, boolean isActor) {
 		CollectionInfo ci = UserData.apiLinker.getCollections().getCollectionInfo(collectionId, null);
 		ci.getParts().sort(releaseDateComparator);
 		MediaItem mi;
 		for (int i = 0; i < ci.getParts().size(); ++i) {
 			mi = MediaSearchHandler.getMovieInfoById(ci.getParts().get(i).getId());
-			for (int j = 0; j < Objects.requireNonNull(mi).getCredits().size(); ++j) {
-				if (mi.getCredits().get(j).getId() == personId) {
-					return mi;
+			if (isActor) {
+				for (int j = 0; j < Objects.requireNonNull(mi).getCast().size(); ++j) {
+					if (mi.getCast().get(j).getId() == personId) {
+						return mi;
+					}
+				}
+			} else {
+				for (int j = 0; j < Objects.requireNonNull(mi).getCrew().size(); ++j) {
+					if (mi.getCrew().get(j).getId() == personId) {
+						return mi;
+					}
 				}
 			}
 		}

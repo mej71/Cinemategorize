@@ -21,6 +21,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.Rating;
@@ -64,6 +65,9 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private Label episodeTitleLabel;
     @FXML private JFXButton playAllEpisodesButton;
     @FXML private JFXRippler optionsRippler;
+    @FXML private StackPane imageStackPane;
+    @FXML private Label starRatingLabel;
+    @FXML private StackPane innerStackPane;
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
@@ -90,12 +94,14 @@ public class SelectionViewController extends LoadingControllerBase implements In
 			actorTiles.add(JFXPersonRippler.createBasicRippler());
 		}
 
+
 		rating.setOnMouseClicked(event -> {
 			if (mediaItem!=null) {
 				mediaItem.rating = rating.getRating();
 				if (!rating.getStyleClass().contains("loaded")) {
 					rating.getStyleClass().add("loaded");
 				}
+				starRatingLabel.setText("My Rating");
 			}
 		});
 		seasonComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -125,8 +131,8 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		writerFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		genreFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		tagsFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
-		posterImageView.fitHeightProperty().bind(mainGrid.heightProperty().multiply(0.83));
-		posterImageView.fitWidthProperty().bind(mainGrid.widthProperty().multiply(0.30));
+		posterImageView.fitHeightProperty().bind(imageStackPane.heightProperty());
+		posterImageView.fitWidthProperty().bind(imageStackPane.widthProperty());
 		descLabel.wrappingWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
 		playAllEpisodesButton.managedProperty().bindBidirectional(playAllEpisodesButton.visibleProperty());
 		optionList = new JFXListView<>();
@@ -220,6 +226,8 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		});
 		cancelButton.setOnAction(event -> confirmDialog.close());
 		confirmLayout.setActions(confirmButton, cancelButton);
+		innerStackPane.prefHeightProperty().bind(posterImageView.getImage().heightProperty());
+		innerStackPane.prefWidthProperty().bind(posterImageView.getImage().widthProperty());
 		confirmDialog.show();
 	}
 
@@ -347,11 +355,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		if (mediaItem.rating==-1) {
 			rating.getStyleClass().remove("loaded");
 			rating.setRating(mediaItem.getVoteAverage()/10*5);
+			starRatingLabel.setText("TMDB Avg Rating");
 		} else {
 			rating.setRating(mediaItem.rating);
 			if (!rating.getStyleClass().contains("loaded")) {
 				rating.getStyleClass().add("loaded");
 			}
+			starRatingLabel.setText("My Rating");
 		}
 
 		List<Keyword> keywords = mediaItem.getKeywords();

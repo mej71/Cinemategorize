@@ -27,18 +27,30 @@
         <ColumnConstraints percentWidth="18.0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints percentHeight="20.0" />
-        <RowConstraints percentHeight="20.0" />
+        <RowConstraints percentHeight="15.0" />
+        <RowConstraints percentHeight="25.0" />
         <RowConstraints percentHeight="5.0" />
         <RowConstraints percentHeight="35.0" />
         <RowConstraints percentHeight="10.0" />
         <RowConstraints fillHeight="false" percentHeight="10.0" />
     </rowConstraints>
-    <ImageView fx:id="posterImageView" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowSpan="5" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
-        <GridPane.margin>
-          <Insets top="55.0" />
-        </GridPane.margin>
-    </ImageView>
+   <StackPane fx:id="imageStackPane" minHeight="0.0" minWidth="0.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="4" GridPane.valignment="BOTTOM" GridPane.vgrow="NEVER">
+      <children>
+          <ImageView fx:id="posterImageView" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
+          <Rating fx:id="rating" maxHeight="-Infinity" minHeight="-Infinity" partialRating="true" prefHeight="36.0" rating="2.5" StackPane.alignment="BOTTOM_CENTER">
+              <cursor>
+                <Cursor fx:constant="HAND" />
+              </cursor>
+            <StackPane.margin>
+               <Insets bottom="20.0" />
+            </StackPane.margin>
+          </Rating>
+         <Label fx:id="starRatingLabel" styleClass="outlined-text" text="Label" StackPane.alignment="BOTTOM_CENTER" />
+      </children>
+      <GridPane.margin>
+         <Insets right="10.0" />
+      </GridPane.margin>
+   </StackPane>
     <HBox alignment="CENTER" spacing="20.0" GridPane.rowIndex="5">
         <JFXButton onAction="#playMedia" text="Play" />
         <JFXButton fx:id="playAllEpisodesButton" mnemonicParsing="false" onAction="#playShow" text="Play All Episodes" />
@@ -100,12 +112,7 @@
           <Insets />
         </GridPane.margin>
     </Label>
-    <Rating fx:id="rating" partialRating="true" rating="2.5" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="BASELINE" GridPane.vgrow="NEVER">
-        <cursor>
-          <Cursor fx:constant="HAND" />
-        </cursor>
-    </Rating>
-    <JFXRippler fx:id="optionsRippler" alignment="TOP_RIGHT" maskType="CIRCLE" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" styleClass="hamburger-rippler" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="TOP">
+    <JFXRippler fx:id="optionsRippler" alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="40.0" prefWidth="40.0" styleClass="circle-rippler" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="TOP">
         <GridPane.margin>
             <Insets right="10.0" top="10.0" />
         </GridPane.margin>

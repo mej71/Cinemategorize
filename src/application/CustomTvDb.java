@@ -218,11 +218,14 @@ public class CustomTvDb implements Serializable {
 	}
 
 	public Credits getCredits() {
-		return getCredits(1, 1);
+		return getCredits(0, 0);
 	}
 	
 	//don't use credits as a whole, only on an episode basis
 	public Credits getCredits(int seasonNum, int epNum) {
+		if (seasonNum == 0 || epNum == 0) {
+			return series.getCredits();
+		}
 		return getEpisode(seasonNum, epNum).getCredits();
 	}
 

@@ -229,21 +229,27 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 			boolean isKnownDep;
 			final String knownDep = person.getKnownForDepartment();
 			HashMap<PersonCredit, MediaItem> lesserKnown = new HashMap<>();
-			PersonCredit tempCredit;
 			for (PersonCredit personCredit : knownForList) {
-				tempCredit = personCredit;
-				isKnownDep = (tempCredit.getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (tempCredit.getDepartment() != null && tempCredit.getDepartment().equals(knownDep));
+				isKnownDep = (personCredit.getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (personCredit.getDepartment() != null && personCredit.getDepartment().equals(knownDep));
 				int voteCountThreshold = 100;
 				int popularityThreshold = 3;//number of episodes someone must be involved in to count as "Known For"
 				int episodeCountThreshold = 5;
-				if (tempCredit.getPopularity() > popularityThreshold && tempCredit.getVoteCount() > voteCountThreshold &&
-						(tempCredit.getEpisodeCount() == 0 || tempCredit.getEpisodeCount() > episodeCountThreshold) &&
-						tempCredit.getReleaseDate() != null && isKnownDep) {
+				if (personCredit.getPopularity() > popularityThreshold && personCredit.getVoteCount() > voteCountThreshold &&
+						(personCredit.getEpisodeCount() == 0 || personCredit.getEpisodeCount() > episodeCountThreshold) &&
+						personCredit.getReleaseDate() != null && isKnownDep) {
 					if (personCredit.getMediaType().equalsIgnoreCase("movie")) {
 						mi = SerializationUtils.clone(MediaSearchHandler.getMovieInfoById(personCredit.getMediaId()));
 						//if part of collection, just use first
 						if (Objects.requireNonNull(mi).belongsToCollection()) {
-							mi = SerializationUtils.clone(MediaSearchHandler.getFirstFromCollectionMatchesPerson(mi.getCollection().getId(), person.getId()));
+							mi = SerializationUtils.clone(MediaSearchHandler.getFirstFromCollectionMatchesPerson(mi.getCollection().getId(), person.getId(), (personCredit.getDepartment() == null ||
+									personCredit.getDepartment().equalsIgnoreCase("Acting"))));
+							//if we change movie, then change credit
+							for (PersonCredit tempCredit : knownForList) {
+								if (tempCredit.getMediaType().equalsIgnoreCase("movie") && tempCredit.getMediaId() == mi.getId()) {
+									personCredit = tempCredit;
+									break;
+								}
+							}
 						}
 					} else {
 						mi = SerializationUtils.clone(MediaSearchHandler.getTvInfoById(personCredit.getMediaId()));
@@ -252,6 +258,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 				} else {
 					continue;
 				}
+
 				//item credit should match what the person is known for, been released already, and bias against being in a low count of episodes for a series
 				if (!tempKnownList.contains(mId)) {
 					//prefer people higher up in the cast bill and in full features or tv shows (bias against short films)
@@ -262,7 +269,6 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 						workingKnownForCollection.add(knownForRipplers.get(known));
 						if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
 							ControllerMaster.userData.knownFor.get(person.getId()).add(personCredit);
-
 						} else {
 							ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Arrays.asList(personCredit)));
 						}
@@ -301,7 +307,9 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		} else {
 			List<PersonCredit> knownCredits = ControllerMaster.userData.getKnowForCredits(person.getId());
 			for (int i = 0; i < knownCredits.size(); ++i) {
+
 				if (knownCredits.get(i).getMediaType().equalsIgnoreCase("Movie")) {
+					System.out.println(knownCredits.get(i).getMediaId());
 					knownForRipplers.get(i).setItem(MediaSearchHandler.getMovieInfoById( knownCredits.get(i).getMediaId() ));
 				} else {
 					knownForRipplers.get(i).setItem(MediaSearchHandler.getTvInfoById( knownCredits.get(i).getMediaId() ));

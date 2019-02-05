@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import info.movito.themoviedbapi.model.people.PersonCast;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
@@ -180,7 +181,7 @@ public class JFXMediaRippler extends JFXRippler {
         		JFXMediaRippler.directorsLabel.setText(mi.getNumSeasons() + " seasons");
         	} else {
         		StringBuilder directors = new StringBuilder();
-        		List<PersonCrew> crew = mi.getCrew();
+        		List<PersonCrew> crew = mi.getCrew(false);
         		PersonCrew crewMember;
 	        	for (int i = 0; i < crew.size(); ++i) {
 					crewMember = crew.get(i);
@@ -195,21 +196,22 @@ public class JFXMediaRippler extends JFXRippler {
 	        	JFXMediaRippler.directorsLabel.setText("Directed by: " + directors);
         	}
         	String releaseDate = "";
-        	if (mi.getReleaseDate() != null && mi.getReleaseDate().length()>3) {
-        		releaseDate = mi.getReleaseDate().substring(0, 4);
+        	if (mi.getReleaseDate(false) != null && mi.getReleaseDate(false).length()>3) {
+        		releaseDate = mi.getReleaseDate(false).substring(0, 4);
         	}
-        	JFXMediaRippler.titleLabel.setText(mi.getTitle()+ " (" + releaseDate + lastDate + ")");
-        	JFXMediaRippler.descLabel.setText(mi.getOverview());
+        	JFXMediaRippler.titleLabel.setText(mi.getTitle(false)+ " (" + releaseDate + lastDate + ")");
+        	JFXMediaRippler.descLabel.setText(mi.getOverview(false));
         	
         	StringBuilder cast = new StringBuilder();
+        	List<PersonCast> pCast = mi.getCast(false);
         	for (int i = 0; i<4; ++i) {
-        		if (i==mi.getCast().size()) {
+        		if (i==pCast.size()) {
         			break;
         		}
         		if (i==0) {
-        			cast.append(mi.getCast().get(i).getName());
+        			cast.append(pCast.get(i).getName());
         		} else {
-        			cast.append(", ").append(mi.getCast().get(i).getName());
+        			cast.append(", ").append(pCast.get(i).getName());
         		}
         	}
         	JFXMediaRippler.actorsLabel.setText("Starring: " + cast);		

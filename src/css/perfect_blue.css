@@ -23,7 +23,6 @@
 	-fx-font-smoothing-type: lcd;
 }
 
-
 .text-desc {
 	-fx-fill: #dee5ed;
 	-fx-font-smoothing-type: lcd;
@@ -32,6 +31,12 @@
 .header {
 	-fx-text-fill: #dee5ed;
     -fx-font-size: 16;
+}
+
+.outlined-text .text{
+    -fx-font-size: 14;
+
+    -fx-effect: dropshadow(three-pass-box, black, 0.08em, 0.08em, -0.08em, 0.08em)
 }
 
 /*******************************************************************************
@@ -59,12 +64,12 @@
 }
 
 .add-button {
-	-fx-pref-height: 9px;
-	-fx-max-height: 9px;
-	-fx-pref-width: 9px;
-	-fx-max-width: 9px;
+	-fx-pref-height: 10px;
+	-fx-max-height: 10px;
+	-fx-pref-width: 10px;
+	-fx-max-width: 10px;
 	-fx-background-image: url('plus.png');
-	-fx-background-size: 8px;
+	-fx-background-size: 10px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
@@ -108,7 +113,7 @@
     -fx-background-color: #ff565c;
 }
 
-.hamburger-rippler {
+.circle-rippler .jfx-rippler{
     -jfx-mask-type: CIRCLE;
     -fx-cursor: hand;
 }

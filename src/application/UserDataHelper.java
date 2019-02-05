@@ -177,7 +177,7 @@ public class UserDataHelper {
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
 		try {
-			Date date = formatter.parse(mi.getReleaseDate());
+			Date date = formatter.parse(mi.getReleaseDate(false));
 			int year = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(date)).getYear();
 			if (ControllerMaster.userData.minYear == 0 || ControllerMaster.userData.minYear > year) {
 				ControllerMaster.userData.minYear = year;

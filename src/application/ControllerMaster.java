@@ -16,5 +16,7 @@ public class ControllerMaster {
 	
 	public static SettingsController settingsController;
 
+	static PlaylistManagerController playlistController;
+
 	static TileAnimator tileAnimator = new TileAnimator();
 }

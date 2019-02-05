@@ -12,7 +12,7 @@ public class MainOptions {
 
     public enum MainOptionTitles {
 
-        ADDMOVIE("Add Movie"),
+        ADDMOVIE("Add Media"),
         MANAGEPLAYLISTS("Manage Playlists"),
         SETTINGS("Settings"),
         ABOUT("About");

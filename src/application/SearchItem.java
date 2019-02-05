@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import info.movito.themoviedbapi.TmdbCompany;
 import info.movito.themoviedbapi.model.Genre;
+import info.movito.themoviedbapi.model.ProductionCompany;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 
@@ -18,6 +20,7 @@ public class SearchItem {
 	private PersonCast actor;
 	private Genre genre;
 	private PersonCrew writer;
+	private ProductionCompany company;
 	
 	public SearchItem(SearchTypes type, Object obj) {
 		searchType = type;
@@ -40,6 +43,9 @@ public class SearchItem {
 		case GENRE:
 			genre = (Genre) obj;
 			break;
+		case COMPANY:
+			company = (ProductionCompany) obj;
+			break;
 		default:
 			tag = obj.toString();
 			break;
@@ -61,6 +67,8 @@ public class SearchItem {
 			return genre;
 		case WRITER:
 			return writer;
+		case COMPANY:
+			return company;
 		default:
 			break;
 		}
@@ -81,6 +89,8 @@ public class SearchItem {
 			return genre.getName();
 		case WRITER:
 			return writer.getName();
+		case COMPANY:
+			return company.getName();
 		default:
 			break;
 		}
@@ -119,6 +129,9 @@ public class SearchItem {
 			movieList.addAll(userData.getMoviesWithWriter(writer));
 			tvList.addAll(userData.getTvWithWriter(writer));
 			break;
+		case COMPANY:
+
+			break;
 		default:
 			break;
 		}
@@ -126,10 +139,10 @@ public class SearchItem {
 		tvList.removeAll(Collections.singleton(null)); 
 		Map<String,List<Integer>> map = new HashMap<>();
 		if (!movieList.isEmpty()) {
-			map.put("movies", movieList);
+			map.put(UserData.movieIdentifier, movieList);
 		}
 		if (!tvList.isEmpty()) {
-			map.put("tv", tvList);
+			map.put(UserData.tvIdentifier, tvList);
 		}
 		return map;		
 	}
@@ -140,6 +153,7 @@ public class SearchItem {
 		TAG,
 		DIRECTOR,
 		ACTOR, 
-		WRITER
+		WRITER,
+		COMPANY
 	}
 }
