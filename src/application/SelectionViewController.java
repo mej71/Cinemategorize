@@ -67,7 +67,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private JFXRippler optionsRippler;
     @FXML private StackPane imageStackPane;
     @FXML private Label starRatingLabel;
-    @FXML private StackPane innerStackPane;
     //other variables
     private MediaItem mediaItem;
     private String videoLink;
@@ -97,11 +96,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
 
 		rating.setOnMouseClicked(event -> {
 			if (mediaItem!=null) {
+				rating.setRating(Math.max(0.0, rating.getRating()));
+				rating.setRating(Math.min(5.0, rating.getRating()));
 				mediaItem.rating = rating.getRating();
 				if (!rating.getStyleClass().contains("loaded")) {
 					rating.getStyleClass().add("loaded");
 				}
-				starRatingLabel.setText("My Rating");
+				starRatingLabel.setText("My Rating: " + (Math.round(rating.getRating() * 100.0) / 100.0));
 			}
 		});
 		seasonComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -226,8 +227,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		});
 		cancelButton.setOnAction(event -> confirmDialog.close());
 		confirmLayout.setActions(confirmButton, cancelButton);
-		innerStackPane.prefHeightProperty().bind(posterImageView.getImage().heightProperty());
-		innerStackPane.prefWidthProperty().bind(posterImageView.getImage().widthProperty());
 		confirmDialog.show();
 	}
 
@@ -355,13 +354,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		if (mediaItem.rating==-1) {
 			rating.getStyleClass().remove("loaded");
 			rating.setRating(mediaItem.getVoteAverage()/10*5);
-			starRatingLabel.setText("TMDB Avg Rating");
+			starRatingLabel.setText("TMDB Avg Rating: " + (Math.round(rating.getRating() * 100.0) / 100.0));
 		} else {
 			rating.setRating(mediaItem.rating);
 			if (!rating.getStyleClass().contains("loaded")) {
 				rating.getStyleClass().add("loaded");
 			}
-			starRatingLabel.setText("My Rating");
+			starRatingLabel.setText("My Rating: " + (Math.round(rating.getRating() * 100.0) / 100.0));
 		}
 
 		List<Keyword> keywords = mediaItem.getKeywords();

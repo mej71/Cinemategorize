@@ -75,8 +75,12 @@
 }
 
 .jfx-button {
-	-fx-background-color: #ff3946;
-	-fx-text-fill: #dee5ed;
+	-fx-background-color: #051b27;
+	-fx-text-fill: #ff3946;
+	-fx-border-color: #ff3946;
+	-fx-stroke: 1px;
+	-fx-border-radius: 5px;
+	-jfx-button-type: RAISED;
 }
 
 .jfx-rippler {
@@ -113,7 +117,7 @@
     -fx-background-color: #ff565c;
 }
 
-.circle-rippler .jfx-rippler{
+.circle-rippler {
     -jfx-mask-type: CIRCLE;
     -fx-cursor: hand;
 }
@@ -409,9 +413,18 @@
 
 .cell-sub-text  {
 	-fx-fill: #dee5ed;
-	-fx-font-size: 10pt;
+	-fx-font-size: 9pt;
 }
 
+.playlist-cell-name {
+    -fx-fill: #B5C3D5;
+	-fx-font-size: 11pt;
+}
+
+.playlist-cell-subtitle {
+    -fx-fill: grey;
+	-fx-font-size: 8pt;
+}
 
 /*******************************************************************************
  *                                                                             *
@@ -462,23 +475,29 @@
  ******************************************************************************/ 
 .genre-chip-hbox {
     -fx-font-size: 12.0;
-    -fx-background-color: #ff3946;
+    -fx-background-color: #051b27;
+    -fx-border-color: #ff3946;
+    -fx-stroke: 0.5px;
     -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
     -fx-padding: 5px 8px 5px 12px;
     -fx-pref-height: 28px;
     -fx-alignment: center;
     -fx-spacing: 8;
-    -fx-cursor: hand;    
+    -fx-cursor: hand;
 }
 
 .genre-chip-label {
-	-fx-text-fill: #dee5ed;
+	-fx-text-fill: #ff3946;
 }
 
 .tag-chip-hbox {
 	-fx-font-size: 10.0;
-    -fx-background-color: #ff3946;
+    -fx-background-color: #051b27;
+    -fx-border-color: #ff3946;
+    -fx-stroke: 0.5px;
     -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
     -fx-padding: 5px 8px 5px 12px;
     -fx-pref-height: 24px;
     -fx-alignment: center;
@@ -487,7 +506,7 @@
 }
 
 .tag-chip-label {
-	-fx-text-fill: #dee5ed;
+	-fx-text-fill: #ff3946;
 }
 
 

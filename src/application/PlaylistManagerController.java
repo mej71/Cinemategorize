@@ -1,10 +1,12 @@
 package application;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXScrollPane;
+import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
@@ -17,6 +19,10 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
     @FXML private StackPane stackPane;
     @FXML private ListFlowPane<PlaylistCell<MediaPlaylist>, MediaPlaylist> playlistFlowPane;
     @FXML private ScrollPane playlistScrollPane;
+    @FXML private Label noPlaylistsLabel;
+    @FXML private Label emptyPlaylistLabel;
+    @FXML private JFXTextField playlistNameField;
+    @FXML private JFXButton addPlaylistButton;
 
     private MovieScrollPane movieScrollPane;
     private TilePane tilePane;
@@ -43,18 +49,39 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
         JFXSmoothScroll.smoothScrolling(movieScrollPane);
         movieScrollPane.getStyleClass().add("movie-scroll-pane");
         stackPane.getChildren().add(movieScrollPane);
+        addPlaylistButton.setDisable(true);
+        playlistNameField.textProperty().addListener(observable -> {
+            addPlaylistButton.setDisable(playlistNameField.getText().isEmpty() || playlistNameField.getText().equals(""));
+        });
     }
 
     void show(JFXDialog dialog) {
         super.setDialogLink(dialog);
+        updatePlaylists();
+        dLink.show();
+    }
+
+    void updatePlaylists() {
+        updatePlaylists(false);
+    }
+
+    void updatePlaylists(boolean selectNew) {
+        clearRipplers();
         playlistFlowPane.getChildren().clear();
         playlistFlowPane.getChildren().addAll(PlaylistCell.createCells(ControllerMaster.userData.userPlaylists, playlistFlowPane));
         if (playlistFlowPane.getChildren().size() > 0) {
-            playlistFlowPane.selectCell((PlaylistCell<MediaPlaylist>)playlistFlowPane.getChildren().get(0));
+            noPlaylistsLabel.setVisible(false);
+            playlistFlowPane.setPrefHeight(playlistFlowPane.getChildren().size() * PlaylistCell.prefCellHeight);
+            if (selectNew) { //select the newest added
+                playlistFlowPane.selectCell((PlaylistCell<MediaPlaylist>) playlistFlowPane.getChildren().get(playlistFlowPane.getChildren().size()-1));
+                playlistScrollPane.setVvalue(1);
+            } else {
+                playlistFlowPane.selectCell((PlaylistCell<MediaPlaylist>) playlistFlowPane.getChildren().get(0));
+                playlistScrollPane.setVvalue(0);
+            }
         } else {
-            clearRipplers();
+            noPlaylistsLabel.setVisible(true);
         }
-        dLink.show();
     }
 
     public void updateRipplers() {
@@ -69,6 +96,8 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
     }
 
     @FXML public void createNewPlaylist() {
-
+        ControllerMaster.userData.userPlaylists.add(new MediaPlaylist(playlistNameField.getText()));
+        updatePlaylists(true);
+        playlistNameField.clear();
     }
 }

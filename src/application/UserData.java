@@ -98,70 +98,70 @@ class UserData implements Serializable {
 	}
 	
 	public List<Integer> getMoviesWithActor(PersonCast actor) {
-		if (actorList.containsKey(actor) && !actorList.get(actor).get(movieIdentifier).isEmpty()) {
+		if (actorList.containsKey(actor) && actorList.get(actor).get(movieIdentifier) != null && !actorList.get(actor).get(movieIdentifier).isEmpty()) {
 			return actorList.get(actor).get(movieIdentifier);
 		} 
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithActor(PersonCast actor) {
-		if (actorList.containsKey(actor) && !actorList.get(actor).get(tvIdentifier).isEmpty()) {
+		if (actorList.containsKey(actor) && actorList.get(actor).get(tvIdentifier) != null && !actorList.get(actor).get(tvIdentifier).isEmpty()) {
 			return actorList.get(actor).get(tvIdentifier);
 		}
 		return new ArrayList<>();
 	}
 
 	public List<Integer> getMoviesWithDirector(PersonCrew director) {
-		if (directorList.containsKey(director) && !directorList.get(director).get(movieIdentifier).isEmpty()) {
+		if (directorList.containsKey(director) && directorList.get(director).get(movieIdentifier) != null && !directorList.get(director).get(movieIdentifier).isEmpty()) {
 			return directorList.get(director).get(movieIdentifier);
 		}
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithDirector(PersonCrew director) {
-		if (directorList.containsKey(director) && !directorList.get(director).get(tvIdentifier).isEmpty()) {
+		if (directorList.containsKey(director) && directorList.get(director).get(tvIdentifier) != null && !directorList.get(director).get(tvIdentifier).isEmpty()) {
 			return directorList.get(director).get(tvIdentifier);
 		}
 		return new ArrayList<>();
 	}
 
 	public List<Integer> getMoviesWithTag(String tag) {
-		if (mediaTags.containsKey(tag) && !mediaTags.get(tag).get(movieIdentifier).isEmpty()) {
+		if (mediaTags.containsKey(tag) && mediaTags.get(tag).get(movieIdentifier) != null && !mediaTags.get(tag).get(movieIdentifier).isEmpty()) {
 			return mediaTags.get(tag).get(movieIdentifier);
 		}
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithTag(String tag) {
-		if (mediaTags.containsKey(tag) && !mediaTags.get(tag).get(tvIdentifier).isEmpty()) {
+		if (mediaTags.containsKey(tag) && mediaTags.get(tag).get(tvIdentifier) != null && !mediaTags.get(tag).get(tvIdentifier).isEmpty()) {
 			return mediaTags.get(tag).get(tvIdentifier);
 		}
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getMoviesWithWriter(PersonCrew writer) {
-		if (writerList.containsKey(writer) && !writerList.get(writer).get(movieIdentifier).isEmpty()) {
+		if (writerList.containsKey(writer) && writerList.get(writer).get(movieIdentifier) != null && !writerList.get(writer).get(movieIdentifier).isEmpty()) {
 			return writerList.get(writer).get(movieIdentifier);
 		}
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithWriter(PersonCrew writer) {
-		if (writerList.containsKey(writer) && !writerList.get(writer).get(tvIdentifier).isEmpty()) {
+		if (writerList.containsKey(writer) && writerList.get(writer).get(tvIdentifier) != null && !writerList.get(writer).get(tvIdentifier).isEmpty()) {
 			return writerList.get(writer).get(tvIdentifier);
 		}
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getMoviesWithGenre(Genre g) {
-		if (genreList.containsKey(g) && !genreList.get(g).get(movieIdentifier).isEmpty()) {
+		if (genreList.containsKey(g) && genreList.get(g).get(movieIdentifier) != null && !genreList.get(g).get(movieIdentifier).isEmpty()) {
 			return genreList.get(g).get(movieIdentifier);
 		}
 		return new ArrayList<>();
 	}
 	
 	public List<Integer> getTvWithGenre(Genre g) {
-		if (genreList.containsKey(g) && !genreList.get(g).get(tvIdentifier).isEmpty()) {
+		if (genreList.containsKey(g) && genreList.get(g).get(tvIdentifier) != null && !genreList.get(g).get(tvIdentifier).isEmpty()) {
 			return genreList.get(g).get(tvIdentifier);
 		}
 		return new ArrayList<>();

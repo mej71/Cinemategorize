@@ -15,7 +15,13 @@ public class MediaPlaylist implements Serializable {
 
     public MediaPlaylist(String name, MediaItem mi) {
         this.name = name;
+        items = new ArrayList<>();
         items.add(mi);
+    }
+
+    public MediaPlaylist(String name) {
+        this.name = name;
+        items = new ArrayList<>();
     }
 
     String getName() {
@@ -36,8 +42,7 @@ public class MediaPlaylist implements Serializable {
         return items;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return getName();
     }
 

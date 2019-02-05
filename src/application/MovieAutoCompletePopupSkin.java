@@ -79,7 +79,7 @@ public class MovieAutoCompletePopupSkin implements Skin<JFXAutoCompletePopup> {
 				} else {
 					Label reference = new Label();
 					HBox hbox = new HBox();
-					hbox.setSpacing(5);
+					hbox.setSpacing(7);
 					Text title = new Text();
 					Text subtitle = new Text();
 					ImageView imageView = null;
