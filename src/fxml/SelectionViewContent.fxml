@@ -27,32 +27,37 @@
         <ColumnConstraints percentWidth="18.0" />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints percentHeight="15.0" />
+        <RowConstraints percentHeight="13.0" />
         <RowConstraints percentHeight="25.0" />
         <RowConstraints percentHeight="5.0" />
         <RowConstraints percentHeight="35.0" />
-        <RowConstraints percentHeight="10.0" />
+        <RowConstraints percentHeight="12.0" />
         <RowConstraints fillHeight="false" percentHeight="10.0" />
     </rowConstraints>
-   <StackPane fx:id="imageStackPane" minHeight="0.0" minWidth="0.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="4" GridPane.valignment="BOTTOM" GridPane.vgrow="NEVER">
+   <StackPane fx:id="imageStackPane" minHeight="0.0" minWidth="0.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="3" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
       <children>
           <ImageView fx:id="posterImageView" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
-          <Rating fx:id="rating" maxHeight="-Infinity" minHeight="-Infinity" partialRating="true" prefHeight="36.0" rating="2.5" StackPane.alignment="BOTTOM_CENTER">
-              <cursor>
-                <Cursor fx:constant="HAND" />
-              </cursor>
-            <StackPane.margin>
-               <Insets bottom="20.0" />
-            </StackPane.margin>
-          </Rating>
-         <Label fx:id="starRatingLabel" styleClass="outlined-text" text="Label" StackPane.alignment="BOTTOM_CENTER" />
       </children>
       <GridPane.margin>
          <Insets right="10.0" />
       </GridPane.margin>
    </StackPane>
+    <Rating fx:id="rating" maxHeight="-Infinity" minHeight="-Infinity" partialRating="true" prefHeight="36.0" rating="2.5" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+        <cursor>
+          <Cursor fx:constant="HAND" />
+        </cursor>
+      <GridPane.margin>
+         <Insets bottom="25.0" />
+      </GridPane.margin>
+    </Rating>
+   <Label fx:id="starRatingLabel" styleClass="outlined-text" text="Label" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+      <GridPane.margin>
+         <Insets top="25.0" />
+      </GridPane.margin>
+   </Label>
     <HBox alignment="CENTER" spacing="20.0" GridPane.rowIndex="5">
         <JFXButton onAction="#playMedia" text="Play" />
+      <JFXButton fx:id="playSeasonButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" onAction="#playSeason" text="Play Season" />
         <JFXButton fx:id="playAllEpisodesButton" mnemonicParsing="false" onAction="#playShow" text="Play All Episodes" />
         <JFXButton onAction="#playTrailer" text="Watch Trailer" />
     </HBox>
@@ -125,7 +130,7 @@
           <Label text="Rating: " HBox.hgrow="ALWAYS" />
           <Label fx:id="ratingLabel" minHeight="-Infinity" styleClass="rating-label" text="Label" HBox.hgrow="ALWAYS" />
       </children></HBox>
-    <StackPane fx:id="overlayPane" disable="true" visible="false">
+    <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="3" GridPane.rowSpan="6">
         <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />
     </StackPane>
 </GridPane>

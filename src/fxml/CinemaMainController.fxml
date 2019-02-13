@@ -99,7 +99,7 @@
                         <Insets left="5.0" right="5.0" />
                     </padding>
                 </Label>
-                <JFXSlider fx:id="scaleSlider" blockIncrement="0.1" cache="true" cacheHint="SPEED" majorTickUnit="1.0" max="8.0" min="1.0" minorTickCount="0" showTickMarks="true" value="4.0">
+                <JFXSlider fx:id="scaleSlider" blockIncrement="0.1" cache="true" cacheHint="SPEED" majorTickUnit="1.0" max="8.0" min="3.0" minorTickCount="0" showTickMarks="true" value="4.0">
                     <cursor>
                         <Cursor fx:constant="CLOSED_HAND" />
                     </cursor>

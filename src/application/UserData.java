@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 class UserData implements Serializable {
 
-	final transient static TmdbApi apiLinker = new TmdbApi(getAPIKey("THE_MOVIE_DB_API_TOKEN"));  //your key goes in api_keys.xml
+	transient static TmdbApi apiLinker;  //your key goes in api_keys.xml
 	final transient static String movieIdentifier = "movie";
 	final transient static String tvIdentifier = "tv";
 
@@ -68,17 +68,60 @@ class UserData implements Serializable {
 			return "";
 		}
 	}
+
+	public UserData() {
+		updateApiLinker();
+		tryLoadFile();
+		if (userPlaylists.isEmpty()) {
+			//Create favorites list if empty
+			MediaPlaylist favoriteList = new MediaPlaylist("Favorites");
+			favoriteList.canDelete = false;
+			userPlaylists.add(favoriteList);
+		}
+	}
+
+	void updateApiLinker() {
+		try {
+			apiLinker = new TmdbApi(getAPIKey("THE_MOVIE_DB_API_TOKEN"));
+		} catch (Exception e) {
+			apiLinker = null; //offline mode
+		}
+	}
+
+	MediaPlaylist getPlaylistByName(String name) {
+		for (int i = 0; i < userPlaylists.size(); ++i) {
+			if (userPlaylists.get(i).getName().equalsIgnoreCase(name)) {
+				return userPlaylists.get(i);
+			}
+		}
+		return null;
+	}
+
+	private static final String favoritesName = "Favorites";
+	boolean favoritesContains(MediaItem mi) {
+		MediaPlaylist favorites = getPlaylistByName(favoritesName);
+		return favorites != null && favorites.getItems().contains(mi);
+	}
+
+	MediaPlaylist getFavoritesList() {
+		return getPlaylistByName(favoritesName);
+	}
 	
 	
 	public PersonCredits getCredits(int personId) {
 		if (!creditsList.containsKey(personId)) {
-			PersonCredits credits = MediaSearchHandler.getPersonCombinedCredits(personId);
-			creditsList.put(personId, credits);
+			updateApiLinker();
+			if (UserData.apiLinker != null) {
+				PersonCredits credits = MediaSearchHandler.getPersonCombinedCredits(personId);
+				creditsList.put(personId, credits);
+			} else {
+				return null;
+			}
 		}
 		return creditsList.get(personId);
 	}
 	
-	public PersonPeople getPerson(int personId) {		
+	public PersonPeople getPerson(int personId) {
 		return personList.get(personId);
 	}
 	
@@ -222,11 +265,6 @@ class UserData implements Serializable {
 	public int numMediaItems() {
 		return getAllMedia().size() + getAllMedia().size();
 	}
-
-	public UserData() {
-		tryLoadFile();
-	}
-
 
 	public void saveAll() {
 		String base = "";

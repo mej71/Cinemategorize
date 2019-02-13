@@ -102,7 +102,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				if (!rating.getStyleClass().contains("loaded")) {
 					rating.getStyleClass().add("loaded");
 				}
-				starRatingLabel.setText("My Rating: " + (Math.round(rating.getRating() * 100.0) / 100.0));
+				starRatingLabel.setText("My Score: " + (Math.round(rating.getRating() * 100.0) / 100.0));
 			}
 		});
 		seasonComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -152,7 +152,6 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		            JFXListCell<SelectionOptions.SelectionOptionTitles> target = (JFXListCell)e.getTarget();
                     switch (target.getItem()) {
                         case ADDTOPLAYLIST:
-                            System.out.println("a");
                             break;
                         case CHANGELOCATION:
 							FileChooser chooser = new FileChooser();
@@ -354,13 +353,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		if (mediaItem.rating==-1) {
 			rating.getStyleClass().remove("loaded");
 			rating.setRating(mediaItem.getVoteAverage()/10*5);
-			starRatingLabel.setText("TMDB Avg Rating: " + (Math.round(rating.getRating() * 100.0) / 100.0));
+			starRatingLabel.setText("TMDB Avg Score: " + (Math.round(rating.getRating() * 100.0) / 100.0));
 		} else {
 			rating.setRating(mediaItem.rating);
 			if (!rating.getStyleClass().contains("loaded")) {
 				rating.getStyleClass().add("loaded");
 			}
-			starRatingLabel.setText("My Rating: " + (Math.round(rating.getRating() * 100.0) / 100.0));
+			starRatingLabel.setText("My Score: " + (Math.round(rating.getRating() * 100.0) / 100.0));
 		}
 
 		List<Keyword> keywords = mediaItem.getKeywords();
@@ -470,6 +469,30 @@ public class SelectionViewController extends LoadingControllerBase implements In
 	
 	@FXML public void playMedia() {
 		openFile(mediaItem.getFullFilePath());
+	}
+
+	//Creates a m3u playlist of the currently selected season, from the first episode
+	@FXML public void playSeason() {
+		List<String> previousFilePaths = new ArrayList<>();
+		List<String> filePaths = new ArrayList<>();
+		String tempPath;
+		int seasonNum = Integer.parseInt(seasonComboBox.getValue());
+		for (int j = 1; j < mediaItem.getEpisodes(seasonNum).size(); ++j) {
+			tempPath = mediaItem.getFullFilePath(seasonNum, j);
+			//skip empty paths
+			if (!tempPath.isEmpty()) {
+				if (j < Integer.parseInt(episodeComboBox.getValue())) {
+					previousFilePaths.add(tempPath);
+				} else {
+					filePaths.add(tempPath);
+				}
+			}
+		}
+		filePaths.addAll(previousFilePaths);
+		File file = M3UBuilder.buildFile(filePaths);
+		if (file != null) {
+			openFile(file.getAbsolutePath());
+		}
 	}
 
 	//create a m3u playlist of all path files, then play

@@ -10,8 +10,8 @@ public class MediaPlaylist implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String name = "";
-    private boolean isFavorite = false;
-    private List<MediaItem> items = new ArrayList<>();
+    boolean canDelete = true;
+    private List<MediaItem> items;
 
     public MediaPlaylist(String name, MediaItem mi) {
         this.name = name;
@@ -36,6 +36,23 @@ public class MediaPlaylist implements Serializable {
                 iterator.remove();
             }
         }
+        refreshPlaylistInMain();
+    }
+
+    void addItem(MediaItem mi) {
+        items.add(mi);
+        refreshPlaylistInMain();
+    }
+
+    private void refreshPlaylistInMain() {
+        MediaPlaylist curList = ControllerMaster.mainController.playlistCombo.getValue();
+        ControllerMaster.mainController.updatePlaylistCombo();
+        if (ControllerMaster.userData.userPlaylists.contains(curList) && curList.getItems().size()>0) {
+            ControllerMaster.mainController.playlistCombo.setValue(curList);
+        } else {
+            ControllerMaster.mainController.playlistCombo.setValue(null);
+        }
+        ControllerMaster.mainController.refreshSearch();
     }
 
     List<MediaItem> getItems() {

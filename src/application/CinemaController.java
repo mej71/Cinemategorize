@@ -95,6 +95,14 @@ public class CinemaController implements Initializable {
 		
 		updatePlaylistCombo();
 		playlistCombo.setCellFactory(param -> new PlaylistComboCell());
+		playlistCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue!=null) {
+				playlistClearButton.setVisible(true);
+			} else {
+				playlistClearButton.setVisible(false);
+			}
+			refreshSearch();
+		});
 
 		updateCollectionCombo();
 		collectionsCombo.setCellFactory(param -> new CollectionComboCell());
@@ -300,12 +308,12 @@ public class CinemaController implements Initializable {
 		mainGrid.requestFocus();
 	}
 	
-	@FXML private void clearPlaylistSelection() {
+	@FXML public void clearPlaylistSelection() {
 		playlistCombo.getSelectionModel().clearSelection();
 		mainGrid.requestFocus();
 	}
 	
-	@FXML private void clearCollectionSelection() {
+	@FXML public void clearCollectionSelection() {
 		collectionsCombo.getSelectionModel().clearSelection();
 		mainGrid.requestFocus();
 	}
@@ -313,12 +321,10 @@ public class CinemaController implements Initializable {
 	public void updateScale() {
 		tilePane.setVgap(15*ControllerMaster.userData.getScaleFactor());
 		tilePane.setHgap(10*ControllerMaster.userData.getScaleFactor());
-		StackPane n;
+		JFXMediaRippler n;
 		for (int i = 0; i < tilePane.getChildren().size(); ++i) {
-			n = ((JFXMediaRippler)tilePane.getChildren().get(i)).getPane();
-			n.setMaxWidth(139*ControllerMaster.userData.getScaleFactor());
-			n.setMaxHeight(208*ControllerMaster.userData.getScaleFactor());
-			n.resize(139*ControllerMaster.userData.getScaleFactor(), 208*ControllerMaster.userData.getScaleFactor());
+			n = ((JFXMediaRippler)tilePane.getChildren().get(i));
+			n.updateScale();
 		}
 	}
 	
@@ -340,10 +346,12 @@ public class CinemaController implements Initializable {
 	}
 
 	public void updatePlaylistCombo() {
+		playlistCombo.getItems().clear();
 		playlistCombo.setItems(FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists));
 	}
 	
 	public void updateCollectionCombo() {
+		collectionsCombo.getItems().clear();
 		collectionsCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.ownedCollections.keySet()));
 	}	
 
@@ -432,7 +440,7 @@ public class CinemaController implements Initializable {
 	
 	//create pane for the media
 	public JFXMediaRippler addMediaTile(MediaItem mediaObject) {
-		JFXMediaRippler rippler = JFXMediaRippler.createBasicRippler(tilePane, scrollPane);
+		JFXMediaRippler rippler = JFXMediaRippler.createBasicRippler(scrollPane);
 		rippler.setItem(mediaObject);
 		return rippler;
 	}

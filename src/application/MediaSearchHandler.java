@@ -88,10 +88,18 @@ public  class MediaSearchHandler {
 	
 	
 	public static PersonCredits getPersonCombinedCredits(int personId) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		return UserData.apiLinker.getPeople().getCombinedPersonCredits(personId);
 	}
 	
 	public static Artwork getTopPersonImage(int personId) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		List<Artwork> result = UserData.apiLinker.getPeople().getPersonImages(personId);
 		if (result.size() > 0) {
 			return result.get(0);
@@ -101,10 +109,18 @@ public  class MediaSearchHandler {
 	}
 	
 	public static PersonPeople getPersonPeople(int personId) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		return UserData.apiLinker.getPeople().getPersonInfo(personId, TmdbPeople.TMDB_METHOD_PERSON);
 	}
 	
 	public static CustomMovieDb getMovieInfo(String movieName, int movieYear) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		MovieResultsPage moviePage = UserData.apiLinker.getSearch().searchMovie(movieName, movieYear, null, true, 1);
 		if (moviePage.getResults().size() > 0) {
 			MovieDb m = UserData.apiLinker.getMovies().getMovie(moviePage.getResults().get(0).getId(), null, MovieMethod.images, MovieMethod.credits, 
@@ -119,12 +135,20 @@ public  class MediaSearchHandler {
 	}
 	
 	public static MovieResultsPage getMovieResults(String movieName, int movieYear) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		return UserData.apiLinker.getSearch().searchMovie(movieName, movieYear, null, true, 1);
 	}
 	
 	public static MediaItem getMovieInfoById(int movieId) {
 		if (ControllerMaster.userData.getMovieById(movieId) != null) {
 			return ControllerMaster.userData.getMovieById(movieId);
+		}
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
 		}
 		MovieDb movie = UserData.apiLinker.getMovies().getMovie(movieId, null, MovieMethod.images, MovieMethod.credits, 
 				MovieMethod.keywords, MovieMethod.videos, MovieMethod.release_dates);
@@ -139,6 +163,10 @@ public  class MediaSearchHandler {
 		if (ControllerMaster.userData.getTvById(tvId) != null) {
 			return ControllerMaster.userData.getTvById(tvId);
 		}
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		TvSeries result = UserData.apiLinker.getTvSeries().getSeries(tvId, null, TvMethod.images, TvMethod.credits, TvMethod.videos, 
 				TvMethod.keywords, TvMethod.content_ratings);
 		if (result == null) { 
@@ -149,6 +177,10 @@ public  class MediaSearchHandler {
 	}
 	
 	public static CustomTvDb getTVInfo(String seriesName) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		TvResultsPage tvPage = UserData.apiLinker.getSearch().searchTv(seriesName, null, 1);
 		if (tvPage.getResults().size() > 0) {
 			TvSeries result = UserData.apiLinker.getTvSeries().getSeries(tvPage.getResults().get(0).getId(), null, TvMethod.images, 
@@ -163,10 +195,18 @@ public  class MediaSearchHandler {
 	}
 	
 	public static TvResultsPage getTvResults(String seriesName) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		return UserData.apiLinker.getSearch().searchTv(seriesName, null, 1);
 	}
 	
 	public static TvSeason getSeasonInfo(int id, int sesNum) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		TvSeason season;
 		try {
 			season = UserData.apiLinker.getTvSeasons().getSeason(id, sesNum, "en", SeasonMethod.credits);
@@ -178,10 +218,18 @@ public  class MediaSearchHandler {
 	
 	
 	public static TvEpisode getEpisodeInfo(int id, int season, int ep) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		return UserData.apiLinker.getTvEpisodes().getEpisode(id, season, ep, "en", EpisodeMethod.credits, EpisodeMethod.images);
 	}
 	
 	public static MediaItem getFirstFromCollectionMatchesPerson(int collectionId, int personId, boolean isActor) {
+		ControllerMaster.userData.updateApiLinker();
+		if (UserData.apiLinker == null) {
+			return null;
+		}
 		CollectionInfo ci = UserData.apiLinker.getCollections().getCollectionInfo(collectionId, null);
 		ci.getParts().sort(releaseDateComparator);
 		MediaItem mi;
@@ -302,10 +350,8 @@ public  class MediaSearchHandler {
 		//if all failed, use default poster
 		if (iView.getImage()==null) {
 			URL url = MediaSearchHandler.class.getClassLoader().getResource("unknown_poster.png");
-			BufferedImage image;
 			try {
-				image = ImageIO.read(Objects.requireNonNull(url));
-				iView.setImage(SwingFXUtils.toFXImage(image, null));
+				iView.setImage(SwingFXUtils.toFXImage(ImageIO.read(Objects.requireNonNull(url)), null));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
@@ -316,11 +362,9 @@ public  class MediaSearchHandler {
 	public static void getPosterFromFilePath(ImageView iView, int size, String baseFolder, String id) {
 		new File(baseFolder).mkdirs();
 		File f = new File(baseFolder+"/"+ id + "_" + size + ".jpg");
-		if (f.exists() && !f.isDirectory()) {
+		if (f.exists()) {
 			try {
-				f.toURI().toURL();
-				BufferedImage b = ImageIO.read(f);
-				iView.setImage(SwingFXUtils.toFXImage(b, null));
+				iView.setImage(SwingFXUtils.toFXImage(ImageIO.read(f), null));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}		
@@ -339,9 +383,8 @@ public  class MediaSearchHandler {
 			if (in!=null) {
 				iView.setImage(new Image(in));
 				new File(basePath).mkdirs();
-				File file = new File(basePath + "/" + id + "_" + size + ".jpg");	
-				BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
-				ImageIO.write(b, "jpg", file);
+				File file = new File(basePath + "/" + id + "_" + size + ".jpg");
+				ImageIO.write(SwingFXUtils.fromFXImage(iView.getImage(), null), "jpg", file);
 			}
 			Objects.requireNonNull(in).close();
 		} catch (IOException e) {
@@ -363,7 +406,10 @@ public  class MediaSearchHandler {
 				File file = new File(getPersonDir() + "/" + p.getId()+ ".jpg");
 				BufferedImage image = ImageIO.read(Objects.requireNonNull(url));
 				iView.setImage(SwingFXUtils.toFXImage(image, null));
-				ImageIO.write(image, "jpg", file);
+				//don't write file if we failed because offline
+				if (UserData.apiLinker != null) {
+					ImageIO.write(image, "jpg", file);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}	
@@ -374,11 +420,9 @@ public  class MediaSearchHandler {
 	public static void getProfilePictureFromFile(ImageView iView, int id) {
 		new File(getPersonDir()).mkdirs();
 		File f = new File(getPersonDir()+"/"+ id + ".jpg");
-		if (f.exists() && !f.isDirectory()) {
+		if (f.exists()) {
 			try {
-				f.toURI().toURL();
-				BufferedImage b = ImageIO.read(f);
-				iView.setImage(SwingFXUtils.toFXImage(b, null));
+				iView.setImage(SwingFXUtils.toFXImage(ImageIO.read(f), null));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}		
@@ -397,8 +441,7 @@ public  class MediaSearchHandler {
 			if (in!=null) {
 				iView.setImage(new Image(in));
 				File file = new File(getPersonDir() + "/" + id+ ".jpg");
-				BufferedImage b = SwingFXUtils.fromFXImage(iView.getImage(), null);
-				ImageIO.write(b, "jpg", file);
+				ImageIO.write(SwingFXUtils.fromFXImage(iView.getImage(), null), "jpg", file);
 			}
 			Objects.requireNonNull(in).close();
 		} catch (IOException e) {

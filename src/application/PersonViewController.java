@@ -1,14 +1,8 @@
 package application;
 
-import java.net.URL;
-import java.util.*;
-
-import org.apache.commons.lang3.SerializationUtils;
-
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
-
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCredit;
 import info.movito.themoviedbapi.model.people.PersonPeople;
@@ -21,8 +15,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import org.apache.commons.lang3.SerializationUtils;
+
+import java.net.URL;
+import java.util.*;
 
 public class PersonViewController extends LoadingControllerBase implements Initializable {
 
@@ -84,7 +81,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		knownForRipplers = new ArrayList<>();
 		JFXMediaRippler mRip;
 		for (int i = 0; i < maxKnownMovies; ++i) {
-			mRip = JFXMediaRippler.createBasicRippler(famousTilePane, null);
+			mRip = JFXMediaRippler.createBasicRippler(null);
 			mRip.getPane().prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.05));
 			knownForRipplers.add(mRip);
 		}
@@ -117,7 +114,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	protected void runTasks() {
 		super.runTasks();
 		observeNodes();
-		personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());	
+		personImageView.setImage(MediaSearchHandler.getProfilePicture(person).getImage());
 		creditSort();
 		setCredits();
 		enableTabs();
@@ -163,7 +160,6 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	private void creditSort() {
 		crewCredits = ControllerMaster.userData.getCredits(person.getId()).getCrew();
 		castCredits = ControllerMaster.userData.getCredits(person.getId()).getCast();
-		
 		crewCredits.sort(dateComparator);
 		castCredits.sort(dateComparator);
 	}
@@ -216,100 +212,12 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	}
 	
 	private void loadInfo() {
-		
 		ObservableList<Node> workingKnownForCollection = FXCollections.observableArrayList();
-		if (!ControllerMaster.userData.knownFor.containsKey(person.getId())) {
-			List<Integer> tempKnownList = new ArrayList<>();
-			List<PersonCredit> knownForList = new ArrayList<>(crewCredits);
-			knownForList.addAll(castCredits);
-			knownForList.sort(knownComprator);
-			int known = 0;
-			MediaItem mi;
-			int mId;
-			boolean isKnownDep;
-			final String knownDep = person.getKnownForDepartment();
-			HashMap<PersonCredit, MediaItem> lesserKnown = new HashMap<>();
-			for (PersonCredit personCredit : knownForList) {
-				isKnownDep = (personCredit.getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (personCredit.getDepartment() != null && personCredit.getDepartment().equals(knownDep));
-				int voteCountThreshold = 100;
-				int popularityThreshold = 3;//number of episodes someone must be involved in to count as "Known For"
-				int episodeCountThreshold = 5;
-				if (personCredit.getPopularity() > popularityThreshold && personCredit.getVoteCount() > voteCountThreshold &&
-						(personCredit.getEpisodeCount() == 0 || personCredit.getEpisodeCount() > episodeCountThreshold) &&
-						personCredit.getReleaseDate() != null && isKnownDep) {
-					if (personCredit.getMediaType().equalsIgnoreCase("movie")) {
-						mi = SerializationUtils.clone(MediaSearchHandler.getMovieInfoById(personCredit.getMediaId()));
-						//if part of collection, just use first
-						if (Objects.requireNonNull(mi).belongsToCollection()) {
-							mi = SerializationUtils.clone(MediaSearchHandler.getFirstFromCollectionMatchesPerson(mi.getCollection().getId(), person.getId(), (personCredit.getDepartment() == null ||
-									personCredit.getDepartment().equalsIgnoreCase("Acting"))));
-							//if we change movie, then change credit
-							for (PersonCredit tempCredit : knownForList) {
-								if (tempCredit.getMediaType().equalsIgnoreCase("movie") && tempCredit.getMediaId() == mi.getId()) {
-									personCredit = tempCredit;
-									break;
-								}
-							}
-						}
-					} else {
-						mi = SerializationUtils.clone(MediaSearchHandler.getTvInfoById(personCredit.getMediaId()));
-					}
-					mId = Objects.requireNonNull(mi).getId();
-				} else {
-					continue;
-				}
-
-				//item credit should match what the person is known for, been released already, and bias against being in a low count of episodes for a series
-				if (!tempKnownList.contains(mId)) {
-					//prefer people higher up in the cast bill and in full features or tv shows (bias against short films)
-					//order in the cast list in which to be credited
-					int castPositionThreshold = 5;
-					if ((!knownDep.equalsIgnoreCase("Acting") || mi.getCreditPosition(person.getId()) < castPositionThreshold) && mi.isFullLength()) {
-						knownForRipplers.get(known).setItem(mi);
-						workingKnownForCollection.add(knownForRipplers.get(known));
-						if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
-							ControllerMaster.userData.knownFor.get(person.getId()).add(personCredit);
-						} else {
-							ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Arrays.asList(personCredit)));
-						}
-						tempKnownList.add(mId);
-						++known;
-					} else {
-						lesserKnown.put(personCredit, mi);
-					}
-				}
-				if (known == maxKnownMovies) {
-					break;
-
-				}
-			}
-			//if the known for tiles haven't been filled, fill them up with lesser known roles.  If short of even the minimum, don't fill up two rows
-			if (known < maxKnownMovies) {
-				for (PersonCredit credit : lesserKnown.keySet()) {
-					if (!tempKnownList.contains(credit.getId() ) ) {
-						knownForRipplers.get(known).setItem(lesserKnown.get(credit));
-						workingKnownForCollection.add(knownForRipplers.get(known));
-						if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
-							ControllerMaster.userData.knownFor.get(person.getId()).add(credit);
-						} else {
-							ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Collections.singletonList(credit)));
-						}
-						tempKnownList.add( lesserKnown.get(credit).getId() );
-						++known;
-						//try and get at least this many movies for person, including lesser known if they have to
-						int minKnownMovies = 4;
-						if (known == maxKnownMovies || known == minKnownMovies) {
-							break;
-						}
-					}
-				}
-			}
-		} else {
+		if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
 			List<PersonCredit> knownCredits = ControllerMaster.userData.getKnowForCredits(person.getId());
 			for (int i = 0; i < knownCredits.size(); ++i) {
 
 				if (knownCredits.get(i).getMediaType().equalsIgnoreCase("Movie")) {
-					System.out.println(knownCredits.get(i).getMediaId());
 					knownForRipplers.get(i).setItem(MediaSearchHandler.getMovieInfoById( knownCredits.get(i).getMediaId() ));
 				} else {
 					knownForRipplers.get(i).setItem(MediaSearchHandler.getTvInfoById( knownCredits.get(i).getMediaId() ));
@@ -319,9 +227,99 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 					break;
 				}
 			}
+
+		} else {
+			ControllerMaster.userData.updateApiLinker();
+			if (UserData.apiLinker != null) {
+				List<Integer> tempKnownList = new ArrayList<>();
+				List<PersonCredit> knownForList = new ArrayList<>(crewCredits);
+				knownForList.addAll(castCredits);
+				knownForList.sort(knownComprator);
+				int known = 0;
+				MediaItem mi;
+				int mId;
+				boolean isKnownDep;
+				final String knownDep = person.getKnownForDepartment();
+				HashMap<PersonCredit, MediaItem> lesserKnown = new HashMap<>();
+				for (PersonCredit personCredit : knownForList) {
+					isKnownDep = (personCredit.getDepartment() == null && knownDep.equalsIgnoreCase("Acting")) || (personCredit.getDepartment() != null && personCredit.getDepartment().equals(knownDep));
+					int voteCountThreshold = 100;
+					int popularityThreshold = 3;//number of episodes someone must be involved in to count as "Known For"
+					int episodeCountThreshold = 5;
+					if (personCredit.getPopularity() > popularityThreshold && personCredit.getVoteCount() > voteCountThreshold &&
+							(personCredit.getEpisodeCount() == 0 || personCredit.getEpisodeCount() > episodeCountThreshold) &&
+							personCredit.getReleaseDate() != null && isKnownDep) {
+						if (personCredit.getMediaType().equalsIgnoreCase("movie")) {
+							mi = SerializationUtils.clone(MediaSearchHandler.getMovieInfoById(personCredit.getMediaId()));
+							//if part of collection, just use first
+							if (Objects.requireNonNull(mi).belongsToCollection()) {
+								mi = SerializationUtils.clone(MediaSearchHandler.getFirstFromCollectionMatchesPerson(mi.getCollection().getId(), person.getId(), (personCredit.getDepartment() == null ||
+										personCredit.getDepartment().equalsIgnoreCase("Acting"))));
+								//if we change movie, then change credit
+								for (PersonCredit tempCredit : knownForList) {
+									if (tempCredit.getMediaType().equalsIgnoreCase("movie") && tempCredit.getMediaId() == mi.getId()) {
+										personCredit = tempCredit;
+										break;
+									}
+								}
+							}
+						} else {
+							mi = SerializationUtils.clone(MediaSearchHandler.getTvInfoById(personCredit.getMediaId()));
+						}
+						mId = Objects.requireNonNull(mi).getId();
+					} else {
+						continue;
+					}
+
+					//item credit should match what the person is known for, been released already, and bias against being in a low count of episodes for a series
+					if (!tempKnownList.contains(mId)) {
+						//prefer people higher up in the cast bill and in full features or tv shows (bias against short films)
+						//order in the cast list in which to be credited
+						int castPositionThreshold = 5;
+						if ((!knownDep.equalsIgnoreCase("Acting") || mi.getCreditPosition(person.getId()) < castPositionThreshold) && mi.isFullLength()) {
+							knownForRipplers.get(known).setItem(mi);
+							workingKnownForCollection.add(knownForRipplers.get(known));
+							if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
+								ControllerMaster.userData.knownFor.get(person.getId()).add(personCredit);
+							} else {
+								ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Arrays.asList(personCredit)));
+							}
+							tempKnownList.add(mId);
+							++known;
+						} else {
+							lesserKnown.put(personCredit, mi);
+						}
+					}
+					if (known == maxKnownMovies) {
+						break;
+
+					}
+				}
+				//if the known for tiles haven't been filled, fill them up with lesser known roles.  If short of even the minimum, don't fill up two rows
+				if (known < maxKnownMovies) {
+					for (PersonCredit credit : lesserKnown.keySet()) {
+						if (!tempKnownList.contains(credit.getId())) {
+							knownForRipplers.get(known).setItem(lesserKnown.get(credit));
+							workingKnownForCollection.add(knownForRipplers.get(known));
+							if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
+								ControllerMaster.userData.knownFor.get(person.getId()).add(credit);
+							} else {
+								ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Collections.singletonList(credit)));
+							}
+							tempKnownList.add(lesserKnown.get(credit).getId());
+							++known;
+							//try and get at least this many movies for person, including lesser known if they have to
+							int minKnownMovies = 4;
+							if (known == maxKnownMovies || known == minKnownMovies) {
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
-		//add blank array for empty person
-		if (workingKnownForCollection.isEmpty()) {
+		//add blank array for empty person if not offline
+		if (workingKnownForCollection.isEmpty() && UserData.apiLinker != null) {
 			ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>());
 		}
 		famousTilePane.getChildren().setAll(workingKnownForCollection);
@@ -330,12 +328,10 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 
 	private void resizeTiles() {
 		//keep tilepane from getting taller than two rows
-		StackPane n;
+		JFXMediaRippler n;
 		for (int i = 0; i < famousTilePane.getChildren().size(); ++i) {
-			n = ((JFXMediaRippler)famousTilePane.getChildren().get(i)).getPane();
-			n.setMaxWidth(139*scaleWFactor);
-			n.setMaxHeight(208*scaleHFactor);
-			n.resize(139*scaleWFactor, 208*scaleHFactor);
+			n = ((JFXMediaRippler)famousTilePane.getChildren().get(i));
+			n.updateScale(scaleWFactor);
 		}
 	}
 }

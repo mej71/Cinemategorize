@@ -35,7 +35,6 @@
 
 .outlined-text .text{
     -fx-font-size: 14;
-
     -fx-effect: dropshadow(three-pass-box, black, 0.08em, 0.08em, -0.08em, 0.08em)
 }
 
@@ -120,6 +119,10 @@
 .circle-rippler {
     -jfx-mask-type: CIRCLE;
     -fx-cursor: hand;
+}
+
+.media-rippler-bottom {
+    -fx-background-color: #010f15;
 }
 
 /*******************************************************************************
@@ -480,7 +483,7 @@
     -fx-stroke: 0.5px;
     -fx-background-radius: 40px;
     -fx-border-radius: 40px;
-    -fx-padding: 5px 8px 5px 12px;
+    -fx-padding: 5px 8px 5px 8px;
     -fx-pref-height: 28px;
     -fx-alignment: center;
     -fx-spacing: 8;
@@ -496,9 +499,9 @@
     -fx-background-color: #051b27;
     -fx-border-color: #ff3946;
     -fx-stroke: 0.5px;
-    -fx-background-radius: 40px;
-    -fx-border-radius: 40px;
-    -fx-padding: 5px 8px 5px 12px;
+    -fx-background-radius: 36px;
+    -fx-border-radius: 36px;
+    -fx-padding: 5px 8px 5px 8px;
     -fx-pref-height: 24px;
     -fx-alignment: center;
     -fx-spacing: 8;

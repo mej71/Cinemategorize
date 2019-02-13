@@ -15,50 +15,44 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane fx:id="mainGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-          prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141"
-          xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PersonViewController">
+<GridPane fx:id="mainGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PersonViewController">
     <rowConstraints>
-        <RowConstraints fillHeight="false" percentHeight="5.0"/>
-        <RowConstraints percentHeight="20.0"/>
-        <RowConstraints percentHeight="25.0"/>
-        <RowConstraints percentHeight="25.0"/>
-        <RowConstraints percentHeight="25.0"/>
+        <RowConstraints fillHeight="false" percentHeight="5.0" />
+        <RowConstraints percentHeight="20.0" />
+        <RowConstraints percentHeight="25.0" />
+        <RowConstraints percentHeight="25.0" />
+        <RowConstraints percentHeight="25.0" />
     </rowConstraints>
     <columnConstraints>
-        <ColumnConstraints percentWidth="20.0"/>
-        <ColumnConstraints percentWidth="20.0"/>
-        <ColumnConstraints percentWidth="20.0"/>
-        <ColumnConstraints percentWidth="20.0"/>
-        <ColumnConstraints percentWidth="20.0"/>
-        <ColumnConstraints percentWidth="20.0"/>
+        <ColumnConstraints percentWidth="20.0" />
+        <ColumnConstraints percentWidth="20.0" />
+        <ColumnConstraints percentWidth="20.0" />
+        <ColumnConstraints percentWidth="20.0" />
+        <ColumnConstraints percentWidth="20.0" />
+        <ColumnConstraints percentWidth="20.0" />
     </columnConstraints>
-    <ImageView fx:id="personImageView" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4"
-               GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowSpan="4" GridPane.valignment="TOP">
+    <ImageView fx:id="personImageView" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowSpan="4" GridPane.valignment="TOP">
         <GridPane.margin>
-          <Insets right="5.0" top="10.0"/>
+          <Insets right="5.0" top="10.0" />
         </GridPane.margin>
     </ImageView>
-    <Label fx:id="nameLabel" styleClass="dialog-title" text="Label" GridPane.columnIndex="1" GridPane.columnSpan="2"
-           GridPane.halignment="CENTER" GridPane.valignment="CENTER"/>
-    <ScrollPane fx:id="bioScrollPane" fitToWidth="true" GridPane.columnIndex="4" GridPane.columnSpan="2"
-                GridPane.rowIndex="3" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
+    <Label fx:id="nameLabel" styleClass="dialog-title" text="Label" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+    <ScrollPane fx:id="bioScrollPane" fitToWidth="true" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="3" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
         <GridPane.margin>
-            <Insets bottom="5.0" right="5.0" top="5.0"/>
+            <Insets bottom="5.0" right="5.0" top="5.0" />
         </GridPane.margin>
         <GridPane>
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES"/>
-                <ColumnConstraints hgrow="SOMETIMES"/>
+                <ColumnConstraints hgrow="SOMETIMES" />
+                <ColumnConstraints hgrow="SOMETIMES" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints vgrow="ALWAYS"/>
-                <RowConstraints vgrow="ALWAYS"/>
+                <RowConstraints vgrow="ALWAYS" />
+                <RowConstraints vgrow="ALWAYS" />
             </rowConstraints>
-            <Label fx:id="bioLabel" text="Label" wrapText="true" GridPane.columnSpan="2" GridPane.rowSpan="2"
-                   GridPane.vgrow="ALWAYS">
+            <Label fx:id="bioLabel" text="Label" wrapText="true" GridPane.columnSpan="2" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
                 <GridPane.margin>
-                    <Insets left="5.0" right="10.0" top="5.0"/>
+                    <Insets left="5.0" right="10.0" top="5.0" />
                 </GridPane.margin>
             </Label>
         </GridPane>
@@ -66,37 +60,37 @@
 
     <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
         <GridPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" />
         </GridPane.margin>
-        <Label fx:id="famousLabel" styleClass="dialog-subtitle" text="Famous For:"/>
-        <TilePane fx:id="famousTilePane" tileAlignment="TOP_CENTER"/>
+        <Label fx:id="famousLabel" styleClass="dialog-subtitle" text="Famous For:" />
+        <TilePane fx:id="famousTilePane" tileAlignment="TOP_CENTER" />
         <JFXTabPane fx:id="tabPane" nodeOrientation="LEFT_TO_RIGHT" tabClosingPolicy="UNAVAILABLE">
             <VBox.margin>
-                <Insets top="5.0"/>
+                <Insets top="5.0" />
             </VBox.margin>
             <Tab fx:id="directorTab" text="Director">
                 <ScrollPane fx:id="dirScrollPane">
-                    <ListFlowPane fx:id="dirFlowPane" orientation="VERTICAL"/>
+                    <ListFlowPane fx:id="dirFlowPane" orientation="VERTICAL" />
                 </ScrollPane>
             </Tab>
             <Tab fx:id="writerTab" text="Writer">
                 <ScrollPane fx:id="writScrollPane">
-                    <ListFlowPane fx:id="writFlowPane" orientation="VERTICAL"/>
+                    <ListFlowPane fx:id="writFlowPane" orientation="VERTICAL" />
                 </ScrollPane>
             </Tab>
             <Tab fx:id="actorTab" text="Actor">
                 <ScrollPane fx:id="actScrollPane">
-                    <ListFlowPane fx:id="actFlowPane" orientation="VERTICAL"/>
+                    <ListFlowPane fx:id="actFlowPane" orientation="VERTICAL" />
                 </ScrollPane>
             </Tab>
             <Tab fx:id="producerTab" text="Producer">
                 <ScrollPane fx:id="prodScrollPane">
-                    <ListFlowPane fx:id="prodFlowPane" orientation="VERTICAL"/>
+                    <ListFlowPane fx:id="prodFlowPane" orientation="VERTICAL" />
                 </ScrollPane>
             </Tab>
         </JFXTabPane>
     </VBox>
     <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="6" GridPane.rowSpan="5">
-        <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER"/>
+        <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />
     </StackPane>
 </GridPane>

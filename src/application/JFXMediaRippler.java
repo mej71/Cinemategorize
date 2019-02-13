@@ -1,10 +1,16 @@
 package application;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import info.movito.themoviedbapi.model.people.PersonCast;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.PopOver.ArrowLocation;
 
@@ -17,16 +23,17 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
+import javax.imageio.ImageIO;
+
 public class JFXMediaRippler extends JFXRippler { 
-	
+
+	public final static int baseHeight = 208;
+	public final static int baseWidth = 139;
+	public final static int bottomHeight = 38;
+
 	private static GridPane gridPane;
 	private static PopOver pOver;
 	private static Label titleLabel;
@@ -45,6 +52,10 @@ public class JFXMediaRippler extends JFXRippler {
 	
 	public MediaItem linkedItem;
 	private final ImageView iView;
+	private final ImageView heartIcon;
+	private final ImageView playIcon;
+	private final Label nameLabel;
+	private final HBox iconBox;
 	
 	private static void init() {
 		gridPane = new GridPane();
@@ -123,14 +134,60 @@ public class JFXMediaRippler extends JFXRippler {
 		return pOver.isShowing();
 	}
 	
-	private JFXMediaRippler(StackPane control, ImageView iv){
+	private JFXMediaRippler(StackPane control, ImageView iv, ImageView heartIcon, ImageView playIcon, Label nameLabel, HBox iconBox){
 		super(control, RipplerMask.RECT, RipplerPos.FRONT);
 		if (gridPane == null) {
 			init();
 		}
 		control.setPickOnBounds(false);
 		iView = iv;
-	} 
+		this.heartIcon = heartIcon;
+		this.playIcon = playIcon;
+		this.nameLabel = nameLabel;
+		this.iconBox = iconBox;
+	}
+
+	@Override
+	protected void initControlListeners() {
+		// if the control got resized the overlay rect must be rest
+		control.layoutBoundsProperty().addListener(observable -> resetRippler());
+		if(getChildren().contains(control))
+			control.boundsInParentProperty().addListener(observable -> resetRippler());
+		control.addEventHandler(MouseEvent.MOUSE_PRESSED, (event) -> {
+			if (event.getTarget().equals(iView)) {
+				if (event.isPrimaryButtonDown()) {
+					createRipple(event.getX(), event.getY());
+				}
+			} else if (event.getTarget().equals(heartIcon)) {
+				if (ControllerMaster.userData.favoritesContains(linkedItem)) {
+					ControllerMaster.userData.getFavoritesList().removeMedia(linkedItem);
+				} else {
+					ControllerMaster.userData.getFavoritesList().addItem(linkedItem);
+				}
+				updateFavoriteIcon();
+			}
+			event.consume();
+		});
+		// create fade out transition for the ripple
+		control.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+			releaseRipple();
+			if (event.getTarget().equals(iView)) {
+				boolean isMovie = linkedItem.isMovie();
+				int mId = linkedItem.getId();
+				if ((isMovie && ControllerMaster.userData.ownsMovie(mId)) ||
+						(!isMovie && ControllerMaster.userData.ownsShow(mId))) {
+					if (pOver.isShowing()) {
+						pOver.hide();
+					}
+					if (hasEntered) {
+						timer.cancel();
+						hasEntered = false;
+					}
+					Platform.runLater(() -> ControllerMaster.mainController.showSelectionDialog(linkedItem));
+				}
+			}
+		});
+	}
 	
 	public void setItem(MediaItem item) {
 		linkedItem = item;
@@ -143,29 +200,91 @@ public class JFXMediaRippler extends JFXRippler {
 			getControl().getStyleClass().removeAll("selectable");
 		}
 		iView.setImage(MediaSearchHandler.getItemPoster(linkedItem).getImage());
+		updateFavoriteIcon();
+		playIcon.getStyleClass().add("play-icon");
+		URL url = MediaSearchHandler.class.getClassLoader().getResource("play.png");
+		try {
+			playIcon.setImage(SwingFXUtils.toFXImage(ImageIO.read(Objects.requireNonNull(url)), null));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		nameLabel.setText(linkedItem.getTitle(false));
+	}
+
+	void updateFavoriteIcon() {
+		String heartName = (ControllerMaster.userData.favoritesContains(linkedItem))? "heart.png" : "empty_heart.png";
+		URL url = MediaSearchHandler.class.getClassLoader().getResource(heartName);
+		try {
+			heartIcon.setImage(SwingFXUtils.toFXImage(ImageIO.read(Objects.requireNonNull(url)), null));
+			heartIcon.getStyleClass().add("heart-icon");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void updateScale() {
+		updateScale(ControllerMaster.userData.getScaleFactor());
+	}
+
+	public void updateScale(double scaleFactor) {
+		StackPane pane = getPane();
+		pane.setMinWidth(JFXMediaRippler.baseWidth * scaleFactor);
+		pane.setMinHeight(JFXMediaRippler.baseHeight * scaleFactor + JFXMediaRippler.bottomHeight);
+		pane.setMaxWidth(JFXMediaRippler.baseWidth * scaleFactor);
+		pane.setMaxHeight(JFXMediaRippler.baseHeight * scaleFactor + JFXMediaRippler.bottomHeight);
+		pane.resize(JFXMediaRippler.baseWidth * scaleFactor, JFXMediaRippler.baseHeight * scaleFactor + JFXMediaRippler.bottomHeight);
 	}
 	
 	public StackPane getPane() {
 		return (StackPane) getControl();
 	}
 	
-	public static JFXMediaRippler createBasicRippler(TilePane tilePane, MovieScrollPane scrollPane) {
+	public static JFXMediaRippler createBasicRippler(MovieScrollPane scrollPane) {
 		StackPane paneChild = new StackPane();
 		ImageView iView = new ImageView();
-		
+		ImageView heartIcon = new ImageView();
+		ImageView playIcon = new ImageView();
+
+		StackPane bottomPane = new StackPane();
+		bottomPane.getStyleClass().add("media-rippler-bottom");
+		HBox iconBox = new HBox();
+		iconBox.setMaxHeight(bottomHeight);
+
+		iconBox.setAlignment(Pos.CENTER);
+		iconBox.setFillHeight(true);
+		iconBox.setSpacing(5);
+		iconBox.getChildren().add(heartIcon);
+		iconBox.getChildren().add(playIcon);
+		Label name = new Label("Test");
+		name.maxWidthProperty().bind(bottomPane.widthProperty().multiply(0.5));
+		name.prefWidthProperty().bind(bottomPane.widthProperty().multiply(0.5));
+		iconBox.maxWidthProperty().bind(bottomPane.widthProperty().multiply(0.25));
+		iconBox.prefWidthProperty().bind(bottomPane.widthProperty().multiply(0.25));
+
+		bottomPane.getChildren().add(name);
+		bottomPane.getChildren().add(iconBox);
+		bottomPane.maxWidthProperty().bind(paneChild.maxWidthProperty());
+		bottomPane.prefWidthProperty().bind(paneChild.prefWidthProperty());
+		bottomPane.setPrefHeight(bottomHeight);
+		bottomPane.setMaxHeight(bottomHeight);
+		bottomPane.resize(baseWidth, bottomHeight);
+		StackPane.setAlignment(name, Pos.CENTER_LEFT);
+		StackPane.setAlignment(iconBox, Pos.CENTER_RIGHT);
+
 		//user a smaller resolution for smaller scale.  looks better for smaller posters
-		paneChild.getChildren().add(iView);
+		paneChild.getChildren().addAll(iView, bottomPane);
+		StackPane.setAlignment(iView, Pos.TOP_CENTER);
+		StackPane.setAlignment(bottomPane, Pos.BOTTOM_CENTER);
 		paneChild.setPickOnBounds(false);
 		iView.fitWidthProperty().bind(paneChild.widthProperty());
-		iView.fitHeightProperty().bind(paneChild.heightProperty());
-		
-		
-		JFXMediaRippler rippler = new JFXMediaRippler(paneChild, iView);
-		rippler.getStyleClass().add("jfx-media-rippler");
-		paneChild.setMaxWidth(139);
-		paneChild.setMaxHeight(208);
-		paneChild.resize(139, 208);
-		paneChild.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> { 
+		iView.fitHeightProperty().bind(paneChild.heightProperty().subtract(bottomHeight));
+
+
+		JFXMediaRippler rippler = new JFXMediaRippler(paneChild, iView, heartIcon, playIcon, name, iconBox);
+		rippler.maxWidthProperty().bind(paneChild.widthProperty());
+		rippler.maxHeightProperty().bind(paneChild.heightProperty());
+		rippler.updateScale();
+        iView.addEventHandler(MouseEvent.MOUSE_ENTERED, (e) -> {
 			if ( (scrollPane !=null && scrollPane.isScrolling) || pOver.isShowing()) {
 				return;
 			}
@@ -222,7 +341,7 @@ public class JFXMediaRippler extends JFXRippler {
 				timer.schedule(getTimerTask(), taskMiliSeconds);
 			}
 		});
-		paneChild.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
+        iView.addEventHandler(MouseEvent.MOUSE_EXITED, (e) -> {
 			if (e.getPickResult().getIntersectedNode() == iView) {
 				tempIView = iView;
 				tempIView.addEventHandler(MouseEvent.MOUSE_EXITED, (ev) -> {
@@ -250,22 +369,6 @@ public class JFXMediaRippler extends JFXRippler {
 				hasEntered = false;
 			}
 			
-		});
-		paneChild.addEventHandler(MouseEvent.MOUSE_CLICKED, (e) -> {
-			boolean isMovie = rippler.linkedItem.isMovie();
-			int mId = rippler.linkedItem.getId();
-			if ( (isMovie && ControllerMaster.userData.ownsMovie(mId)) ||
-					(!isMovie && ControllerMaster.userData.ownsShow(mId)) ) {
-				if (pOver.isShowing()) {
-					pOver.hide();
-				}
-				if (hasEntered) {
-					timer.cancel();
-					hasEntered = false;
-				}
-				Platform.runLater(() -> ControllerMaster.mainController.showSelectionDialog(rippler.linkedItem));
-			}
-			e.consume();
 		});
 		return rippler;
 	}

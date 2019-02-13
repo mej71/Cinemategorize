@@ -14,6 +14,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -144,7 +145,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	@FXML
 	public void chooseFolder() {
 		DirectoryChooser chooser = new DirectoryChooser();
-		chooser.setTitle("Choose directory");
+		chooser.setTitle("Choose directory (also searches through all subdirectories)");
 		File dirFile = chooser.showDialog(dLink.getScene().getWindow());
 		new Thread(lookupTask).start();
 		lookupTask = new Task<Object>() {
@@ -157,29 +158,22 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 					int addedFiles = 0;
 					int skippedFiles = 0;
 					int failedFiles = 0;
-					boolean added = false;
-		            for (File file : Objects.requireNonNull(Objects.requireNonNull(dirFile.listFiles()))) {
+					List<File> skippedResults = new ArrayList<>();
+					List<File> fileResults = new ArrayList<>();
+					findMovieFiles(dirFile, fileResults, skippedResults);
+					skippedFiles += skippedResults.size();
+		            for (File file : fileResults) {
 		            	if (ControllerMaster.userData.hasPath(file.getPath())) { //skip files already saved
 		            		++skippedFiles;
 		            		continue;
 		            	}
-		            	for (int i = 0; i < extFilter.getExtensions().size(); ++i) {            		
-		            		if (file.getName().endsWith(extFilter.getExtensions().get(i).substring(1))) { //substring to get rid of the *
-		            			if (UserDataHelper.addMovieOrTvShow(file)) {
-		            				++addedFiles;
-		            			} else {
-		            				++failedFiles;
-		            			}
-		            			added = true;
-		            			break;
-		            		} 
-		            	}
-		            	if (!added) {
-		            		++skippedFiles;
-		            	}
-		            	added = false;
-		            	this.updateProgress(((double)skippedFiles+failedFiles+addedFiles)/(double) Objects.requireNonNull(dirFile.listFiles()).length, Objects.requireNonNull(dirFile.listFiles()).length);
-            			this.updateMessage(skippedFiles+failedFiles+addedFiles + " out of " + Objects.requireNonNull(dirFile.listFiles()).length + " completed");
+						if (UserDataHelper.addMovieOrTvShow(file)) {
+							++addedFiles;
+						} else {
+							++failedFiles;
+						}
+		            	this.updateProgress(((double)skippedFiles+failedFiles+addedFiles)/(double) (fileResults.size()+skippedResults.size()), (fileResults.size()+skippedResults.size()));
+            			this.updateMessage(skippedFiles+failedFiles+addedFiles + " out of " + (fileResults.size()+skippedResults.size()) + " completed");
 		            }
 		        } 
 				succeeded();
@@ -187,6 +181,30 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	    	}
 		};
 		setupTaskHandlers();
+	}
+
+	//recursive method to find all movies even in subdirectories
+	private void findMovieFiles(File rootFile, List<File> foundFiles, List<File> skippedResults) {
+		if (rootFile == null || foundFiles == null) {
+			return;
+		}
+		if(rootFile.isDirectory()) {
+			for(File file : rootFile.listFiles()) {
+				findMovieFiles(file, foundFiles, skippedResults);
+			}
+		} else if(rootFile.isFile()) {
+			boolean added = false;
+			for (int i = 0; i < extFilter.getExtensions().size(); ++i) {
+				if (rootFile.getName().endsWith(extFilter.getExtensions().get(i).substring(1))) { //substring to get rid of the *
+					foundFiles.add(rootFile);
+					added = true;
+					break;
+				}
+			}
+			if (!added) {
+				skippedResults.add(rootFile);
+			}
+		}
 	}
 	
 	//minimalistic layout handler based on the enum UIMode

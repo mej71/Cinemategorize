@@ -36,6 +36,7 @@ public class JFXCustomChips {
         HBox hBox = new HBox(label);
         hBox.getStyleClass().add("tag-chip-hbox");
         JFXRippler rippler = new JFXRippler(hBox);
+		rippler.getStyleClass().add("jfx-fit-rippler");
         hBox.setOnMouseClicked(ev -> {
 			ControllerMaster.mainController.searchField.setText(tag);
 			ControllerMaster.mainController.autoCompletePopup.hide();
