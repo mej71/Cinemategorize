@@ -173,10 +173,10 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	protected void runOnClick() {
 		super.runOnClick();
 		if (item.getMediaType().equalsIgnoreCase("TV") &&  ControllerMaster.userData.ownsShow(item.getId())) {
-			ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getTvById(item.getMediaId()) );
+			ControllerMaster.showSelectionDialog( ControllerMaster.userData.getTvById(item.getMediaId()) );
 		}
 		if (!item.getMediaType().equalsIgnoreCase("TV") && ControllerMaster.userData.ownsMovie(item.getId())) {
-			ControllerMaster.mainController.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getMediaId()));		
+			ControllerMaster.showSelectionDialog( ControllerMaster.userData.getMovieById(item.getMediaId()));
 		}
 	}
 	

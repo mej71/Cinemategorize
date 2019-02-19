@@ -74,7 +74,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		mediaList = mList;
 		fileFlowPane.getChildren().clear();
 		fileFlowPane.getChildren().addAll(FileCell.createCells(mediaList.keySet(), fileFlowPane));
-		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * ResultCell.prefCellHeight);
+		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * FileCell.prefCellHeight);
 		fileFlowPane.selectCell((FileCell<MediaItem>)fileFlowPane.getChildren().get(0));
 	}
 	
@@ -95,7 +95,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		oldEpisode = epNum;
 		dLink.setOnDialogClosed(event -> {
 			if (ControllerMaster.userData.numMediaItems() > 0) {
-				ControllerMaster.mainController.addMediaWindow.close();
+				ControllerMaster.addMediaWindow.close();
 			}
 			//remove manual edits
 			if (oldId != 0) {
@@ -237,6 +237,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 			}
 		}
 		fileFlowPane.getChildren().remove(fileFlowPane.selectedCell);
+		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * FileCell.prefCellHeight);
 		
 		//refresh master view with new file
 		ControllerMaster.mainController.refreshSearch();
@@ -251,7 +252,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 				} else {
 					mi = ControllerMaster.userData.getMovieById(fileItem.getId());
 				}
-				ControllerMaster.mainController.showSelectionDialog(mi);
+				ControllerMaster.showSelectionDialog(mi);
 			}
 		} else {
 			fileFlowPane.selectedCell = (FileCell<MediaItem>)fileFlowPane.getChildren().get(0);

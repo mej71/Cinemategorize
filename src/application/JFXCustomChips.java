@@ -19,11 +19,13 @@ public class JFXCustomChips {
         JFXRippler rippler = new JFXRippler(hBox);
         rippler.getStyleClass().add("jfx-fit-rippler");
         hBox.setOnMouseClicked(ev -> {
+			ControllerMaster.mainController.autoSelection = new SearchItem(SearchTypes.GENRE, g);
+			ControllerMaster.mainController.refreshSearch();
+			ControllerMaster.mainController.tempStopSearchDelay = true;
 			ControllerMaster.mainController.searchField.setText(g.getName());
 			ControllerMaster.mainController.autoCompletePopup.hide();
-			ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.GENRE, g));
-			ControllerMaster.mainController.refreshSearch();
-			ControllerMaster.mainController.closeDialogs();
+			ControllerMaster.mainController.tempStopSearchDelay = false;
+			ControllerMaster.closeDialogs();
 			ev.consume();
 		});
         return rippler;
@@ -38,11 +40,13 @@ public class JFXCustomChips {
         JFXRippler rippler = new JFXRippler(hBox);
 		rippler.getStyleClass().add("jfx-fit-rippler");
         hBox.setOnMouseClicked(ev -> {
+			ControllerMaster.mainController.autoSelection = new SearchItem(SearchTypes.TAG, tag);
+			ControllerMaster.mainController.refreshSearch();
+			ControllerMaster.mainController.tempStopSearchDelay = true;
 			ControllerMaster.mainController.searchField.setText(tag);
 			ControllerMaster.mainController.autoCompletePopup.hide();
-			ControllerMaster.mainController.autoEvent = new MovieAutoCompleteEvent<>(MovieAutoCompleteEvent.SELECTION, new SearchItem(SearchTypes.TAG, tag));
-			ControllerMaster.mainController.refreshSearch();
-			ControllerMaster.mainController.closeDialogs();
+			ControllerMaster.mainController.tempStopSearchDelay = false;
+			ControllerMaster.closeDialogs();
 			ev.consume();
 		});
         return rippler;

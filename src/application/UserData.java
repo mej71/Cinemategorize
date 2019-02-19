@@ -120,8 +120,11 @@ class UserData implements Serializable {
 		}
 		return creditsList.get(personId);
 	}
-	
+
 	public PersonPeople getPerson(int personId) {
+		if (!personList.containsKey(personId)) {
+			personList.put(personId, MediaSearchHandler.getPersonPeople(personId));
+		}
 		return personList.get(personId);
 	}
 	
@@ -427,16 +430,10 @@ class UserData implements Serializable {
 	}
 	
 	public void addPerson(PersonCast p, int mId, boolean isMovie) {
-		if (!personList.containsKey(p.getId())) {
-			personList.put(p.getId(), MediaSearchHandler.getPersonPeople(p.getId()));
-		}
 		addToList(actorList, p, mId, isMovie);
 	}
 	
 	public void addPerson(PersonCrew p, int mId, boolean isMovie) {
-		if (!personList.containsKey(p.getId())) {
-			personList.put(p.getId(), MediaSearchHandler.getPersonPeople(p.getId()));
-		}
 		if (p.getJob().equalsIgnoreCase("Director")) {
 			addToList(directorList, p, mId, isMovie);
 		} else if (p.getJob().equalsIgnoreCase("Screenplay") || p.getJob().equalsIgnoreCase("Writer") || 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -11,7 +12,7 @@ import javafx.scene.layout.HBox;
 
 public class FileCell<T extends MediaItem> extends FlowCell<T> {
 	
-	static int prefCellHeight = 110;
+	static int prefCellHeight = 55;
 	
 	FileCell(T item, ListFlowPane<FileCell<T>, T> pane) {
 		super(item, pane);
@@ -31,6 +32,7 @@ public class FileCell<T extends MediaItem> extends FlowCell<T> {
 			folderLabel.setText(item.getFolder());
 			fileLabel.setText(item.getFileName());
 			gridPane.add(folderLabel, 0, 0);
+			gridPane.setAlignment(Pos.CENTER_LEFT);
 			gridPane.add(fileLabel, 0, 1);
 			Tooltip.install(this, new Tooltip(item.getFullFilePath()));
 			setGraphic(new HBox(gridPane));

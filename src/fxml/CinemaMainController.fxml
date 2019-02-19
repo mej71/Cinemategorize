@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXChipView?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXHamburger?>
 <?import com.jfoenix.controls.JFXRippler?>
@@ -124,4 +125,7 @@
         </HBox>
 
     </GridPane>
+   <StackPane disable="true" prefHeight="150.0" prefWidth="200.0" visible="false">
+         <JFXChipView prefHeight="200.0" prefWidth="200.0" />
+   </StackPane>
 </StackPane>

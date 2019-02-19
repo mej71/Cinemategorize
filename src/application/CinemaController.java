@@ -1,21 +1,20 @@
 package application;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import com.jfoenix.controls.*;
-
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXListCell;
+import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXPopup;
+import com.jfoenix.controls.JFXRippler;
+import com.jfoenix.controls.JFXSlider;
+import com.jfoenix.controls.JFXTextField;
 import info.movito.themoviedbapi.model.Collection;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -31,7 +30,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
+
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CinemaController implements Initializable {
 
@@ -39,9 +44,12 @@ public class CinemaController implements Initializable {
 	@FXML StackPane backgroundStackPane;
 	@FXML StackPane stackPane;
 	@FXML GridPane mainGrid;	
-	@FXML JFXComboBox<SortTypes> sortCombo;
-	@FXML JFXTextField searchField;
-	@FXML JFXSlider scaleSlider;
+	@FXML
+	JFXComboBox<SortTypes> sortCombo;
+	@FXML
+	JFXTextField searchField;
+	@FXML
+	JFXSlider scaleSlider;
 	@FXML private Label scaleLabel;
 	@FXML private JFXButton textClearButton;
 	@FXML private JFXButton startDateClearButton;
@@ -65,14 +73,10 @@ public class CinemaController implements Initializable {
 	public final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
 	public List<JFXMediaRippler> allTiles = new ArrayList<>();
 	public LinkedHashMap<String, MediaItem> showingMedia = new LinkedHashMap<>();
-	public MovieAutoCompletePopup autoCompletePopup;
-	public MovieAutoCompleteEvent<SearchItem> autoEvent;
-	public JFXDialog selectionViewWindow;
-	public JFXDialog manualLookupWindow;	
-	public JFXDialog addMediaWindow;
-	public JFXDialog settingsWindow;
-	JFXDialog playlistWindow;
+	public SearchPopup autoCompletePopup;
+	public SearchItem autoSelection = null;
 	public Scene cinemaScene;
+	public boolean tempStopSearchDelay = false;
 	
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -147,41 +151,25 @@ public class CinemaController implements Initializable {
 		JFXSmoothScroll.smoothScrolling(scrollPane);
 		scrollPane.getStyleClass().add("movie-scroll-pane");
 		stackPane.getChildren().add(scrollPane);
-		
-		autoCompletePopup = new MovieAutoCompletePopup();
-		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty().multiply(1.6));
-		autoCompletePopup.setCellLimit(10);
-	    autoCompletePopup.setMovieSelectionHandler(e -> {
-	    	autoEvent = (MovieAutoCompleteEvent<SearchItem>)e;
-	    	searchField.setText(autoEvent.getObject().getItemName());
-	    	refreshSearch();
-	    });
+
+		autoCompletePopup = new SearchPopup();
+		autoCompletePopup.prefWidthProperty().bind(searchField.widthProperty().subtract(20));
 
 	    // filtering options
 	    searchField.textProperty().addListener(observable -> {
-	    	autoCompletePopup.getSuggestions().clear();
-	    	autoCompletePopup.getSuggestions().addAll(ControllerMaster.userData.getAutoCompleteItems(searchField.getText()));
-	    	textClearButton.setVisible(true);
-	        if (autoCompletePopup.getFilteredSuggestions().isEmpty() || searchField.getText().isEmpty()) {
-	            autoCompletePopup.hide();
-	            if (searchField.getText().isEmpty()) {
-	            	textClearButton.setVisible(false);
-	            	if (showingMedia.size() != ControllerMaster.userData.numMediaItems()) {
-		            	autoCompletePopup.getSuggestions().clear();
-		            	autoEvent = null;
-		            	refreshSearch();
-	            	}
-	            }             
-	        } else {
-                JFXMediaRippler.forceHidePopOver();
-	            autoCompletePopup.show(searchField);
-	        }
+			searchField.requestFocus();
+	    	if (!tempStopSearchDelay) {
+				PauseTransition pause = new PauseTransition(Duration.millis(100));
+				pause.setOnFinished(event -> updateAutoComplete(searchField.getText()));
+				pause.playFromStart();
+			} else {
+				updateAutoComplete(searchField.getText());
+			}
 	    });
 	    
 	    searchField.setOnMouseClicked(arg0 -> {
-			if (!autoCompletePopup.getFilteredSuggestions().isEmpty() && !searchField.getText().isEmpty()) {
-                JFXMediaRippler.forceHidePopOver();
-			    autoCompletePopup.show(searchField);
+			if (!autoCompletePopup.isEmpty() && !searchField.getText().isEmpty()) {
+				showAutoComplete();
             }
 		});
 	    
@@ -227,13 +215,13 @@ public class CinemaController implements Initializable {
 					JFXListCell<MainOptions.MainOptionTitles> target = (JFXListCell) e.getTarget();
 					switch (target.getItem()) {
 						case ADDMOVIE:
-							showAddMediaDialog();
+							ControllerMaster.showAddMediaDialog();
 							break;
 						case MANAGEPLAYLISTS:
-							showPlaylistDialog();
+							ControllerMaster.showPlaylistDialog();
 							break;
 						case SETTINGS:
-							showSettingsDialog();
+							ControllerMaster.showSettingsDialog();
 							break;
 						case ABOUT:
 							showAboutDialog();
@@ -248,44 +236,7 @@ public class CinemaController implements Initializable {
 			}
 		});
 	    
-	    //set up dialogs
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("SelectionViewContent.fxml"));
-			GridPane selectionView = loader.load();
-			ControllerMaster.selectionViewController = loader.getController();
-			selectionViewWindow = new JFXDialog(getBackgroundStackPane(), selectionView,
-					JFXDialog.DialogTransition.CENTER);
-			selectionView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
-			selectionView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.3));
-			loader = new FXMLLoader(getClass().getClassLoader().getResource("ManualLookupContent.fxml"));
-			GridPane manualLookupView = loader.load();
-			ControllerMaster.manualController = loader.getController();			
-			manualLookupWindow = new JFXDialog(getBackgroundStackPane(), manualLookupView,
-					JFXDialog.DialogTransition.TOP);
-			manualLookupView.prefWidthProperty().bind(backgroundStackPane.widthProperty().divide(1.15));
-			manualLookupView.prefHeightProperty().bind(backgroundStackPane.heightProperty().divide(1.15));
-			loader = new FXMLLoader(getClass().getClassLoader().getResource("AddMoviesDialogContent.fxml"));
-			JFXDialogLayout addMediaDialogView = loader.load();
-			ControllerMaster.addMediaDialogController = loader.getController();
-			addMediaWindow = new JFXDialog(getBackgroundStackPane(), addMediaDialogView,
-					JFXDialog.DialogTransition.TOP);
-			loader = new FXMLLoader(getClass().getClassLoader().getResource("SettingsContent.fxml"));
-			GridPane settingsView = loader.load();
-			ControllerMaster.settingsController = loader.getController();
-			settingsWindow = new JFXDialog(getBackgroundStackPane(), settingsView,
-					JFXDialog.DialogTransition.TOP);
-			settingsView.prefWidthProperty().bind(backgroundStackPane.widthProperty().multiply(0.25));
-			settingsView.prefHeightProperty().bind(backgroundStackPane.heightProperty().multiply(0.30));
-			loader = new FXMLLoader(getClass().getClassLoader().getResource("PlaylistManagerContent.fxml"));
-			GridPane playlistView = loader.load();
-			ControllerMaster.playlistController = loader.getController();
-			playlistWindow = new JFXDialog(getBackgroundStackPane(), playlistView,
-					JFXDialog.DialogTransition.TOP);
-			playlistView.prefWidthProperty().bind(backgroundStackPane.widthProperty().multiply(0.70));
-			playlistView.prefHeightProperty().bind(backgroundStackPane.heightProperty().multiply(0.85));
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+	   ControllerMaster.init(getBackgroundStackPane());
 
 		createAllRipplers();
 		refreshSearch();
@@ -317,6 +268,36 @@ public class CinemaController implements Initializable {
 		collectionsCombo.getSelectionModel().clearSelection();
 		mainGrid.requestFocus();
 	}
+
+	private void updateAutoComplete(String oldText) {
+		//don't run if text has changed since
+		if (!oldText.equalsIgnoreCase(searchField.getText())) {
+			return;
+		}
+		autoCompletePopup.setItems(ControllerMaster.userData.getAutoCompleteItems(searchField.getText()));
+		textClearButton.setVisible(true);
+		if (autoCompletePopup.isEmpty() || searchField.getText().isEmpty()) {
+			autoCompletePopup.hide();
+			if (searchField.getText().isEmpty()) {
+				textClearButton.setVisible(false);
+				//reset media list if the text field has been cleared, only if displaying search results
+				if (showingMedia.size() != ControllerMaster.userData.numMediaItems()) {
+					autoCompletePopup.clearItems();
+					autoSelection = null;
+					refreshSearch();
+				}
+			}
+		} else {
+			showAutoComplete();
+		}
+	}
+
+	private void showAutoComplete(){
+		JFXMediaRippler.forceHidePopOver();
+		if (!autoCompletePopup.isShowing()) {
+			autoCompletePopup.show(searchField, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT, 0, searchField.getHeight());
+		}
+	}
 	
 	public void updateScale() {
 		tilePane.setVgap(15*ControllerMaster.userData.getScaleFactor());
@@ -329,8 +310,8 @@ public class CinemaController implements Initializable {
 	}
 	
 	public void refreshSearch() {
-		if (autoEvent != null) {
-			ControllerMaster.userData.refreshViewingList(autoEvent.getObject().getTargetIDs());
+		if (autoSelection != null) {
+			ControllerMaster.userData.refreshViewingList(autoSelection.getTargetIDs());
 		} else {
 			ControllerMaster.userData.refreshViewingList(new HashMap<>());
 		}
@@ -368,7 +349,7 @@ public class CinemaController implements Initializable {
 						// if no directories to search, user must select at least one
 						// opens InitialChooseDialogContent, and waits for user to add one to selection
 						if (ControllerMaster.userData.numMediaItems() == 0) {
-							ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, true);
+							ControllerMaster.addMediaDialogController.openDialogMenu(ControllerMaster.addMediaWindow, true);
 						} 
 						KeyCombination keyCombinationMac = new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
 				        KeyCombination keyCombinationWin = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
@@ -377,7 +358,7 @@ public class CinemaController implements Initializable {
 				            if (keyCombinationMac.match(event) || keyCombinationWin.match(event)) {
 				                ControllerMaster.userData.clearSaveData();
 				            } else if (keyCombinationAdd.match(event)) {
-				            	showAddMediaDialog();
+				            	ControllerMaster.showAddMediaDialog();
 				            }
 				        });
 				        backgroundStackPane.prefWidthProperty().bind(newScene.widthProperty());
@@ -392,49 +373,11 @@ public class CinemaController implements Initializable {
 		return window;
 	}
 
-	void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList) {
-		showManualLookupDialog(mediaList, 0, 0, 0);
-	}
 
-	public void showManualLookupDialog(LinkedHashMap<MediaItem, MediaResultsPage> mediaList, int mId, int seasonNum, int epNum) {
-        JFXMediaRippler.forceHidePopOver();
-		ControllerMaster.manualController.setData(mediaList);
-		ControllerMaster.manualController.openDialog(manualLookupWindow, mId, seasonNum, epNum);
-	}
-	
-	@FXML
-	public void showAddMediaDialog() {
-		JFXMediaRippler.forceHidePopOver();
-		ControllerMaster.addMediaDialogController.openDialogMenu(addMediaWindow, false);		
-	}
-		
-	public void showSelectionDialog(MediaItem mi) {
-		JFXMediaRippler.forceHidePopOver();
-		ControllerMaster.selectionViewController.showMediaItem(selectionViewWindow, mi);	
-	}
-	
-	@FXML
-	public void showSettingsDialog() {
-		JFXMediaRippler.forceHidePopOver();
-		ControllerMaster.settingsController.show(settingsWindow);
-	}
 
-	void showPlaylistDialog() {
-		JFXMediaRippler.forceHidePopOver();
-		ControllerMaster.playlistController.show(playlistWindow);
-	}
-	
 	@FXML
 	public void showAboutDialog() {
-		
-	}
 
-	public void closeDialogs() {
-		selectionViewWindow.close();
-		addMediaWindow.close();
-		manualLookupWindow.close();
-		JFXPersonRippler.closeWindow();
-		JFXMediaRippler.forceHidePopOver();
 	}
 	
 	

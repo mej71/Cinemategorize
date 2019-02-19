@@ -4,6 +4,8 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXProgressBar;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -59,6 +61,27 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		updateLayout();
 		
 		dLink.show();
+		chooseFileButton.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (newValue != oldValue) {
+					if (oldValue && !chooseFolderButton.isFocused()) {
+						chooseFolderButton.requestFocus();
+					}
+				}
+			}
+		});
+
+		chooseFolderButton.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (newValue != oldValue) {
+					if (oldValue && !chooseFileButton.isFocused()) {
+						chooseFileButton.requestFocus();
+					}
+				}
+			}
+		});
 	}
 	
 	//Filechooser and DirectoryChooser are forcibly sseparatein Java for some reason, so making two different methods
@@ -131,7 +154,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 			updateLayout();
 			//if unknown items were found, open manual lookup, if not and some items are owned, close
 			if (ControllerMaster.userData.tempManualItems.size() > 0) {
-				ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
+				ControllerMaster.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
 			} else {
 				if (ControllerMaster.userData.numMediaItems() > 0) {
 					preventEscape = false;

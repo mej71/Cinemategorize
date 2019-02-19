@@ -501,7 +501,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	public float getVoteAverage() {
-		return getVoteAverage(true);
+		return getVoteAverage(false);
 	}
 	
 	public float getVoteAverage(boolean useEpisode) {

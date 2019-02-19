@@ -21,6 +21,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -46,7 +47,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
     @FXML private Label tvTitleLabel;
     @FXML private JFXComboBox<String> seasonComboBox;
     @FXML private JFXComboBox<String> episodeComboBox;
-    @FXML private GridPane movieTitleGridPane;
+    @FXML private HBox movieTitleHBox;
     @FXML private Label movieTitleLabel;
     @FXML private Label dirLabel;
     @FXML private Label genreLabel;
@@ -124,7 +125,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				startTask();
 			}
 		});
-
+		movieTitleLabel.maxWidthProperty().bind(movieTitleHBox.widthProperty().subtract(25));
 		infoScrollPane.prefWidthProperty().bind(mainGrid.widthProperty().multiply(0.64));
 		infoScrollPane.prefHeightProperty().bind(mainGrid.heightProperty().multiply(0.70));
 		directorFlowPane.prefWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
@@ -179,7 +180,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 							}
 							MediaItem tempItem = new MediaItem(mediaItem.tvShow, mediaItem.cMovie, mediaItem.getFullFilePath(), mediaItem.getFileName(), mediaItem.getFolder());
 							ControllerMaster.userData.tempManualItems.put(tempItem, mRes);
-                        	ControllerMaster.mainController.showManualLookupDialog(ControllerMaster.userData.tempManualItems, mediaItem.getId(), getSelectedSeason(), getSelectedEpisode());
+                        	ControllerMaster.showManualLookupDialog(ControllerMaster.userData.tempManualItems, mediaItem.getId(), getSelectedSeason(), getSelectedEpisode());
                             break;
                         case REMOVEEPISODE:
 							confirmDelete("Are you sure you want to delete " + mediaItem.getTitle() + "?\nYou cannot undo this action",true);
@@ -250,7 +251,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		super.setDialogLink(d, !mi.hasLoaded());
 		mediaItem = mi;
 		tvTitleGridPane.setVisible(!mediaItem.isMovie());
-		movieTitleGridPane.setVisible(mediaItem.isMovie());
+		movieTitleHBox.setVisible(mediaItem.isMovie());
 		playAllEpisodesButton.setVisible(!mediaItem.isMovie());
         optionList.getItems().setAll( (mediaItem.isMovie())? SelectionOptions.getMovieOptions() : SelectionOptions.getTvOptions());
 		if (!mediaItem.isMovie() ) {
@@ -467,73 +468,14 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		});
 	}
 	
-	@FXML public void playMedia() {
-		openFile(mediaItem.getFullFilePath());
-	}
+	@FXML public void playMedia() { PlayMedia.playMedia(mediaItem);}
 
 	//Creates a m3u playlist of the currently selected season, from the first episode
-	@FXML public void playSeason() {
-		List<String> previousFilePaths = new ArrayList<>();
-		List<String> filePaths = new ArrayList<>();
-		String tempPath;
-		int seasonNum = Integer.parseInt(seasonComboBox.getValue());
-		for (int j = 1; j < mediaItem.getEpisodes(seasonNum).size(); ++j) {
-			tempPath = mediaItem.getFullFilePath(seasonNum, j);
-			//skip empty paths
-			if (!tempPath.isEmpty()) {
-				if (j < Integer.parseInt(episodeComboBox.getValue())) {
-					previousFilePaths.add(tempPath);
-				} else {
-					filePaths.add(tempPath);
-				}
-			}
-		}
-		filePaths.addAll(previousFilePaths);
-		File file = M3UBuilder.buildFile(filePaths);
-		if (file != null) {
-			openFile(file.getAbsolutePath());
-		}
-	}
+	@FXML public void playSeason() { PlayMedia.playSeason(mediaItem, Integer.parseInt(seasonComboBox.getValue()), Integer.parseInt(episodeComboBox.getValue()));}
 
 	//create a m3u playlist of all path files, then play
 	//adds episodes before after the last episode so it plays in a loop starting with your chosen episode
-	@FXML public void playShow() {
-		List<String> previousFilePaths = new ArrayList<>();
-		List<String> filePaths = new ArrayList<>();
-		String tempPath;
-		for (int i = 1; i <= mediaItem.getNumSeasons(); ++i) {
-			for (int j = 1; j < mediaItem.getEpisodes(i).size(); ++j) {
-				tempPath = mediaItem.getFullFilePath(i, j);
-				//skip empty paths
-				if (!tempPath.isEmpty()) {
-					if (i <= Integer.parseInt(seasonComboBox.getValue()) && j < Integer.parseInt(episodeComboBox.getValue())) {
-						previousFilePaths.add(tempPath);
-					} else {
-						filePaths.add(tempPath);
-					}
-				}
-			}
-		}
-		filePaths.addAll(previousFilePaths);
-		File file = M3UBuilder.buildFile(filePaths);
-		if (file != null) {
-			openFile(file.getAbsolutePath());
-		}
-	}
-
-	private void openFile(String path) {
-		if (Desktop.isDesktopSupported()) {
-			try {
-				File file = new File(path);
-				Desktop.getDesktop().open(file);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.out.println("The filepath " + path + " is invalid.");
-			}
-		} else {
-			System.out.println("Unsupported OS, please post this bug and your OS at github");
-		}
-	}
+	@FXML public void playShow() { PlayMedia.playSeason(mediaItem, Integer.parseInt(seasonComboBox.getValue()), Integer.parseInt(episodeComboBox.getValue()), true);}
 	
 	@FXML public void playTrailer() {
 		if (videoLink==null || videoLink.isEmpty()) {

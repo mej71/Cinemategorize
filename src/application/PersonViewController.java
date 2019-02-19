@@ -25,7 +25,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 
 	private final int maxKnownMovies = 8;
 	//resize tiles to fill the space
-	private final float scaleWFactor = 0.83f;
+	private final float scaleWFactor = 0.7f;
 	private final float scaleHFactor = 0.7f;
 	
     
@@ -76,7 +76,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		knownComprator = (o1, o2) -> o2.getVoteAvg().compareTo(o1.getVoteAvg());
 		famousTilePane.setVgap(15*scaleHFactor);
 		famousTilePane.setHgap(10*scaleWFactor);
-		famousTilePane.setMaxHeight(208 * scaleHFactor * 2 + 15 * scaleHFactor * 2);
+		famousTilePane.setMaxHeight(JFXMediaRippler.baseHeight * scaleHFactor * 2 + 15 * scaleHFactor * 2 + JFXMediaRippler.bottomHeight * 2);
 		
 		knownForRipplers = new ArrayList<>();
 		JFXMediaRippler mRip;

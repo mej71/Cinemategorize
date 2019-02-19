@@ -32,6 +32,7 @@ public class UserDataHelper {
 		MovieResultsPage mRes;
 		Integer tvDistance = 100;
 		series = MediaSearchHandler.getTVInfo(tvParsedInfo[0]);
+
 		if (series != null) {
 			tvDistance = StringTools.getLevenshteinDistance(series.getName(), tvParsedInfo[0]);
 			if (tvDistance == series.getName().length()) {
@@ -56,14 +57,23 @@ public class UserDataHelper {
 			}
 		}
 		// if both results are really far off, we probably failed.  Use a temporary movie lookup to avoid errors
-		if (series == null &&  cm==null) { 		
+		if (series == null &&  cm==null) {
 			for (MediaItem m: ControllerMaster.userData.tempManualItems.keySet()) {
 				if (m.getFullFilePath().equals(file.getPath())) {
 					return false;
 				}
 			}
-			mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
-					Integer.parseInt(movieParsedInfo[1]));
+			//prefer tv in bad search results
+			if (tvParsedInfo[0] != null) {
+				tRes = MediaSearchHandler.getTvResults(tvParsedInfo[0]);
+				ControllerMaster.userData.tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(tRes));
+				return false;
+			} else if (movieParsedInfo[0] != null){
+				mRes = MediaSearchHandler.getMovieResults(movieParsedInfo[0],
+						Integer.parseInt(movieParsedInfo[1]));
+			} else {
+				mRes = MediaSearchHandler.getMovieResults(file.getName(), 0);
+			}
 			ControllerMaster.userData.tempManualItems.put(new MediaItem(null, null, file.getPath(), file.getName(), file.getParentFile().getName()), new MediaResultsPage(mRes));
 			return false;
 		} else if (series != null) {
