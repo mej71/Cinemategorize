@@ -30,8 +30,8 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	private JFXComboBox<Integer> episodeBox;
 	
 	
-	ResultCell(T item, ListFlowPane<ResultCell<T>, T> pane) {
-		super(item, pane);
+	ResultCell(T item) {
+		super(item);
 	}
 	
 	void setItem(T item) {
@@ -69,11 +69,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	        for (int i = 0; i < numRows; i++) {
 	        	
 	            RowConstraints rowConst = new RowConstraints();
-	            if (i==0) {
-	            	rowConst.setPercentHeight(15);
-	            } else {
-	            	rowConst.setPercentHeight(85.0 / (numRows-1));
-	            }
+				rowConst.setPercentHeight(100 / numRows);
 	            gridPane.getRowConstraints().add(rowConst);         
 	        }
 	        descLabel.setWrapText(true);
@@ -143,7 +139,6 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	
 	@Override 
 	protected void runOnClick() {
-		super.runOnClick();
 		ResultsMediaItem mi = getItem();
 		if (mi.isTvShow()) {
     		if (seasonBox.getValue() != null && seasonBox.getValue() > 0 &&
@@ -163,10 +158,10 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	}
 	
 
-	static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results, ListFlowPane<ResultCell<T>,T> pane) {
+	static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results) {
 		List<ResultCell<T>> cells = new ArrayList<>();
 		for (T result : results) {
-			cells.add(new ResultCell<>(result, pane));
+			cells.add(new ResultCell<>(result));
 		}
 		return cells;
 	}

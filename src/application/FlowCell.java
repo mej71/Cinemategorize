@@ -12,19 +12,23 @@ import javafx.scene.input.MouseEvent;
 public class FlowCell<T> extends Control {
 	
 	private static final String DEFAULT_STYLE_CLASS = "flow-cell";
-	
+	private ListFlowPane pane;
 	protected T item;
-	protected ListFlowPane pane;
 	protected EventHandler<MouseEvent> clickHandler = event -> runOnClick();
 	
-	public FlowCell(T item, ListFlowPane pane) {
+	public FlowCell(T item) {
 		super();
-		pane.addItem(item);
 		getStyleClass().add(DEFAULT_STYLE_CLASS);
 		this.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
 		this.item = item;
+	}
+
+	public void setPane(ListFlowPane pane) {
 		this.pane = pane;
-		updateItem();
+	}
+
+	public ListFlowPane getPane() {
+		return pane;
 	}
 	
 	@Override
@@ -36,14 +40,9 @@ public class FlowCell<T> extends Control {
 		return item;
 	}
 	
-	public ListFlowPane getPane() {
-		return pane;
-	}
-	
 	protected <R extends Node> void setGraphic(R graphic) {
 		this.getChildren().clear();
-		JFXRippler rippler = new JFXRippler(graphic);
-		this.getChildren().add(rippler);
+		this.getChildren().add(new JFXRippler(graphic));
 	}
 
 	private JFXRippler getGraphic() {
@@ -60,22 +59,8 @@ public class FlowCell<T> extends Control {
 
 	//update item
 	//super to automatically refresh selection handler
-	protected void updateItem() {
-		removeSelectionHandler();
-		addSelectionHandler();
-	}
-	
-	protected void addSelectionHandler() {
-		this.setOnMouseClicked(clickHandler);
-	}
-	
-	protected void removeSelectionHandler() {
-		this.removeEventHandler(MouseEvent.MOUSE_CLICKED, clickHandler);
-	}
-	
-	protected void runOnClick() {
-		//must select season & episode for tv
-    	getPane().selectCell(this);
-	}
+	protected void updateItem() {}
+
+	protected void runOnClick() {}
 	
 }

@@ -1,22 +1,19 @@
 package application;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class PlaylistCell<T extends MediaPlaylist> extends FlowCell<T> {
 
     static int prefCellHeight = 42;
 
-    PlaylistCell(T item, ListFlowPane<PlaylistCell<T>, T> pane) {
-        super(item, pane);
+    PlaylistCell(T item) {
+        super(item);
     }
 
     void setItem(T item) {
@@ -58,10 +55,10 @@ public class PlaylistCell<T extends MediaPlaylist> extends FlowCell<T> {
         }
     }
 
-    public static <T extends MediaPlaylist> List<PlaylistCell<T>> createCells(List<T> items, ListFlowPane<PlaylistCell<T>, T> pane) {
+    public static <T extends MediaPlaylist> List<PlaylistCell<T>> createCells(List<T> items) {
         List<PlaylistCell<T>> cells = new ArrayList<>();
         for (T item : items) {
-            cells.add(new PlaylistCell<>(item, pane));
+            cells.add(new PlaylistCell<>(item));
         }
         return cells;
     }

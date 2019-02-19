@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.File;
 import java.net.URL;
@@ -28,8 +29,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	@FXML private ScrollPane resultsScrollPane;
 	@FXML private ListFlowPane<ResultCell<ResultsMediaItem>, ResultsMediaItem> resultsFlowPane;
 	@FXML private Label noResultsLabel;
-	
-	private LinkedHashMap<MediaItem, MediaResultsPage> mediaList;
+
 	private int oldId = 0;
 	private int oldSeason = 0;
 	private int oldEpisode = 0;
@@ -42,10 +42,9 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		fileFlowPane.hasChanged.addListener((observable, oldValue, newValue) -> {
 			if (oldValue != newValue && newValue != null && newValue) {
 				fileFlowPane.setChanged(false);
-				resultsFlowPane.getChildren().clear();
-				MediaItem item = fileFlowPane.selectedCell.getItem();
-				if (mediaList.get(item) != null) {
-					resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(item).getResults(), resultsFlowPane));
+				if (fileFlowPane.getSelectedCell() != null) {
+					resultsFlowPane.clearCells();
+					resultsFlowPane.addCells(fileFlowPane.getSelectedCell().resultCells);
 					resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
 				}
 
@@ -71,21 +70,24 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	}
 
 	public void setData(LinkedHashMap<MediaItem, MediaResultsPage> mList) {
-		mediaList = mList;
-		fileFlowPane.getChildren().clear();
-		fileFlowPane.getChildren().addAll(FileCell.createCells(mediaList.keySet(), fileFlowPane));
+		fileFlowPane.clearCells();
+		FileCell cell;
+		for (MediaItem mi : mList.keySet()) {
+			cell = new FileCell(mi);
+			cell.mediaResultsPage = mList.get(mi);
+			cell.resultCells = ResultCell.createCells(cell.mediaResultsPage.getResults());
+			fileFlowPane.addCell(cell);
+		}
 		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * FileCell.prefCellHeight);
-		fileFlowPane.selectCell((FileCell<MediaItem>)fileFlowPane.getChildren().get(0));
+		fileFlowPane.selectCell(0);
+
+		System.out.println(fileFlowPane.getCells());
 	}
 	
 	@Override 
 	protected void runTasks() {
 		super.runTasks();
 		resetValidations();
-	}
-
-	void openDialog(JFXDialog dLink) {
-    	openDialog(dLink, 0, 0, 0);
 	}
 
 	public void openDialog(JFXDialog dLink, int oi, int seasonNum, int epNum) {
@@ -105,8 +107,6 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 				} else {
 					mi = ControllerMaster.userData.getMovieById(oldId);
 				}
-				boolean miIsMovie = mi.isMovie();
-				int miId = mi.getId();
 				for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
 					if (mi.equals(mik)) {
 						ControllerMaster.userData.tempManualItems.remove(mik);
@@ -142,15 +142,15 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	public void confirmMediaItem() {
 		JFXDialogLayout confirmLayout = new JFXDialogLayout();
 		String releaseDate = "";
-    	if (resultsFlowPane.selectedCell.getItem().getReleaseDate(false) != null && resultsFlowPane.selectedCell.getItem().getReleaseDate(false).length()>3) {
-    		releaseDate = " (" + resultsFlowPane.selectedCell.getItem().getReleaseDate(false).substring(0, 4) + ")";
+    	if (resultsFlowPane.getSelectedItem().getReleaseDate(false) != null && resultsFlowPane.getSelectedItem().getReleaseDate(false).length()>3) {
+    		releaseDate = " (" + resultsFlowPane.getSelectedItem().getReleaseDate(false).substring(0, 4) + ")";
     	} else {
     		releaseDate += " (N/A)";
 		}
-		String text = "The file\n" + fileFlowPane.selectedCell.getItem().getFullFilePath() + "\nis " + 
-				resultsFlowPane.selectedCell.getItem().getTitle(false) + releaseDate;
-		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
-			text += ": Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
+		String text = "The file\n" + fileFlowPane.getSelectedItem().getFullFilePath() + "\nis " +
+				resultsFlowPane.getSelectedItem().getTitle(false) + releaseDate;
+		if (!resultsFlowPane.getSelectedItem().isMovie()) {
+			text += ": Season " + resultsFlowPane.getSelectedCell().getSeason()  + " Episode " + resultsFlowPane.getSelectedCell().getEpisode();
 		} 
 		confirmLayout.setBody(new Label(text + "?"));
 		JFXDialog confirmDialog = new JFXDialog();
@@ -172,15 +172,15 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	public void informAlreadyOwns() {
 		JFXDialogLayout confirmLayout = new JFXDialogLayout();
 		String releaseDate = "";
-		if (resultsFlowPane.selectedCell.getItem().getReleaseDate(false) != null && resultsFlowPane.selectedCell.getItem().getReleaseDate(false).length()>3) {
-			releaseDate = " (" + resultsFlowPane.selectedCell.getItem().getReleaseDate(false).substring(0, 4) + ")";
+		if (resultsFlowPane.getSelectedItem().getReleaseDate(false) != null && resultsFlowPane.getSelectedItem().getReleaseDate(false).length()>3) {
+			releaseDate = " (" + resultsFlowPane.getSelectedItem().getReleaseDate(false).substring(0, 4) + ")";
 		} else {
 			releaseDate += " (N/A)";
 		}
 		String text = "The file item " +
-				resultsFlowPane.selectedCell.getItem().getTitle(false) + releaseDate;
-		if (!resultsFlowPane.selectedCell.getItem().isMovie()) {
-			text += ": Season " + resultsFlowPane.selectedCell.getSeason()  + " Episode " + resultsFlowPane.selectedCell.getEpisode();
+				resultsFlowPane.getSelectedItem().getTitle(false) + releaseDate;
+		if (!resultsFlowPane.getSelectedItem().isMovie()) {
+			text += ": Season " + resultsFlowPane.getSelectedCell().getSeason()  + " Episode " + resultsFlowPane.getSelectedCell().getEpisode();
 		}
 		confirmLayout.setBody(new Label(text + " is already owned.\nPlease select a different item or change that one first"));
 		JFXDialog confirmDialog = new JFXDialog();
@@ -197,8 +197,8 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 	
 	@FXML
 	public void addMediaItem() {
-		MediaItem fileItem = fileFlowPane.selectedCell.getItem();
-		ResultsMediaItem resultItem = resultsFlowPane.selectedCell.getItem();
+		MediaItem fileItem = fileFlowPane.getSelectedItem();
+		ResultsMediaItem resultItem = resultsFlowPane.getSelectedItem();
 
 		//if editing manually, remove old item
 		MediaItem mi;
@@ -236,7 +236,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 				break;
 			}
 		}
-		fileFlowPane.getChildren().remove(fileFlowPane.selectedCell);
+		fileFlowPane.removeCell(fileFlowPane.getSelectedCell());
 		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * FileCell.prefCellHeight);
 		
 		//refresh master view with new file
@@ -255,7 +255,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 				ControllerMaster.showSelectionDialog(mi);
 			}
 		} else {
-			fileFlowPane.selectedCell = (FileCell<MediaItem>)fileFlowPane.getChildren().get(0);
+			fileFlowPane.selectCell(0);
 			fileFlowPane.setChanged(true);
 		}
 	}
@@ -288,10 +288,12 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		} else if (mediaTypeComboBox.getValue()==MediaTypeOptions.TV_SHOW) { //tv show
 			mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(title));
 		}
-		mediaList.get(fileFlowPane.selectedCell.getItem()).setResults(mRes);
+		System.out.println(fileFlowPane.getSelectedCell());
+		fileFlowPane.getSelectedCell().mediaResultsPage.setResults(mRes);
+		fileFlowPane.getSelectedCell().resultCells = ResultCell.createCells(mRes.getResults());
 		Platform.runLater(() -> {
-			resultsFlowPane.getChildren().clear();
-			resultsFlowPane.getChildren().addAll(ResultCell.createCells(mediaList.get(fileFlowPane.selectedCell.getItem()).getResults(), resultsFlowPane));
+			resultsFlowPane.clearCells();
+			resultsFlowPane.addCells(fileFlowPane.getSelectedCell().resultCells);
 			resultsFlowPane.setPrefHeight(resultsFlowPane.getChildren().size() * ResultCell.prefCellHeight);
 			noResultsLabel.setVisible(resultsFlowPane.getChildren().size() == 0);
 		});

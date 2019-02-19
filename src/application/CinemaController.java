@@ -1,22 +1,12 @@
 package application;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXListCell;
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXPopup;
-import com.jfoenix.controls.JFXRippler;
-import com.jfoenix.controls.JFXSlider;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import info.movito.themoviedbapi.model.Collection;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -330,10 +320,17 @@ public class CinemaController implements Initializable {
 		playlistCombo.getItems().clear();
 		playlistCombo.setItems(FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists));
 	}
-	
+
+	//don't show collections with only one movie (setting maybe?)
 	public void updateCollectionCombo() {
 		collectionsCombo.getItems().clear();
-		collectionsCombo.setItems( FXCollections.observableArrayList(ControllerMaster.userData.ownedCollections.keySet()));
+		List<Collection> collections = new ArrayList<>();
+		for (Collection c : ControllerMaster.userData.ownedCollections.keySet()) {
+			if (ControllerMaster.userData.ownedCollections.get(c).size() >1) {
+				collections.add(c);
+			}
+		}
+		collectionsCombo.setItems( FXCollections.observableArrayList(collections));
 	}	
 
 	//make sure everything is loaded, then if the media list is empty force the player to add at least one item
@@ -350,13 +347,11 @@ public class CinemaController implements Initializable {
 						// opens InitialChooseDialogContent, and waits for user to add one to selection
 						if (ControllerMaster.userData.numMediaItems() == 0) {
 							ControllerMaster.addMediaDialogController.openDialogMenu(ControllerMaster.addMediaWindow, true);
-						} 
-						KeyCombination keyCombinationMac = new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
-				        KeyCombination keyCombinationWin = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+						}
 				        KeyCombination keyCombinationAdd = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
 				        newScene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-				            if (keyCombinationMac.match(event) || keyCombinationWin.match(event)) {
-				                ControllerMaster.userData.clearSaveData();
+				            if (event.getCode().equals(KeyCode.DOWN) && autoCompletePopup.isShowing()) {
+
 				            } else if (keyCombinationAdd.match(event)) {
 				            	ControllerMaster.showAddMediaDialog();
 				            }

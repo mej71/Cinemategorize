@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import info.movito.themoviedbapi.model.ContentRating;
-import info.movito.themoviedbapi.model.Credits;
-import info.movito.themoviedbapi.model.Genre;
-import info.movito.themoviedbapi.model.Video;
+import info.movito.themoviedbapi.model.*;
 import info.movito.themoviedbapi.model.keywords.Keyword;
+import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
@@ -332,4 +330,7 @@ public class CustomTvDb implements Serializable {
 		return series.getNumberOfEpisodes();
 	}
 
+	public List<Network> getNetworks() {
+		return series.getNetworks();
+	}
 }

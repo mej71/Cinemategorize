@@ -68,15 +68,15 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
     void updatePlaylists(boolean selectNew) {
         clearRipplers();
         playlistFlowPane.getChildren().clear();
-        playlistFlowPane.getChildren().addAll(PlaylistCell.createCells(ControllerMaster.userData.userPlaylists, playlistFlowPane));
+        playlistFlowPane.addCells(PlaylistCell.createCells(ControllerMaster.userData.userPlaylists));
         if (playlistFlowPane.getChildren().size() > 0) {
             noPlaylistsLabel.setVisible(false);
             playlistFlowPane.setPrefHeight(playlistFlowPane.getChildren().size() * PlaylistCell.prefCellHeight);
             if (selectNew) { //select the newest added
-                playlistFlowPane.selectCell((PlaylistCell<MediaPlaylist>) playlistFlowPane.getChildren().get(playlistFlowPane.getChildren().size()-1));
+                playlistFlowPane.selectCell(playlistFlowPane.getChildren().size()-1);
                 playlistScrollPane.setVvalue(1);
             } else {
-                playlistFlowPane.selectCell((PlaylistCell<MediaPlaylist>) playlistFlowPane.getChildren().get(0));
+                playlistFlowPane.selectCell(0);
                 playlistScrollPane.setVvalue(0);
             }
         } else {
@@ -86,8 +86,8 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
 
     public void updateRipplers() {
         clearRipplers();
-        for (int i = 0; i < playlistFlowPane.selectedCell.item.getItems().size(); ++i) {
-            tilePane.getChildren().add(ControllerMaster.mainController.addMediaTile(playlistFlowPane.selectedCell.item.getItems().get(i)));
+        for (int i = 0; i < playlistFlowPane.getSelectedItem().getItems().size(); ++i) {
+            tilePane.getChildren().add(ControllerMaster.mainController.addMediaTile(playlistFlowPane.getSelectedItem().getItems().get(i)));
         }
     }
 

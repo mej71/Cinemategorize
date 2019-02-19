@@ -142,14 +142,10 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	}
 
 	private void resetCreditTabs() {
-		dirFlowPane.getItems().clear();
-		writFlowPane.getItems().clear();
-		actFlowPane.getItems().clear();
-		prodFlowPane.getItems().clear();
-		dirFlowPane.getChildren().clear();
-		writFlowPane.getChildren().clear();
-		actFlowPane.getChildren().clear();
-		prodFlowPane.getChildren().clear();
+		dirFlowPane.clearCells();
+		writFlowPane.clearCells();
+		actFlowPane.clearCells();
+		prodFlowPane.clearCells();
 		dirScrollPane.setVvalue(0);
 		writScrollPane.setVvalue(0);
 		actScrollPane.setVvalue(0);
@@ -166,16 +162,15 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 
 
 	private void addToList(ListFlowPane<CreditCell<PersonCredit>, PersonCredit> listFlowPane, PersonCredit credit) {
-		listFlowPane.addItem(credit);
-		listFlowPane.getChildren().add(new CreditCell<>(credit, listFlowPane));
+		listFlowPane.addCell(new CreditCell<>(credit));
 		listFlowPane.setPrefHeight(listFlowPane.getChildren().size() * CreditCell.prefCellHeight);
 	}
 
 	private void enableTabs() {
-		directorTab.setDisable(dirFlowPane.getItems().size() == 0);
-		writerTab.setDisable(writFlowPane.getItems().size() == 0);
-		actorTab.setDisable(actFlowPane.getItems().size() == 0);
-		producerTab.setDisable(prodFlowPane.getItems().size() == 0);
+		directorTab.setDisable(dirFlowPane.getCells().size() == 0);
+		writerTab.setDisable(writFlowPane.getCells().size() == 0);
+		actorTab.setDisable(actFlowPane.getCells().size() == 0);
+		producerTab.setDisable(prodFlowPane.getCells().size() == 0);
 	}
 
 	private void setCredits() {

@@ -11,6 +11,7 @@ import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.ProductionCompany;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
+import info.movito.themoviedbapi.model.tv.Network;
 
 public class SearchItem {
 	public SearchTypes searchType;
@@ -21,6 +22,8 @@ public class SearchItem {
 	private Genre genre;
 	private PersonCrew writer;
 	private ProductionCompany company;
+	private Network network;
+	private int year;
 	
 	public SearchItem(SearchTypes type, Object obj) {
 		searchType = type;
@@ -46,6 +49,9 @@ public class SearchItem {
 		case COMPANY:
 			company = (ProductionCompany) obj;
 			break;
+		case NETWORK:
+			network = (Network) obj;
+			break;
 		default:
 			tag = obj.toString();
 			break;
@@ -69,6 +75,8 @@ public class SearchItem {
 			return writer;
 		case COMPANY:
 			return company;
+		case NETWORK:
+			return network;
 		default:
 			break;
 		}
@@ -91,6 +99,8 @@ public class SearchItem {
 			return writer.getName();
 		case COMPANY:
 			return company.getName();
+		case NETWORK:
+			return network.getName();
 		default:
 			break;
 		}
@@ -130,7 +140,7 @@ public class SearchItem {
 			tvList.addAll(userData.getTvWithWriter(writer));
 			break;
 		case COMPANY:
-
+			movieList.addAll(userData.getMoviesWithProductionCompany(company));
 			break;
 		default:
 			break;
@@ -154,6 +164,8 @@ public class SearchItem {
 		DIRECTOR,
 		ACTOR, 
 		WRITER,
-		COMPANY
+		COMPANY,
+		NETWORK,
+		YEAR
 	}
 }

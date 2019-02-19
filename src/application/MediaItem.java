@@ -7,16 +7,12 @@ import java.util.List;
 
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 
-import info.movito.themoviedbapi.model.Collection;
-import info.movito.themoviedbapi.model.ContentRating;
-import info.movito.themoviedbapi.model.Credits;
-import info.movito.themoviedbapi.model.Genre;
-import info.movito.themoviedbapi.model.ReleaseInfo;
-import info.movito.themoviedbapi.model.Video;
+import info.movito.themoviedbapi.model.*;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
+import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
@@ -517,6 +513,22 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 			return new ArrayList<>();
 		} else {
 			return tvShow.getContentRating();
+		}
+	}
+
+	public List<ProductionCompany> getProductionCompanies() {
+		if (isMovie()) {
+			return cMovie.getProductionCompanies();
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	public List<Network> getNetworks() {
+		if (isMovie()) {
+			return null;
+		} else {
+			return tvShow.getNetworks();
 		}
 	}
 }

@@ -13,10 +13,11 @@ import javafx.scene.layout.HBox;
 public class FileCell<T extends MediaItem> extends FlowCell<T> {
 	
 	static int prefCellHeight = 55;
+
+	public MediaResultsPage mediaResultsPage;
+	public List<ResultCell<ResultsMediaItem>> resultCells;
 	
-	FileCell(T item, ListFlowPane<FileCell<T>, T> pane) {
-		super(item, pane);
-	}
+	FileCell(T item) { super(item); }
 	
 	@Override
 	public void updateItem() {
@@ -39,10 +40,10 @@ public class FileCell<T extends MediaItem> extends FlowCell<T> {
 		} 
 	}
 	
-	public static <T extends MediaItem> List<FileCell<T>> createCells(Set<T> items, ListFlowPane<FileCell<T>, T> pane) {
+	public static <T extends MediaItem> List<FileCell<T>> createCells(Set<T> items) {
 		List<FileCell<T>> cells = new ArrayList<>();
 		for (T item : items) {
-			cells.add(new FileCell<>(item, pane));
+			cells.add(new FileCell<>(item));
 		}
 		return cells;		
 	}

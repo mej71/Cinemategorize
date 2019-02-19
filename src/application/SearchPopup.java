@@ -26,8 +26,8 @@ public class SearchPopup extends JFXPopup {
     }
 
     void setItems(List<SearchItem> items) {
-        searchFlowPane.getChildren().clear();
-        searchFlowPane.getChildren().addAll(SearchCell.createCells(items, searchFlowPane));
+        searchFlowPane.clearCells();
+        searchFlowPane.addCells(SearchCell.createCells(items));
         searchFlowPane.setPrefHeight(searchFlowPane.getChildren().size() * SearchCell.prefCellHeight);
     }
 

@@ -3,12 +3,7 @@ package application;
 import java.io.Serializable;
 import java.util.List;
 
-import info.movito.themoviedbapi.model.Collection;
-import info.movito.themoviedbapi.model.Credits;
-import info.movito.themoviedbapi.model.Genre;
-import info.movito.themoviedbapi.model.MovieDb;
-import info.movito.themoviedbapi.model.ReleaseInfo;
-import info.movito.themoviedbapi.model.Video;
+import info.movito.themoviedbapi.model.*;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
@@ -79,8 +74,7 @@ public class CustomMovieDb implements Serializable {
 		return movie.getVoteAverage();
 	}
 
-	
-
-	
-	
+    public List<ProductionCompany> getProductionCompanies() {
+		return movie.getProductionCompanies();
+    }
 }

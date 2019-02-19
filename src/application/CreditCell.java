@@ -110,8 +110,8 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 		return title + year + role;
     }
 	
-	CreditCell(T item, ListFlowPane<CreditCell<T>, T> pane) {
-		super(item, pane);
+	CreditCell(T item) {
+		super(item);
 		if (gridPane == null) {
 			init();
 		}
@@ -146,7 +146,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	@Override
 	protected void updateItem() {
 		super.updateItem();
-		if (item != null) {
+		if (item != null && getPane() != null) {
 			HBox hbox = new HBox();
 			hbox.setPrefHeight(prefCellHeight);
 			hbox.setMaxHeight(prefCellHeight);
@@ -171,7 +171,6 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 	
 	@Override
 	protected void runOnClick() {
-		super.runOnClick();
 		if (item.getMediaType().equalsIgnoreCase("TV") &&  ControllerMaster.userData.ownsShow(item.getId())) {
 			ControllerMaster.showSelectionDialog( ControllerMaster.userData.getTvById(item.getMediaId()) );
 		}
@@ -180,10 +179,10 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 		}
 	}
 	
-	public static <T extends PersonCredit> List<CreditCell<T>> createCells(List<T> credits, ListFlowPane<CreditCell<T>,T> pane) {
+	public static <T extends PersonCredit> List<CreditCell<T>> createCells(List<T> credits) {
 		List<CreditCell<T>> cells = new ArrayList<>();
 		for (T credit : credits) {
-			cells.add(new CreditCell<>(credit, pane));
+			cells.add(new CreditCell<>(credit));
 		}
 		return cells;
 		

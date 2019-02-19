@@ -2,11 +2,11 @@ package application;
 
 import application.SearchItem.SearchTypes;
 import info.movito.themoviedbapi.TmdbApi;
+import info.movito.themoviedbapi.model.*;
 import info.movito.themoviedbapi.model.Collection;
-import info.movito.themoviedbapi.model.Genre;
-import info.movito.themoviedbapi.model.MovieDb;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.*;
+import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvSeries;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +37,8 @@ class UserData implements Serializable {
 	private LinkedHashMap<PersonCrew, LinkedHashMap<String, List<Integer>>> writerList = new LinkedHashMap<>();
 	private LinkedHashMap<PersonCast, LinkedHashMap<String, List<Integer>>> actorList = new LinkedHashMap<>();
 	private LinkedHashMap<Genre, LinkedHashMap<String, List<Integer>>> genreList = new LinkedHashMap<>();
+	private LinkedHashMap<ProductionCompany, LinkedHashMap<String, List<Integer>>> companyList = new LinkedHashMap<>();
+	private LinkedHashMap<Network, LinkedHashMap<String, List<Integer>>> networkList = new LinkedHashMap<>();
 	private LinkedHashMap<Integer, PersonPeople> personList = new LinkedHashMap<>();
 	private LinkedHashMap<Integer, PersonCredits> creditsList = new LinkedHashMap<>();
 	private List<String> allPaths = new ArrayList<>();
@@ -212,6 +214,21 @@ class UserData implements Serializable {
 		}
 		return new ArrayList<>();
 	}
+
+	//Movies have production companies, tv shows have networks
+	public List<Integer> getMoviesWithProductionCompany(ProductionCompany company) {
+		if (companyList.containsKey(company) && companyList.get(company).get(movieIdentifier) != null && !companyList.get(company).get(movieIdentifier).isEmpty()) {
+			return companyList.get(company).get(movieIdentifier);
+		}
+		return new ArrayList<>();
+	}
+
+	public List<Integer> getTvWithNetwork(Network network) {
+		if (networkList.containsKey(network) && networkList.get(network).get(tvIdentifier) != null && !networkList.get(network).get(tvIdentifier).isEmpty()) {
+			return networkList.get(network).get(tvIdentifier);
+		}
+		return new ArrayList<>();
+	}
 	
 	public boolean ownsMovie(int iD) {
 		for (int i = 0; i < getAllMedia().size(); ++i) {
@@ -360,6 +377,7 @@ class UserData implements Serializable {
 
 	public List<SearchItem> getAutoCompleteItems(String userInput) {
 		List<SearchItem> suggestions = new ArrayList<>();
+		userInput = userInput.trim(); //remove whitespace
 		boolean detailedLength = userInput.length() > 1;
 		if (userInput.equals("")) {
 			return suggestions;
@@ -367,50 +385,98 @@ class UserData implements Serializable {
 		userInput = quoteRegExSpecialChars(userInput); // escape special characters so users can search literally
 		Pattern pattern = Pattern.compile("(?i)(^|\\s|\\()" + userInput);
 		Matcher matcher = pattern.matcher("");
+		int titleMatchLimiter = 5;
 		for (int i = 0; i < getAllMedia().size(); ++i) {
 			matcher.reset(getAllMedia().get(i).getItemName());
 			if (matcher.find()) {
 				suggestions.add(new SearchItem(SearchTypes.TITLE, getAllMedia().get(i)));
+				if (suggestions.size() == titleMatchLimiter) {
+					break;
+				}
 			}
 		}
-		Collections.addAll(suggestions, addGenreSuggestion(genreList.keySet(), pattern, matcher));
+		Collections.addAll(suggestions, addGenreSuggestion(genreList.keySet(), matcher));
 		if (detailedLength || suggestions.size()==0) {
-			Collections.addAll(suggestions, addTagSuggestion(mediaTags.keySet(), pattern, matcher));
-			Collections.addAll(suggestions, addPeopleSuggestion(directorList.keySet(), pattern, matcher, SearchTypes.DIRECTOR));
-			Collections.addAll(suggestions, addPeopleSuggestion(actorList.keySet(), pattern, matcher, SearchTypes.ACTOR));
-			Collections.addAll(suggestions, addPeopleSuggestion(writerList.keySet(), pattern, matcher, SearchTypes.WRITER));
+			Collections.addAll(suggestions, addTagSuggestion(mediaTags.keySet(), matcher));
+			Collections.addAll(suggestions, addPeopleSuggestion(directorList.keySet(), matcher, SearchTypes.DIRECTOR));
+			Collections.addAll(suggestions, addPeopleSuggestion(actorList.keySet(), matcher, SearchTypes.ACTOR));
+			Collections.addAll(suggestions, addPeopleSuggestion(writerList.keySet(), matcher, SearchTypes.WRITER));
+			Collections.addAll(suggestions, addProductionCompanySuggestion(companyList.keySet(), matcher));
+			Collections.addAll(suggestions, addNetworkSuggestion(networkList.keySet(), matcher));
 		}
 		return suggestions;
 	}
 
-	public SearchItem[] addGenreSuggestion(Set<Genre> set, Pattern pattern, Matcher matcher) {
+	public SearchItem[] addGenreSuggestion(Set<Genre> set, Matcher matcher) {
 		List<SearchItem> suggestions = new ArrayList<>();
+		int matchLimit = 2;
 		for (Genre t : set) {
 			matcher.reset(t.getName());
 			if (matcher.find()) {
 				suggestions.add(new SearchItem(SearchTypes.GENRE, t));
+				if (suggestions.size() == matchLimit) {
+					break;
+				}
 			}
 		}
 		return suggestions.toArray(new SearchItem[suggestions.size()]);
 	}
 	
-	public SearchItem[]  addTagSuggestion(Set<String> set, Pattern pattern, Matcher matcher) {
+	public SearchItem[]  addTagSuggestion(Set<String> set, Matcher matcher) {
+		int matchLimit = 3;
 		List<SearchItem> suggestions = new ArrayList<>();
 		for (String t : set) {
 			matcher.reset(t);
 			if (matcher.find()) {
 				suggestions.add(new SearchItem(SearchTypes.TAG, t));
+				if (suggestions.size() == matchLimit) {
+					break;
+				}
 			}
 		}
 		return suggestions.toArray(new SearchItem[suggestions.size()]);
 	}
 	
-	public <T extends Person> SearchItem[]  addPeopleSuggestion(Set<T> set, Pattern pattern, Matcher matcher, SearchTypes type) {
+	public <T extends Person> SearchItem[]  addPeopleSuggestion(Set<T> set, Matcher matcher, SearchTypes type) {
+		int matchLimit = 3;
 		List<SearchItem> suggestions = new ArrayList<>();
 		for (T t : set) {
 			matcher.reset(t.getName());
 			if (matcher.find()) {
 				suggestions.add(new SearchItem(type, t));
+				if (suggestions.size() == matchLimit) {
+					break;
+				}
+			}
+		}
+		return suggestions.toArray(new SearchItem[suggestions.size()]);
+	}
+
+	public SearchItem[] addProductionCompanySuggestion(Set<ProductionCompany> set, Matcher matcher) {
+		int matchLimit = 3;
+		List<SearchItem> suggestions = new ArrayList<>();
+		for (ProductionCompany t : set) {
+			matcher.reset(t.getName());
+			if (matcher.find()) {
+				suggestions.add(new SearchItem(SearchTypes.COMPANY, t));
+				if (suggestions.size() == matchLimit) {
+					break;
+				}
+			}
+		}
+		return suggestions.toArray(new SearchItem[suggestions.size()]);
+	}
+
+	public SearchItem[] addNetworkSuggestion(Set<Network> set, Matcher matcher) {
+		int matchLimit = 3;
+		List<SearchItem> suggestions = new ArrayList<>();
+		for (Network t : set) {
+			matcher.reset(t.getName());
+			if (matcher.find()) {
+				suggestions.add(new SearchItem(SearchTypes.NETWORK, t));
+				if (suggestions.size() == matchLimit) {
+					break;
+				}
 			}
 		}
 		return suggestions.toArray(new SearchItem[suggestions.size()]);
@@ -444,6 +510,14 @@ class UserData implements Serializable {
 
 	void addGenre(Genre g, int mId, boolean isMovie) {
 		addToList(genreList, g, mId, isMovie);
+	}
+
+	void addProductionCompany(ProductionCompany company, int mId, boolean isMovie) {
+		addToList(companyList, company, mId,isMovie );
+	}
+
+	void addNetwork(Network network, int mId, boolean isMovie) {
+		addToList(networkList, network, mId,isMovie );
 	}
 	
 	<T> void addToList(LinkedHashMap<T, LinkedHashMap<String, List<Integer>>> list, T g, int mId, boolean isMovie) {

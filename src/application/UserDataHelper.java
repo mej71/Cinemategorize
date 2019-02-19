@@ -10,10 +10,12 @@ import java.util.List;
 
 import info.movito.themoviedbapi.TvResultsPage;
 import info.movito.themoviedbapi.model.Genre;
+import info.movito.themoviedbapi.model.ProductionCompany;
 import info.movito.themoviedbapi.model.core.MovieResultsPage;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
+import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 
 public class UserDataHelper {
@@ -183,6 +185,18 @@ public class UserDataHelper {
 		if (genres != null) {
 			for (int i = 0; i < genres.size(); ++i) {
 				ControllerMaster.userData.addGenre(genres.get(i), mi.getId(), isMovie);
+			}
+		}
+		List<ProductionCompany> companies = mi.getProductionCompanies();
+		if (companies != null) {
+			for (int i = 0; i < companies.size(); ++i) {
+				ControllerMaster.userData.addProductionCompany(companies.get(i), mi.getId(), isMovie);
+			}
+		}
+		List<Network> networks = mi.getNetworks();
+		if (networks != null) {
+			for (int i = 0; i < networks.size(); ++i) {
+				ControllerMaster.userData.addNetwork(networks.get(i), mi.getId(), isMovie);
 			}
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 

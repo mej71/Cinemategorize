@@ -16,18 +16,62 @@ import javafx.scene.layout.FlowPane;
 
 public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 	private SimpleBooleanProperty changed = new SimpleBooleanProperty(false);
-	private List<R> allItems = new ArrayList<>();
-	public BooleanBinding hasChanged = Bindings.createBooleanBinding(() -> changed.getValue(), changed);	
-	public T selectedCell = null;
-	
-	public List<R> getItems() {
-		return allItems;
+	public BooleanBinding hasChanged = Bindings.createBooleanBinding(() -> changed.getValue(), changed);
+	public int selectedIndex = -1;
+	private List<T> cells;
+
+	public ListFlowPane() {
+		super();
+		cells = new ArrayList<>();
 	}
-	
-	public void addItem(R r) {
-		if (!allItems.contains(r)) {
-			allItems.add(r);
+
+	public void addCell(T newCell) {
+		newCell.setPane(this);
+		cells.add(newCell);
+		this.getChildren().add(newCell);
+		newCell.setOnMouseClicked(e -> {
+			selectCell(cells.indexOf(newCell));
+			newCell.runOnClick();
+			//don't consume, flow cells have their own properties
+		});
+		newCell.updateItem();
+	}
+
+	public void addCells(List<T> newCells) {
+		for (T t: newCells) {
+			addCell(t);
 		}
+	}
+
+	public void clearCells() {
+		if (selectedIndex > -1 && selectedIndex < cells.size()) {
+			deselectCell(cells.get(selectedIndex));
+		}
+		cells.clear();
+		this.getChildren().clear();
+	}
+
+	void removeCell(T cell) {
+		cells.remove(cell);
+		this.getChildren().remove(cell);
+	}
+
+	public List<T> getCells() {
+		return cells;
+	}
+
+	public T getSelectedCell() {
+		if (selectedIndex > -1 && selectedIndex < cells.size()) {
+			return cells.get(selectedIndex);
+		}
+		return null;
+	}
+
+	public R getSelectedItem() {
+		if (selectedIndex > -1 && selectedIndex < cells.size()) {
+			return cells.get(selectedIndex).getItem();
+		}
+		return null;
 	}
 	
 	public void setChanged(boolean b) {
@@ -35,18 +79,23 @@ public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 	}
 	
 	//highlights cell, but doesn't trigger click.  Use for external selection to prevent null selections
-	public void selectCell(T cell) {
-		if (selectedCell == cell) {
+	public void selectCell(int newIndex) {
+		if (newIndex == selectedIndex) {
 			return;
 		}
-		if (selectedCell != null) {
-    		selectedCell.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
-    	}
-		selectedCell = cell;
-		if (selectedCell != null) {
-			selectedCell.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), true);
+		//deselect old cell
+		if (selectedIndex > -1 && selectedIndex < cells.size()) {
+			deselectCell(cells.get(selectedIndex));
 		}
+		if (newIndex > -1 && newIndex < cells.size()) {
+			cells.get(newIndex).pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), true);
+		}
+		selectedIndex = newIndex;
 		setChanged(true);
+	}
+
+	public void deselectCell(T cell) {
+		cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
 	}
 	
 	//binding should be done in initialization
