@@ -1,5 +1,8 @@
-package application;
+package application.controllers;
 
+import application.ControllerMaster;
+import application.UserDataHelper;
+import application.controls.EscapableBase;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
@@ -18,12 +21,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class AddMediaDialogController extends EscapableBase implements Initializable {
 
-	static ExtensionFilter extFilter = new ExtensionFilter("Video files", ControllerMaster.mainController.supportedFileTypes);
+	private static final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
+
+	public static ExtensionFilter extFilter = new ExtensionFilter("Video files", AddMediaDialogController.supportedFileTypes);
 
 	@FXML private JFXDialogLayout dialogLayout;
 	@FXML private Label welcomeLabel;
@@ -61,24 +65,18 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 		updateLayout();
 		
 		dLink.show();
-		chooseFileButton.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if (newValue != oldValue) {
-					if (oldValue && !chooseFolderButton.isFocused()) {
-						chooseFolderButton.requestFocus();
-					}
+		chooseFileButton.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != oldValue) {
+				if (oldValue && !chooseFolderButton.isFocused()) {
+					chooseFolderButton.requestFocus();
 				}
 			}
 		});
 
-		chooseFolderButton.focusedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				if (newValue != oldValue) {
-					if (oldValue && !chooseFileButton.isFocused()) {
-						chooseFileButton.requestFocus();
-					}
+		chooseFolderButton.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != oldValue) {
+				if (oldValue && !chooseFileButton.isFocused()) {
+					chooseFileButton.requestFocus();
 				}
 			}
 		});
@@ -137,7 +135,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	}
 	
 	//bind progress bar and label, start the task, and handle the logic after trying
-	public void setupTaskHandlers() {
+	private void setupTaskHandlers() {
 		progressBar.progressProperty().bind(lookupTask.workDoneProperty());
 	    progressLabel.textProperty().bind(lookupTask.messageProperty());
 	    dLink.setOverlayClose(false);
@@ -153,8 +151,8 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 			}
 			updateLayout();
 			//if unknown items were found, open manual lookup, if not and some items are owned, close
-			if (ControllerMaster.userData.tempManualItems.size() > 0) {
-				ControllerMaster.showManualLookupDialog(ControllerMaster.userData.tempManualItems);
+			if (ControllerMaster.userData.getTempManualSize() > 0) {
+				ControllerMaster.userData.showTempManualItems();
 			} else {
 				if (ControllerMaster.userData.numMediaItems() > 0) {
 					preventEscape = false;
@@ -231,7 +229,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 	}
 	
 	//minimalistic layout handler based on the enum UIMode
-	public void updateLayout() {
+	private void updateLayout() {
 		welcomeLabel.setVisible(uiMode ==  UIMode.INITIAL);
 		addLabel.setVisible(uiMode ==  UIMode.DEFAULT);
 		cancelLabel.setVisible(uiMode == UIMode.ERRORED);

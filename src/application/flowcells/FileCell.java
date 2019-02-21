@@ -1,9 +1,12 @@
-package application;
+package application.flowcells;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import application.mediainfo.MediaItem;
+import application.mediainfo.MediaResultsPage;
+import application.mediainfo.ResultsMediaItem;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -11,13 +14,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 public class FileCell<T extends MediaItem> extends FlowCell<T> {
-	
-	static int prefCellHeight = 55;
+
+	public static int prefCellHeight = 55;
 
 	public MediaResultsPage mediaResultsPage;
 	public List<ResultCell<ResultsMediaItem>> resultCells;
-	
-	FileCell(T item) { super(item); }
+
+	public FileCell(T item) { super(item); }
 	
 	@Override
 	public void updateItem() {

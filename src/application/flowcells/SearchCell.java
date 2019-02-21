@@ -1,5 +1,9 @@
-package application;
+package application.flowcells;
 
+import application.ControllerMaster;
+import application.mediainfo.MediaItem;
+import application.MediaSearchHandler;
+import application.SearchItem;
 import info.movito.themoviedbapi.model.people.PersonCast;
 import info.movito.themoviedbapi.model.people.PersonCrew;
 import javafx.geometry.Pos;
@@ -14,12 +18,12 @@ import java.util.List;
 
 public class SearchCell<T extends SearchItem> extends FlowCell<T> {
 
-    static final String NAME_CLASS = "cell-name-text";
-    static final String SUB_CLASS = "cell-sub-text";
-    static int prefCellHeight = 36;
+    private static final String NAME_CLASS = "cell-name-text";
+    private static final String SUB_CLASS = "cell-sub-text";
+    public static int prefCellHeight = 36;
     private static final int imageSize = 32;
 
-    public SearchCell(T item){ super(item); }
+    private SearchCell(T item){ super(item); }
 
     @Override
     public void updateItem(){
@@ -83,7 +87,7 @@ public class SearchCell<T extends SearchItem> extends FlowCell<T> {
         ControllerMaster.mainController.autoSelection = item;
         ControllerMaster.mainController.refreshSearch();
         ControllerMaster.mainController.tempStopSearchDelay = true;
-        ControllerMaster.mainController.searchField.setText(item.getItemName());
+        ControllerMaster.mainController.getSearchField().setText(item.getItemName());
         ControllerMaster.mainController.autoCompletePopup.hide();
         ControllerMaster.mainController.tempStopSearchDelay = false;
     }

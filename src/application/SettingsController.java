@@ -3,12 +3,11 @@ package application;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import application.controls.EscapableBase;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXToggleButton;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -43,20 +42,16 @@ public class SettingsController extends EscapableBase implements Initializable {
 			
 		});
 		
-		autoLookupToggle.selectedProperty().addListener((observable, oldVal, newVal) -> {
-			if (newVal != null) {
-				ControllerMaster.userData.useAutoLookup = newVal;
-			}
-		});
+		autoLookupToggle.selectedProperty().addListener((observable, oldVal, newVal) -> ControllerMaster.userData.setUseAutoLookup(newVal));
 		
 	}
 
 	public void show(JFXDialog d) {
 		super.setDialogLink(d);
-		autoLookupToggle.setSelected(ControllerMaster.userData.useAutoLookup);
+		autoLookupToggle.setSelected(ControllerMaster.userData.isUseAutoLookup());
 		//load user selection, if values have changed then use default theme
-		if (themeComboBox.getItems().contains(ControllerMaster.userData.themeSelection)) {
-			themeComboBox.getSelectionModel().select(ControllerMaster.userData.themeSelection);
+		if (themeComboBox.getItems().contains(ControllerMaster.userData.getThemeSelection())) {
+			themeComboBox.getSelectionModel().select(ControllerMaster.userData.getThemeSelection());
 		} else {
 			themeComboBox.getSelectionModel().select(0);
 		}

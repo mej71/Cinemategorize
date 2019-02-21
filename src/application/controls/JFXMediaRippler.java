@@ -1,4 +1,4 @@
-package application;
+package application.controls;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import application.*;
+import application.mediainfo.MediaItem;
 import info.movito.themoviedbapi.model.people.PersonCast;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.layout.*;
 import org.controlsfx.control.PopOver;
@@ -31,7 +31,7 @@ import javax.imageio.ImageIO;
 public class JFXMediaRippler extends JFXRippler { 
 
 	public final static int baseHeight = 208;
-	public final static int baseWidth = 139;
+	private final static int baseWidth = 139;
 	public final static int bottomHeight = 38;
 
 	private static GridPane gridPane;
@@ -147,14 +147,11 @@ public class JFXMediaRippler extends JFXRippler {
 		this.playIcon = playIcon;
 		this.nameLabel = nameLabel;
 		this.setFocusTraversable(true);
-		this.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue != oldValue) {
-                    updateScale();
-                }
-            }
-        });
+		this.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != oldValue) {
+				updateScale();
+			}
+		});
 	}
 
 	@Override
@@ -235,7 +232,7 @@ public class JFXMediaRippler extends JFXRippler {
 
 	}
 
-	void updateFavoriteIcon() {
+	private void updateFavoriteIcon() {
 		String heartName = (ControllerMaster.userData.favoritesContains(linkedItem))? "heart.png" : "empty_heart.png";
 		URL url = MediaSearchHandler.class.getClassLoader().getResource(heartName);
 		try {

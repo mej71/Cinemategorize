@@ -1,4 +1,4 @@
-package application;
+package application.flowcells;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import javafx.scene.layout.FlowPane;
 public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 	private SimpleBooleanProperty changed = new SimpleBooleanProperty(false);
 	public BooleanBinding hasChanged = Bindings.createBooleanBinding(() -> changed.getValue(), changed);
-	public int selectedIndex = -1;
+	private int selectedIndex = -1;
 	private List<T> cells;
 
 	public ListFlowPane() {
@@ -51,7 +51,7 @@ public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 		this.getChildren().clear();
 	}
 
-	void removeCell(T cell) {
+	public void removeCell(T cell) {
 		cells.remove(cell);
 		this.getChildren().remove(cell);
 	}
@@ -94,7 +94,7 @@ public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 		setChanged(true);
 	}
 
-	public void deselectCell(T cell) {
+	private void deselectCell(T cell) {
 		cell.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
 	}
 	
@@ -108,7 +108,7 @@ public class ListFlowPane<T extends FlowCell<R>, R> extends FlowPane{
 		}
 	}
 	
-	public void setupScrollPane(ScrollPane sp) {
+	private void setupScrollPane(ScrollPane sp) {
 		sp.setHbarPolicy(ScrollBarPolicy.NEVER);
 		JFXScrollPane.smoothScrolling(sp);
 	}

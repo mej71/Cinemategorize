@@ -3,7 +3,6 @@ package application;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ThemeSelection implements Serializable {
 		
@@ -14,19 +13,14 @@ public class ThemeSelection implements Serializable {
 	//set new theme and refresh css
 	//just refresh if theme is null (used for inital loading)
 	public static void updateTheme(ThemeSelection theme) {
-		if (theme != null) {
-			//remove last stylesheet so small modifications aren't overridden by it
-			ControllerMaster.mainController.cinemaScene.getStylesheets().remove(Objects.requireNonNull(theme.getClass().getClassLoader().getResource(ControllerMaster.userData.themeSelection.getFileName())).toExternalForm());
-			ControllerMaster.userData.themeSelection = theme;
-		}
-		ControllerMaster.mainController.cinemaScene.getStylesheets().add(Objects.requireNonNull(ControllerMaster.userData.getClass().getClassLoader().getResource(ControllerMaster.userData.themeSelection.getFileName())).toExternalForm());
+		ControllerMaster.userData.setTheme(theme);
 	}
 	
 	private static final long serialVersionUID = 1L;
 	private String themeName;
 	private String fileName;
 	
-	public ThemeSelection(String tn, String fn) {
+	private ThemeSelection(String tn, String fn) {
 		setThemeName(tn);
 		setFileName(fn);
 	}
@@ -35,7 +29,7 @@ public class ThemeSelection implements Serializable {
 		return themeName;
 	}
 
-	public void setThemeName(String themeName) {
+	private void setThemeName(String themeName) {
 		this.themeName = themeName;
 	}
 
@@ -43,7 +37,7 @@ public class ThemeSelection implements Serializable {
 		return fileName;
 	}
 
-	public void setFileName(String fileName) {
+	private void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 }

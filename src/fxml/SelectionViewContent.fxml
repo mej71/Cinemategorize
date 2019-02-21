@@ -34,14 +34,14 @@
         <RowConstraints percentHeight="12.0" />
         <RowConstraints fillHeight="false" percentHeight="10.0" />
     </rowConstraints>
-   <StackPane fx:id="imageStackPane" minHeight="0.0" minWidth="0.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="3" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
-      <children>
-          <ImageView fx:id="posterImageView" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
-      </children>
-      <GridPane.margin>
-         <Insets right="10.0" />
-      </GridPane.margin>
-   </StackPane>
+    <StackPane fx:id="imageStackPane" minHeight="0.0" minWidth="0.0" GridPane.columnIndex="1" GridPane.columnSpan="2"
+               GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="3"
+               GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+        <GridPane.margin>
+            <Insets right="10.0"/>
+        </GridPane.margin>
+        <ImageView fx:id="posterImageView" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER"/>
+    </StackPane>
     <Rating fx:id="rating" maxHeight="-Infinity" minHeight="-Infinity" partialRating="true" prefHeight="36.0" rating="2.5" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
         <cursor>
           <Cursor fx:constant="HAND" />
@@ -115,11 +115,10 @@
             <JFXHamburger styleClass="jfx-options-burger" />
         </StackPane>
     </JFXRippler>
-   <HBox alignment="CENTER_RIGHT" spacing="5.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5">
-      <children>
-          <Label text="Rating: " HBox.hgrow="ALWAYS" />
-          <Label fx:id="ratingLabel" minHeight="-Infinity" styleClass="rating-label" text="Label" HBox.hgrow="ALWAYS" />
-      </children></HBox>
+    <HBox alignment="CENTER_RIGHT" spacing="5.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5">
+        <Label text="Rating: " HBox.hgrow="ALWAYS"/>
+        <Label fx:id="ratingLabel" minHeight="-Infinity" styleClass="rating-label" text="Label" HBox.hgrow="ALWAYS"/>
+    </HBox>
     <StackPane fx:id="overlayPane" disable="true" visible="false" GridPane.columnSpan="3" GridPane.rowSpan="6">
         <JFXSpinner fx:id="progressSpinner" StackPane.alignment="CENTER" />
     </StackPane>

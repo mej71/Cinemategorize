@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import info.movito.themoviedbapi.TmdbCompany;
+import application.mediainfo.MediaItem;
 import info.movito.themoviedbapi.model.Genre;
 import info.movito.themoviedbapi.model.ProductionCompany;
 import info.movito.themoviedbapi.model.people.PersonCast;

@@ -1,5 +1,8 @@
-package application;
+package application.controllers;
 
+import application.*;
+import application.controls.JFXMediaRippler;
+import application.mediainfo.MediaItem;
 import com.jfoenix.controls.*;
 import info.movito.themoviedbapi.model.Collection;
 import javafx.animation.PauseTransition;
@@ -33,8 +36,10 @@ public class CinemaController implements Initializable {
 	// local content
 	@FXML StackPane backgroundStackPane;
 	@FXML StackPane stackPane;
-	@FXML GridPane mainGrid;	
 	@FXML
+	private GridPane mainGrid;
+	@FXML
+	private
 	JFXComboBox<SortTypes> sortCombo;
 	@FXML
 	JFXTextField searchField;
@@ -47,20 +52,24 @@ public class CinemaController implements Initializable {
 	@FXML private JFXButton playlistClearButton;
 	@FXML private JFXButton collectionsClearButton;
 
-	@FXML JFXComboBox<Integer> startYearComboBox;
-	@FXML JFXComboBox<Integer> endYearComboBox;
-	@FXML JFXComboBox<MediaPlaylist> playlistCombo;
-	@FXML JFXComboBox<Collection> collectionsCombo;
-	@FXML JFXComboBox<MediaListDisplayType> mediaTypeCombo;
+	@FXML
+	private JFXComboBox<Integer> startYearComboBox;
+	@FXML
+	private JFXComboBox<Integer> endYearComboBox;
+	@FXML
+	private JFXComboBox<MediaPlaylist> playlistCombo;
+	@FXML
+	private JFXComboBox<Collection> collectionsCombo;
+	@FXML
+	private JFXComboBox<MediaListDisplayType> mediaTypeCombo;
 	@FXML private JFXRippler optionsRippler;
 
 	private Window window;
 	private JFXListView optionList;
 
 	public TilePane tilePane;	
-	public MovieScrollPane scrollPane;
+	private MovieScrollPane scrollPane;
 	// other variables
-	public final String[] supportedFileTypes = { "*.mp4", "*.avi", "*.wmv", "*.flv", "*.mov", "*.mkv" };
 	public List<JFXMediaRippler> allTiles = new ArrayList<>();
 	public LinkedHashMap<String, MediaItem> showingMedia = new LinkedHashMap<>();
 	public SearchPopup autoCompletePopup;
@@ -74,22 +83,22 @@ public class CinemaController implements Initializable {
 	public void initialize(URL url, ResourceBundle rb) {
 		ControllerMaster.mainController = this;
 		
-		mainGrid.prefWidthProperty().bind(backgroundStackPane.widthProperty());
-		mainGrid.prefHeightProperty().bind(backgroundStackPane.heightProperty());
+		getMainGrid().prefWidthProperty().bind(backgroundStackPane.widthProperty());
+		getMainGrid().prefHeightProperty().bind(backgroundStackPane.heightProperty());
 		
-		mediaTypeCombo.getItems().clear();
-		mediaTypeCombo.setItems(FXCollections.observableArrayList( MediaListDisplayType.values()));
-		mediaTypeCombo.setValue(MediaListDisplayType.ALL);
-		mediaTypeCombo.valueProperty().addListener((ov, oldVal, newVal) -> refreshSearch());
+		getMediaTypeCombo().getItems().clear();
+		getMediaTypeCombo().setItems(FXCollections.observableArrayList( MediaListDisplayType.values()));
+		getMediaTypeCombo().setValue(MediaListDisplayType.ALL);
+		getMediaTypeCombo().valueProperty().addListener((ov, oldVal, newVal) -> refreshSearch());
 		
-		sortCombo.getItems().clear();
-		sortCombo.setItems(FXCollections.observableArrayList( SortTypes.values()));
-		sortCombo.setValue(SortTypes.NAME_ASC);
-		sortCombo.valueProperty().addListener((arg0, arg1, arg2) -> ControllerMaster.userData.sortShownItems());
+		getSortCombo().getItems().clear();
+		getSortCombo().setItems(FXCollections.observableArrayList( SortTypes.values()));
+		getSortCombo().setValue(SortTypes.NAME_ASC);
+		getSortCombo().valueProperty().addListener((arg0, arg1, arg2) -> ControllerMaster.userData.sortShownItems());
 		
 		updatePlaylistCombo();
-		playlistCombo.setCellFactory(param -> new PlaylistComboCell());
-		playlistCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+		getPlaylistCombo().setCellFactory(param -> new PlaylistComboCell());
+		getPlaylistCombo().valueProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue!=null) {
 				playlistClearButton.setVisible(true);
 			} else {
@@ -99,8 +108,8 @@ public class CinemaController implements Initializable {
 		});
 
 		updateCollectionCombo();
-		collectionsCombo.setCellFactory(param -> new CollectionComboCell());
-		collectionsCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+		getCollectionsCombo().setCellFactory(param -> new CollectionComboCell());
+		getCollectionsCombo().valueProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue!=null) {
 				collectionsClearButton.setVisible(true);
 			} else {
@@ -108,7 +117,7 @@ public class CinemaController implements Initializable {
 			}
 			refreshSearch();
 		});
-		collectionsCombo.setConverter(new StringConverter<Collection>() {
+		getCollectionsCombo().setConverter(new StringConverter<Collection>() {
 
 			@Override
 			public String toString(Collection object) {
@@ -163,12 +172,12 @@ public class CinemaController implements Initializable {
             }
 		});
 	    
-	    fillYearCombos(ControllerMaster.userData.minYear, ControllerMaster.userData.maxYear);
+	    fillYearCombos(ControllerMaster.userData.getMinYear(), ControllerMaster.userData.getMaxYear());
 	    //date range validation
-	    startYearComboBox.valueProperty().addListener((ov, oldValue, newValue) -> {
+	    getStartYearComboBox().valueProperty().addListener((ov, oldValue, newValue) -> {
 			if (newValue!=null) {
-				if (endYearComboBox.getValue() != null  && newValue > endYearComboBox.getValue()) {
-					endYearComboBox.getSelectionModel().clearSelection();
+				if (getEndYearComboBox().getValue() != null  && newValue > getEndYearComboBox().getValue()) {
+					getEndYearComboBox().getSelectionModel().clearSelection();
 				}
 				startDateClearButton.setVisible(true);
             } else {
@@ -177,10 +186,10 @@ public class CinemaController implements Initializable {
 			refreshSearch();
 		});
 
-	    endYearComboBox.valueProperty().addListener((ov, oldValue, newValue) -> {
+	    getEndYearComboBox().valueProperty().addListener((ov, oldValue, newValue) -> {
 			if (newValue!=null) {
-				if (startYearComboBox.getValue()!=null && newValue < startYearComboBox.getValue()) {
-					startYearComboBox.getSelectionModel().clearSelection();
+				if (getStartYearComboBox().getValue()!=null && newValue < getStartYearComboBox().getValue()) {
+					getStartYearComboBox().getSelectionModel().clearSelection();
 				}
 				    endDateClearButton.setVisible(true);
                 } else {
@@ -214,14 +223,12 @@ public class CinemaController implements Initializable {
 							ControllerMaster.showSettingsDialog();
 							break;
 						case ABOUT:
-							showAboutDialog();
+							//show about dialog
 							break;
 						default:
 							break;
 					}
-					Platform.runLater(() ->{
-						optionsPopup.hide();
-					});
+					Platform.runLater(optionsPopup::hide);
 				}
 			}
 		});
@@ -240,23 +247,27 @@ public class CinemaController implements Initializable {
 	}
 	
 	@FXML private void clearStartDate() {
-		startYearComboBox.getSelectionModel().clearSelection();
-		mainGrid.requestFocus();
+		getStartYearComboBox().getSelectionModel().clearSelection();
+		getMainGrid().requestFocus();
 	}
 	
 	@FXML private void clearEndDate() {
-		endYearComboBox.getSelectionModel().clearSelection();
-		mainGrid.requestFocus();
+		getEndYearComboBox().getSelectionModel().clearSelection();
+		getMainGrid().requestFocus();
 	}
 	
 	@FXML public void clearPlaylistSelection() {
-		playlistCombo.getSelectionModel().clearSelection();
-		mainGrid.requestFocus();
+		getPlaylistCombo().getSelectionModel().clearSelection();
+		getMainGrid().requestFocus();
 	}
 	
 	@FXML public void clearCollectionSelection() {
-		collectionsCombo.getSelectionModel().clearSelection();
-		mainGrid.requestFocus();
+		getCollectionsCombo().getSelectionModel().clearSelection();
+		getMainGrid().requestFocus();
+	}
+
+	public JFXTextField getSearchField() {
+		return searchField;
 	}
 
 	private void updateAutoComplete(String oldText) {
@@ -308,34 +319,34 @@ public class CinemaController implements Initializable {
 	}
 	
 	public void fillYearCombos(int minYear, int maxYear) {
-		startYearComboBox.setItems(
+		getStartYearComboBox().setItems(
 				FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
 	    );  
-	    endYearComboBox.setItems(
+	    getEndYearComboBox().setItems(
 	    		FXCollections.observableArrayList(IntStream.rangeClosed(minYear,maxYear).boxed().collect(Collectors.toList()))
 	    ); 
 	}
 
 	public void updatePlaylistCombo() {
 		playlistCombo.getItems().clear();
-		playlistCombo.setItems(FXCollections.observableArrayList(ControllerMaster.userData.userPlaylists));
+		playlistCombo.setItems(FXCollections.observableArrayList(ControllerMaster.userData.getUserPlaylists()));
 	}
 
 	//don't show collections with only one movie (setting maybe?)
 	public void updateCollectionCombo() {
-		collectionsCombo.getItems().clear();
+		getCollectionsCombo().getItems().clear();
 		List<Collection> collections = new ArrayList<>();
-		for (Collection c : ControllerMaster.userData.ownedCollections.keySet()) {
-			if (ControllerMaster.userData.ownedCollections.get(c).size() >1) {
+		for (Collection c : ControllerMaster.userData.getOwnedCollections().keySet()) {
+			if (ControllerMaster.userData.getOwnedCollections().get(c).size() > 1) {
 				collections.add(c);
 			}
 		}
-		collectionsCombo.setItems( FXCollections.observableArrayList(collections));
+		collectionsCombo.setItems(FXCollections.observableArrayList(collections));
 	}	
 
 	//make sure everything is loaded, then if the media list is empty force the player to add at least one item
 	private void determinePrimaryStage() {
-		mainGrid.sceneProperty().addListener((observableScene, oldScene, newScene) -> {
+		getMainGrid().sceneProperty().addListener((observableScene, oldScene, newScene) -> {
 			if (oldScene == null && newScene != null) {
 				cinemaScene = newScene;
 				ThemeSelection.updateTheme(null);
@@ -346,13 +357,12 @@ public class CinemaController implements Initializable {
 						// if no directories to search, user must select at least one
 						// opens InitialChooseDialogContent, and waits for user to add one to selection
 						if (ControllerMaster.userData.numMediaItems() == 0) {
-							ControllerMaster.addMediaDialogController.openDialogMenu(ControllerMaster.addMediaWindow, true);
+							ControllerMaster.showAddMediaDialog();
 						}
 				        KeyCombination keyCombinationAdd = new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
 				        newScene.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-				            if (event.getCode().equals(KeyCode.DOWN) && autoCompletePopup.isShowing()) {
-
-				            } else if (keyCombinationAdd.match(event)) {
+				            //more key combos here
+				        	if (keyCombinationAdd.match(event)) {
 				            	ControllerMaster.showAddMediaDialog();
 				            }
 				        });
@@ -364,18 +374,6 @@ public class CinemaController implements Initializable {
 		});
 	}
 	
-	public Window getMainWindow() {
-		return window;
-	}
-
-
-
-	@FXML
-	public void showAboutDialog() {
-
-	}
-	
-	
 	//create pane for the media
 	public JFXMediaRippler addMediaTile(MediaItem mediaObject) {
 		JFXMediaRippler rippler = JFXMediaRippler.createBasicRippler(scrollPane);
@@ -383,7 +381,7 @@ public class CinemaController implements Initializable {
 		return rippler;
 	}
 	
-	public void createAllRipplers() {
+	private void createAllRipplers() {
 		for (int i = 0; i < ControllerMaster.userData.getAllMedia().size(); ++i) {
 			allTiles.add(ControllerMaster.mainController.addMediaTile(ControllerMaster.userData.getAllMedia().get(i)));
 		}
@@ -393,8 +391,62 @@ public class CinemaController implements Initializable {
 		return backgroundStackPane;
 	}
 
-	
-	
+	public JFXComboBox<Integer> getStartYearComboBox() {
+		return startYearComboBox;
+	}
+
+	public void setStartYearComboBox(JFXComboBox<Integer> startYearComboBox) {
+		this.startYearComboBox = startYearComboBox;
+	}
+
+	public JFXComboBox<Integer> getEndYearComboBox() {
+		return endYearComboBox;
+	}
+
+	public void setEndYearComboBox(JFXComboBox<Integer> endYearComboBox) {
+		this.endYearComboBox = endYearComboBox;
+	}
+
+	public JFXComboBox<MediaPlaylist> getPlaylistCombo() {
+		return playlistCombo;
+	}
+
+	public void setPlaylistCombo(JFXComboBox<MediaPlaylist> playlistCombo) {
+		this.playlistCombo = playlistCombo;
+	}
+
+	public JFXComboBox<Collection> getCollectionsCombo() {
+		return collectionsCombo;
+	}
+
+	public void setCollectionsCombo(JFXComboBox<Collection> collectionsCombo) {
+		this.collectionsCombo = collectionsCombo;
+	}
+
+	public JFXComboBox<MediaListDisplayType> getMediaTypeCombo() {
+		return mediaTypeCombo;
+	}
+
+	public void setMediaTypeCombo(JFXComboBox<MediaListDisplayType> mediaTypeCombo) {
+		this.mediaTypeCombo = mediaTypeCombo;
+	}
+
+	public JFXComboBox<SortTypes> getSortCombo() {
+		return sortCombo;
+	}
+
+	public void setSortCombo(JFXComboBox<SortTypes> sortCombo) {
+		this.sortCombo = sortCombo;
+	}
+
+	public GridPane getMainGrid() {
+		return mainGrid;
+	}
+
+	public void setMainGrid(GridPane mainGrid) {
+		this.mainGrid = mainGrid;
+	}
+
 	public enum SortTypes {
 		NAME_ASC("Name (Asc)"),
 		NAME_DESC("Name (Desc)"),
@@ -402,7 +454,6 @@ public class CinemaController implements Initializable {
 		RELEASE_DATE_DESC("Release Date (Desc)"),
 		ADDED_DATE_ASC("Added Date (Asc)"),
 		ADDED_DATE_DESC("Added Date (Desc)");
-		
 		
 		private final String toString;
 		

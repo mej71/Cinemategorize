@@ -18,7 +18,7 @@ public class SelectionOptions {
         return options;
     }
 
-    static List<SelectionOptionTitles> getBaseOptions() {
+    private static List<SelectionOptionTitles> getBaseOptions() {
         List<SelectionOptionTitles> options = new ArrayList<>();
         options.add(SelectionOptionTitles.ADDTOPLAYLIST);
         options.add(SelectionOptionTitles.CHANGELOCATION);

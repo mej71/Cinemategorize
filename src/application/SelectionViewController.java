@@ -1,5 +1,12 @@
 package application;
 
+import application.controllers.AddMediaDialogController;
+import application.controls.JFXCustomChips;
+import application.controls.JFXPersonRippler;
+import application.controls.LoadingControllerBase;
+import application.mediainfo.FilePathInfo;
+import application.mediainfo.MediaItem;
+import application.mediainfo.MediaResultsPage;
 import com.jfoenix.controls.*;
 import info.movito.themoviedbapi.model.ContentRating;
 import info.movito.themoviedbapi.model.ReleaseDate;
@@ -179,8 +186,8 @@ public class SelectionViewController extends LoadingControllerBase implements In
 								mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(mediaItem.getTitle(false)));
 							}
 							MediaItem tempItem = new MediaItem(mediaItem.tvShow, mediaItem.cMovie, mediaItem.getFullFilePath(), mediaItem.getFileName(), mediaItem.getFolder());
-							ControllerMaster.userData.tempManualItems.put(tempItem, mRes);
-                        	ControllerMaster.showManualLookupDialog(ControllerMaster.userData.tempManualItems, mediaItem.getId(), getSelectedSeason(), getSelectedEpisode());
+							ControllerMaster.userData.addTempManualItem(tempItem, mRes);
+                            ControllerMaster.userData.showTempManualItems(mediaItem.getId(), getSelectedSeason(), getSelectedEpisode());
                             break;
                         case REMOVEEPISODE:
 							confirmDelete("Are you sure you want to delete " + mediaItem.getTitle() + "?\nYou cannot undo this action",true);
@@ -192,15 +199,13 @@ public class SelectionViewController extends LoadingControllerBase implements In
                         default:
                              break;
                     }
-                    Platform.runLater(() ->{
-                        optionsPopup.hide();
-                    });
+                    Platform.runLater(() -> optionsPopup.hide());
                 }
             }
         });
 	}
 
-	public void confirmDelete(String message, boolean episodeOnly) {
+	private void confirmDelete(String message, boolean episodeOnly) {
 		JFXDialogLayout confirmLayout = new JFXDialogLayout();
 		confirmLayout.setBody(new Label(message));
 		JFXDialog confirmDialog = new JFXDialog();
@@ -238,7 +243,7 @@ public class SelectionViewController extends LoadingControllerBase implements In
 		return (mediaItem.isTvShow())? Integer.parseInt(episodeComboBox.getValue()) : 0;
 	}
 
-	void updateComboBoxes() {
+	private void updateComboBoxes() {
 		seasonComboBox.getItems().clear();
 		for (Integer i : mediaItem.tvShow.getOwnedSeasonNumbers()) {
 			seasonComboBox.getItems().add(i.toString());
@@ -264,8 +269,8 @@ public class SelectionViewController extends LoadingControllerBase implements In
 				PersonViewController personViewController = loader.getController();
 				personViewDialog = new JFXDialog(ControllerMaster.mainController.getBackgroundStackPane(), personView,
 						JFXDialog.DialogTransition.CENTER);
-				personView.prefWidthProperty().bind(ControllerMaster.mainController.mainGrid.widthProperty().divide(1.35));
-				personView.prefHeightProperty().bind(ControllerMaster.mainController.mainGrid.heightProperty().divide(1.15));
+				personView.prefWidthProperty().bind(ControllerMaster.mainController.getMainGrid().widthProperty().divide(1.35));
+				personView.prefHeightProperty().bind(ControllerMaster.mainController.getMainGrid().heightProperty().divide(1.15));
 				JFXPersonRippler.setStaticVariables(personViewController, personViewDialog);
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -2,6 +2,7 @@ package application;
 
 import java.util.List;
 
+import application.mediainfo.MediaItem;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;

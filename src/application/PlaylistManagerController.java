@@ -1,5 +1,8 @@
 package application;
 
+import application.flowcells.ListFlowPane;
+import application.flowcells.PlaylistCell;
+import application.controls.EscapableBase;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
@@ -50,9 +53,7 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
         movieScrollPane.getStyleClass().add("movie-scroll-pane");
         stackPane.getChildren().add(movieScrollPane);
         addPlaylistButton.setDisable(true);
-        playlistNameField.textProperty().addListener(observable -> {
-            addPlaylistButton.setDisable(playlistNameField.getText().isEmpty() || playlistNameField.getText().equals(""));
-        });
+        playlistNameField.textProperty().addListener(observable -> addPlaylistButton.setDisable(playlistNameField.getText().isEmpty() || playlistNameField.getText().equals("")));
     }
 
     void show(JFXDialog dialog) {
@@ -61,14 +62,14 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
         dLink.show();
     }
 
-    void updatePlaylists() {
+    private void updatePlaylists() {
         updatePlaylists(false);
     }
 
-    void updatePlaylists(boolean selectNew) {
+    private void updatePlaylists(boolean selectNew) {
         clearRipplers();
         playlistFlowPane.getChildren().clear();
-        playlistFlowPane.addCells(PlaylistCell.createCells(ControllerMaster.userData.userPlaylists));
+        playlistFlowPane.addCells(ControllerMaster.userData.createPlaylistCells());
         if (playlistFlowPane.getChildren().size() > 0) {
             noPlaylistsLabel.setVisible(false);
             playlistFlowPane.setPrefHeight(playlistFlowPane.getChildren().size() * PlaylistCell.prefCellHeight);
@@ -84,19 +85,19 @@ public class PlaylistManagerController extends EscapableBase implements Initiali
         }
     }
 
-    public void updateRipplers() {
+    private void updateRipplers() {
         clearRipplers();
         for (int i = 0; i < playlistFlowPane.getSelectedItem().getItems().size(); ++i) {
             tilePane.getChildren().add(ControllerMaster.mainController.addMediaTile(playlistFlowPane.getSelectedItem().getItems().get(i)));
         }
     }
 
-    void clearRipplers() {
+    private void clearRipplers() {
         tilePane.getChildren().clear();
     }
 
     @FXML public void createNewPlaylist() {
-        ControllerMaster.userData.userPlaylists.add(new MediaPlaylist(playlistNameField.getText()));
+        ControllerMaster.userData.addUserPlaylist(new MediaPlaylist(playlistNameField.getText()));
         updatePlaylists(true);
         playlistNameField.clear();
     }

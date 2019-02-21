@@ -1,4 +1,4 @@
-package application;
+package application.flowcells;
 
 import com.jfoenix.controls.JFXRippler;
 import javafx.css.PseudoClass;
@@ -9,14 +9,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Skin;
 import javafx.scene.input.MouseEvent;
 
-public class FlowCell<T> extends Control {
+class FlowCell<T> extends Control {
 	
 	private static final String DEFAULT_STYLE_CLASS = "flow-cell";
 	private ListFlowPane pane;
-	protected T item;
+	T item;
 	protected EventHandler<MouseEvent> clickHandler = event -> runOnClick();
 	
-	public FlowCell(T item) {
+	FlowCell(T item) {
 		super();
 		getStyleClass().add(DEFAULT_STYLE_CLASS);
 		this.pseudoClassStateChanged(PseudoClass.getPseudoClass("selected"), false);
@@ -27,7 +27,7 @@ public class FlowCell<T> extends Control {
 		this.pane = pane;
 	}
 
-	public ListFlowPane getPane() {
+	ListFlowPane getPane() {
 		return pane;
 	}
 	
@@ -40,7 +40,7 @@ public class FlowCell<T> extends Control {
 		return item;
 	}
 	
-	protected <R extends Node> void setGraphic(R graphic) {
+	<R extends Node> void setGraphic(R graphic) {
 		this.getChildren().clear();
 		this.getChildren().add(new JFXRippler(graphic));
 	}
@@ -59,8 +59,8 @@ public class FlowCell<T> extends Control {
 
 	//update item
 	//super to automatically refresh selection handler
-	protected void updateItem() {}
+    void updateItem() {}
 
-	protected void runOnClick() {}
+	void runOnClick() {}
 	
 }

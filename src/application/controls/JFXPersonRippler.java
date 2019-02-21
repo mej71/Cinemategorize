@@ -1,5 +1,8 @@
-package application;
+package application.controls;
 
+import application.mediainfo.MediaItem;
+import application.MediaSearchHandler;
+import application.PersonViewController;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXRippler;
 
@@ -11,7 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Paint;
 
 public class JFXPersonRippler<T extends Person> extends JFXRippler { 
 	
@@ -51,7 +53,7 @@ public class JFXPersonRippler<T extends Person> extends JFXRippler {
 		return rippler;
 	}
 	
-	public JFXPersonRippler(Node control, Label label, ImageView iView){
+	private JFXPersonRippler(Node control, Label label, ImageView iView){
 		super(control, RipplerMask.RECT, RipplerPos.FRONT);
 		control.getStyleClass().add("selectable");
 		control.setPickOnBounds(false);

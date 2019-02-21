@@ -1,5 +1,12 @@
 package application;
 
+import application.flowcells.FileCell;
+import application.flowcells.ListFlowPane;
+import application.flowcells.ResultCell;
+import application.controls.LoadingControllerBase;
+import application.mediainfo.MediaItem;
+import application.mediainfo.MediaResultsPage;
+import application.mediainfo.ResultsMediaItem;
 import com.jfoenix.controls.*;
 import com.jfoenix.controls.JFXDialog.DialogTransition;
 import com.jfoenix.validation.RequiredFieldValidator;
@@ -11,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.File;
 import java.net.URL;
@@ -97,7 +103,7 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		oldEpisode = epNum;
 		dLink.setOnDialogClosed(event -> {
 			if (ControllerMaster.userData.numMediaItems() > 0) {
-				ControllerMaster.addMediaWindow.close();
+				ControllerMaster.closeAddMediaWindow();
 			}
 			//remove manual edits
 			if (oldId != 0) {
@@ -107,19 +113,13 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 				} else {
 					mi = ControllerMaster.userData.getMovieById(oldId);
 				}
-				for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
-					if (mi.equals(mik)) {
-						ControllerMaster.userData.tempManualItems.remove(mik);
-						break;
-					}
-				}
-
+				ControllerMaster.userData.removeTempManualItem(mi);
 			}
 		});
 		dLink.show();
 	}
 	
-	public void resetValidations() {
+	private void resetValidations() {
 		titleField.resetValidation();
 	}
 	
@@ -188,15 +188,13 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		confirmDialog.setContent(confirmLayout);
 		confirmDialog.setTransitionType(DialogTransition.CENTER);
 		JFXButton okayButton = new JFXButton("Okay");
-		okayButton.setOnAction(event -> {
-			confirmDialog.close();
-		});
+		okayButton.setOnAction(event -> confirmDialog.close());
 		confirmLayout.setActions(okayButton);
 		confirmDialog.show();
 	}
 	
 	@FXML
-	public void addMediaItem() {
+	private void addMediaItem() {
 		MediaItem fileItem = fileFlowPane.getSelectedItem();
 		ResultsMediaItem resultItem = resultsFlowPane.getSelectedItem();
 
@@ -230,12 +228,8 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		}
 		
 		//cleanup
-		for (MediaItem mik : ControllerMaster.userData.tempManualItems.keySet()) {
-			if (mik.getTempFilePath().equals(fileItem.getTempFilePath())) {
-				ControllerMaster.userData.tempManualItems.remove(mik);
-				break;
-			}
-		}
+		ControllerMaster.userData.removeTempManualItem(fileItem.getTempFilePath());
+
 		fileFlowPane.removeCell(fileFlowPane.getSelectedCell());
 		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * FileCell.prefCellHeight);
 		

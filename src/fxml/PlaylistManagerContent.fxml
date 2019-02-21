@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import application.ListFlowPane?>
+<?import application.flowcells.ListFlowPane?>
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
@@ -11,41 +11,44 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-<GridPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PlaylistManagerController">
-   <rowConstraints>
-      <RowConstraints minHeight="10.0" percentHeight="10.0" />
-      <RowConstraints minHeight="10.0" percentHeight="7.0" />
-      <RowConstraints minHeight="10.0" percentHeight="83.0" prefHeight="30.0" />
-   </rowConstraints>
-   <columnConstraints>
-      <ColumnConstraints minWidth="10.0" percentWidth="100.0" />
-      <ColumnConstraints minWidth="10.0" percentWidth="100.0" prefWidth="100.0" />
-   </columnConstraints>
-   <children>
-      <Label styleClass="header" text="Playlists" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-      <ScrollPane fx:id="playlistScrollPane" fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="2">
-        <content>
-            <ListFlowPane fx:id="playlistFlowPane" orientation="VERTICAL" />
-        </content>
-         <GridPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" />
-         </GridPane.margin>
-      </ScrollPane>
-      <StackPane fx:id="stackPane" prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" />
-         </GridPane.margin>
-      </StackPane>
-      <JFXButton fx:id="addPlaylistButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#createNewPlaylist" styleClass="add-button" text="Button" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-         <GridPane.margin>
-            <Insets bottom="2.0" right="2.0" />
-         </GridPane.margin></JFXButton>
-      <Label fx:id="noPlaylistsLabel" text="No Playlists Created" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="2" GridPane.valignment="CENTER" />
-      <Label fx:id="emptyPlaylistLabel" text="No Items In Playlist" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-      <JFXTextField fx:id="playlistNameField" promptText="Create New Playlist" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="5.0" right="30.0" />
-         </GridPane.margin>
-      </JFXTextField>
-   </children>
+<GridPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PlaylistManagerController">
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" percentHeight="10.0"/>
+        <RowConstraints minHeight="10.0" percentHeight="7.0"/>
+        <RowConstraints minHeight="10.0" percentHeight="83.0" prefHeight="30.0"/>
+    </rowConstraints>
+    <columnConstraints>
+        <ColumnConstraints minWidth="10.0" percentWidth="100.0"/>
+        <ColumnConstraints minWidth="10.0" percentWidth="100.0" prefWidth="100.0"/>
+    </columnConstraints>
+    <Label styleClass="header" text="Playlists" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+           GridPane.valignment="CENTER"/>
+    <ScrollPane fx:id="playlistScrollPane" fitToWidth="true" hbarPolicy="NEVER" GridPane.rowIndex="2">
+        <GridPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0"/>
+        </GridPane.margin>
+        <ListFlowPane fx:id="playlistFlowPane" orientation="VERTICAL"/>
+    </ScrollPane>
+    <StackPane fx:id="stackPane" prefHeight="150.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <GridPane.margin>
+          <Insets bottom="5.0" left="5.0" right="5.0"/>
+        </GridPane.margin>
+    </StackPane>
+    <JFXButton fx:id="addPlaylistButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
+               onAction="#createNewPlaylist" styleClass="add-button" text="Button" GridPane.halignment="RIGHT"
+               GridPane.rowIndex="1" GridPane.valignment="CENTER">
+        <GridPane.margin>
+          <Insets bottom="2.0" right="2.0"/>
+        </GridPane.margin>
+    </JFXButton>
+    <Label fx:id="noPlaylistsLabel" text="No Playlists Created" GridPane.halignment="CENTER" GridPane.rowIndex="1"
+           GridPane.rowSpan="2" GridPane.valignment="CENTER"/>
+    <Label fx:id="emptyPlaylistLabel" text="No Items In Playlist" GridPane.columnIndex="1" GridPane.halignment="CENTER"
+           GridPane.rowIndex="2" GridPane.valignment="CENTER"/>
+    <JFXTextField fx:id="playlistNameField" promptText="Create New Playlist" GridPane.rowIndex="1">
+        <GridPane.margin>
+          <Insets left="5.0" right="30.0"/>
+        </GridPane.margin>
+    </JFXTextField>
 </GridPane>

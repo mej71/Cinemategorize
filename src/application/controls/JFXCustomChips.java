@@ -1,5 +1,7 @@
-package application;
+package application.controls;
 
+import application.ControllerMaster;
+import application.SearchItem;
 import application.SearchItem.SearchTypes;
 import com.jfoenix.controls.JFXRippler;
 import info.movito.themoviedbapi.model.Genre;
@@ -8,7 +10,7 @@ import javafx.scene.layout.HBox;
 
 public class JFXCustomChips {
 	
-	static JFXRippler getGenreChip(Genre g) {
+	public static JFXRippler getGenreChip(Genre g) {
 
 
         Label label = new Label(g.getName());
@@ -22,7 +24,7 @@ public class JFXCustomChips {
 			ControllerMaster.mainController.autoSelection = new SearchItem(SearchTypes.GENRE, g);
 			ControllerMaster.mainController.refreshSearch();
 			ControllerMaster.mainController.tempStopSearchDelay = true;
-			ControllerMaster.mainController.searchField.setText(g.getName());
+			ControllerMaster.mainController.getSearchField().setText(g.getName());
 			ControllerMaster.mainController.autoCompletePopup.hide();
 			ControllerMaster.mainController.tempStopSearchDelay = false;
 			ControllerMaster.closeDialogs();
@@ -31,7 +33,7 @@ public class JFXCustomChips {
         return rippler;
 	}
 	
-	static JFXRippler getTagChip(String tag) {
+	public static JFXRippler getTagChip(String tag) {
         Label label = new Label(tag);
         label.setWrapText(true);
         label.getStyleClass().add("tag-chip-label");
@@ -43,7 +45,7 @@ public class JFXCustomChips {
 			ControllerMaster.mainController.autoSelection = new SearchItem(SearchTypes.TAG, tag);
 			ControllerMaster.mainController.refreshSearch();
 			ControllerMaster.mainController.tempStopSearchDelay = true;
-			ControllerMaster.mainController.searchField.setText(tag);
+			ControllerMaster.mainController.getSearchField().setText(tag);
 			ControllerMaster.mainController.autoCompletePopup.hide();
 			ControllerMaster.mainController.tempStopSearchDelay = false;
 			ControllerMaster.closeDialogs();

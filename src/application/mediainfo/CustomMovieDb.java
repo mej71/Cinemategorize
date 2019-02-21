@@ -1,4 +1,4 @@
-package application;
+package application.mediainfo;
 
 import java.io.Serializable;
 import java.util.List;

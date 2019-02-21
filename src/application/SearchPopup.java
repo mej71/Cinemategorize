@@ -1,7 +1,8 @@
 package application;
 
+import application.flowcells.ListFlowPane;
+import application.flowcells.SearchCell;
 import com.jfoenix.controls.JFXPopup;
-import com.jfoenix.skins.JFXPopupSkin;
 import javafx.scene.control.ScrollPane;
 
 import java.util.List;
@@ -25,17 +26,17 @@ public class SearchPopup extends JFXPopup {
         this.setPopupContent(searchScrollPane);
     }
 
-    void setItems(List<SearchItem> items) {
+    public void setItems(List<SearchItem> items) {
         searchFlowPane.clearCells();
         searchFlowPane.addCells(SearchCell.createCells(items));
         searchFlowPane.setPrefHeight(searchFlowPane.getChildren().size() * SearchCell.prefCellHeight);
     }
 
-    boolean isEmpty(){
+    public boolean isEmpty(){
         return searchFlowPane.getChildren().isEmpty();
     }
 
-    void clearItems(){
+    public void clearItems(){
         searchFlowPane.getChildren().clear();
     }
 

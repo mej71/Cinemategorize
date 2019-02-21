@@ -3,7 +3,7 @@ package application;
 import java.io.*;
 import java.util.List;
 
-public class M3UBuilder {
+class M3UBuilder {
 
     public static File buildFile(List<String> items) {
         if (items.isEmpty()) {

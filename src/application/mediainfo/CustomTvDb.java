@@ -1,10 +1,12 @@
-package application;
+package application.mediainfo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import application.ControllerMaster;
+import application.MediaSearchHandler;
 import info.movito.themoviedbapi.model.*;
 import info.movito.themoviedbapi.model.keywords.Keyword;
 import info.movito.themoviedbapi.model.tv.Network;
@@ -47,7 +49,7 @@ public class CustomTvDb implements Serializable {
 	}
 	
 	//get sorted array of seasons that starts with 1
-	public List<Integer> getSeasonNumbers() {
+	private List<Integer> getSeasonNumbers() {
 		return new ArrayList<>(episodePaths.keySet());
 	}
 	
@@ -100,7 +102,7 @@ public class CustomTvDb implements Serializable {
 		return null;
 	}
 	
-	public void loadSeason(int seasonNum) {
+	private void loadSeason(int seasonNum) {
 		TvSeason season = MediaSearchHandler.getSeasonInfo(series.getId(), seasonNum);
 		if (season != null) {
 			getSeasons().set(seasonNum-1, season);
@@ -111,7 +113,7 @@ public class CustomTvDb implements Serializable {
 	//loads episode info for single episode
 	//args should be the aired number, not index (start with 1, no 0s)
 	//Cache both season and episode credits
-	public void loadEpisode(int seasonNum, int epNum) {
+	private void loadEpisode(int seasonNum, int epNum) {
 		TvSeason season = getSeason(seasonNum);
 		if (season.getEpisodes() == null || season.getEpisodes().isEmpty()) {
 			 loadSeason(seasonNum);
@@ -160,11 +162,11 @@ public class CustomTvDb implements Serializable {
 		return series.getSeasons().get(seasonNum-1).getEpisodes().get(epNum-1);
 	}
 	
-	public List<TvSeason> getSeasons() {
+	private List<TvSeason> getSeasons() {
 		return series.getSeasons();
 	}
 	
-	public TvSeason getSeason(int seasonNum) {
+	private TvSeason getSeason(int seasonNum) {
 		return series.getSeasons().get(seasonNum-1);
 	}
 	
@@ -182,7 +184,7 @@ public class CustomTvDb implements Serializable {
 	}
 
 	//nulls fileinfo
-	void removeEpisode(int seasonNum, int epNum) {
+	public void removeEpisode(int seasonNum, int epNum) {
 		if (episodePaths.containsKey(seasonNum)) {
 			episodePaths.get(seasonNum).put(epNum, null);
 		} else {
@@ -220,7 +222,7 @@ public class CustomTvDb implements Serializable {
 	}
 	
 	//don't use credits as a whole, only on an episode basis
-	public Credits getCredits(int seasonNum, int epNum) {
+	private Credits getCredits(int seasonNum, int epNum) {
 		if (seasonNum == 0 || epNum == 0) {
 			return series.getCredits();
 		}
@@ -263,11 +265,11 @@ public class CustomTvDb implements Serializable {
 		return series.getVideos();
 	}
 
-	void setFilePathInfo(FilePathInfo fpi, int seasonNum, int epNum) {
+	public void setFilePathInfo(FilePathInfo fpi, int seasonNum, int epNum) {
 		episodePaths.get(seasonNum).put(epNum, fpi);
 	}
 
-	List<String> getAllFullPaths() {
+	public List<String> getAllFullPaths() {
 		List<String> allPaths = new ArrayList<>();
 		List<Integer> seasons = getOwnedSeasonNumbers();
 		List<Integer> episodes;

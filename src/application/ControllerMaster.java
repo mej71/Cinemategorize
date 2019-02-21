@@ -1,38 +1,42 @@
 package application;
 
 
+import application.controllers.AddMediaDialogController;
+import application.controllers.CinemaController;
+import application.controls.JFXMediaRippler;
+import application.controls.JFXPersonRippler;
+import application.mediainfo.MediaItem;
+import application.mediainfo.MediaResultsPage;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.net.URL;
 import java.util.LinkedHashMap;
 
 //Hold all controllers statically.  Eases communication between dialogs without excess methods
 public class ControllerMaster {
 
 	public static CinemaController mainController;
-	
-	public static UserData userData = new UserData();
-	
-	public static ManualLookupController manualController;
-	
-	public static SelectionViewController selectionViewController;
-	
-	public static AddMediaDialogController addMediaDialogController;
-	
-	public static SettingsController settingsController;
+	public static UserData userData;
+	private static ManualLookupController manualController;
+	private static SelectionViewController selectionViewController;
+	private static AddMediaDialogController addMediaDialogController;
+	private static SettingsController settingsController;
+	private static PlaylistManagerController playlistController;
+	public static TileAnimator tileAnimator = new TileAnimator();
 
-	static PlaylistManagerController playlistController;
-
-	static TileAnimator tileAnimator = new TileAnimator();
-
-	public static JFXDialog selectionViewWindow;
-	public static JFXDialog manualLookupWindow;
-	public static JFXDialog addMediaWindow;
-	public static JFXDialog settingsWindow;
-	static JFXDialog playlistWindow;
+	private static JFXDialog selectionViewWindow;
+	private static JFXDialog manualLookupWindow;
+	private static JFXDialog addMediaWindow;
+	private static JFXDialog settingsWindow;
+	private static JFXDialog playlistWindow;
 
 	public static void init(StackPane stackPane) {
 		//set up dialogs
@@ -116,5 +120,32 @@ public class ControllerMaster {
 	public static void showSettingsDialog() {
 		JFXMediaRippler.forceHidePopOver();
 		ControllerMaster.settingsController.show(settingsWindow);
+	}
+
+	public static void tryLoadFile() {
+		InputStream inputStream;
+		ObjectInputStream objectInputStream;
+		new File("save_data").mkdirs();
+		File file = new File("save_data/userdata.dat");
+		URL url;
+		try {
+			url = file.toURI().toURL();
+			if (file.exists()) {
+				inputStream = url.openStream();
+				objectInputStream = new ObjectInputStream(inputStream);
+				UserData tempDat = (UserData)objectInputStream.readObject();
+				objectInputStream.close();
+				inputStream.close();
+				ControllerMaster.userData = tempDat;
+				return;
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		ControllerMaster.userData = new UserData();
+	}
+
+	public static void closeAddMediaWindow() {
+		addMediaWindow.close();
 	}
 }

@@ -1,5 +1,6 @@
-package application;
+package application.flowcells;
 
+import application.MediaPlaylist;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -10,9 +11,9 @@ import java.util.List;
 
 public class PlaylistCell<T extends MediaPlaylist> extends FlowCell<T> {
 
-    static int prefCellHeight = 42;
+    public static int prefCellHeight = 42;
 
-    PlaylistCell(T item) {
+    private PlaylistCell(T item) {
         super(item);
     }
 
@@ -22,7 +23,7 @@ public class PlaylistCell<T extends MediaPlaylist> extends FlowCell<T> {
     }
 
     @Override
-    public void updateItem() {
+    protected void updateItem() {
         super.updateItem();
         if (item != null) {
             GridPane gridPane = new GridPane();

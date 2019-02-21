@@ -1,6 +1,6 @@
 package application;
 
-public class StringTools {
+class StringTools {
 	
 	public static int getLevenshteinDistance(CharSequence s, CharSequence t) {
 	    if (s == null || t == null) {

@@ -1,22 +1,24 @@
 package application;
 
+import application.mediainfo.MediaItem;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-class PlayMedia {
+public class PlayMedia {
 
-    static void playMedia(MediaItem mi) {
+    public static void playMedia(MediaItem mi) {
         openFile(mi.getFullFilePath());
     }
 
-    static void playSeason(MediaItem mi, int seasonNum, int startEp){
+    public static void playSeason(MediaItem mi, int seasonNum, int startEp){
         PlayMedia.playSeason(mi, seasonNum, startEp, false);
     }
 
-    static void playSeason(MediaItem mi, int curSeason, int curEp, boolean allSeasons){
+    public static void playSeason(MediaItem mi, int curSeason, int curEp, boolean allSeasons){
         List<String> previousFilePaths = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
         String tempPath;
@@ -42,7 +44,7 @@ class PlayMedia {
         }
     }
 
-    static void playPlaylist(MediaItem startItem, MediaPlaylist playlist){
+    public static void playPlaylist(MediaItem startItem, MediaPlaylist playlist){
 
     }
 

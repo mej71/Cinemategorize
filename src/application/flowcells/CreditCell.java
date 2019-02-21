@@ -1,10 +1,11 @@
-package application;
+package application.flowcells;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import application.ControllerMaster;
 import org.controlsfx.control.PopOver;
 
 import info.movito.themoviedbapi.model.people.PersonCredit;
@@ -30,7 +31,7 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
     private static boolean hasEntered = false;
     private static final int taskMiliSeconds = 500;
 	private static Timer timer;
-	static int prefCellHeight = 22;
+	public static int prefCellHeight = 22;
 
 	private static CreditCell<?> tempCell;
 	
@@ -109,8 +110,8 @@ public class CreditCell<T extends PersonCredit> extends FlowCell<T> {
 		}
 		return title + year + role;
     }
-	
-	CreditCell(T item) {
+
+	public CreditCell(T item) {
 		super(item);
 		if (gridPane == null) {
 			init();

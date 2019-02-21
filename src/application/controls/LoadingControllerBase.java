@@ -1,14 +1,13 @@
-package application;
+package application.controls;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import application.controls.EscapableBase;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXSpinner;
-import com.jfoenix.controls.events.JFXDialogEvent;
 
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.GridPane;
@@ -21,7 +20,7 @@ public class LoadingControllerBase extends EscapableBase implements Initializabl
 	@FXML protected StackPane overlayPane;
     @FXML protected JFXSpinner progressSpinner;
 	
-	protected Task<Object> loadTask;
+	private Task<Object> loadTask;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {

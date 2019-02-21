@@ -35,7 +35,7 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
     nodes.addListener(this);
   }
   
-  public void observe(Node n) {
+  private void observe(Node n) {
 	n.layoutXProperty().addListener(this);
 	n.layoutYProperty().addListener(this);
   }
@@ -44,7 +44,7 @@ public class TileAnimator implements ChangeListener<Number>, ListChangeListener<
 	nodes.removeListener(this);    
   }
 
-  public void unobserve(Node n) {
+  private void unobserve(Node n) {
     n.layoutXProperty().removeListener(this);
     n.layoutYProperty().removeListener(this);
   }

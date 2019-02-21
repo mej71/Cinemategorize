@@ -6,7 +6,7 @@ import java.util.List;
 
 public class MainOptions {
 
-    static List<MainOptionTitles> getOptions() {
+    public static List<MainOptionTitles> getOptions() {
         return FXCollections.observableArrayList(MainOptionTitles.values());
     }
 

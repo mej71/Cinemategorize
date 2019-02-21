@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane fx:id="backgroundStackPane" styleClass="grid-pane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CinemaController">
+<StackPane fx:id="backgroundStackPane" styleClass="grid-pane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.CinemaController">
     <GridPane fx:id="mainGrid">
         <rowConstraints>
             <RowConstraints minHeight="10.0" percentHeight="10.0" />

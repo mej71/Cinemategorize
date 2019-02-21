@@ -2,6 +2,7 @@ package application;
 
 import java.util.List;
 
+import application.mediainfo.MediaItem;
 import info.movito.themoviedbapi.model.Collection;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
@@ -20,7 +21,7 @@ public class CollectionComboCell<T extends Collection> extends ComboMovieCell<Co
 			posterPane.setHgap(hGap);
 			posterPane.setMaxWidth( (maxItems * (posterSize + hGap)) + hGap);
 			posterPane.setPrefWidth( (maxItems * (posterSize + hGap)) + hGap);
-			List<MediaItem> media = ControllerMaster.userData.ownedCollections.get(item);
+			List<MediaItem> media = ControllerMaster.userData.getCollectionMedia(item);
 			fillImages(media, posterPane);
 			gp.add(posterPane, 0, 1, 2, 1);
 			setGraphic(gp);

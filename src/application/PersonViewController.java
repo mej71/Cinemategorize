@@ -1,5 +1,10 @@
 package application;
 
+import application.flowcells.CreditCell;
+import application.flowcells.ListFlowPane;
+import application.controls.JFXMediaRippler;
+import application.controls.LoadingControllerBase;
+import application.mediainfo.MediaItem;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXScrollPane;
 import com.jfoenix.controls.JFXTabPane;
@@ -93,12 +98,12 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		prodFlowPane.bindWidthToNode(prodScrollPane);
 	}
 	
-	<T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
+	public <T extends Person> void showPerson(JFXDialog d, T pc, MediaItem mi) {
 		person = ControllerMaster.userData.getPerson(pc.getId());
 		showPerson(d);
 	}
 	
-	void showPerson(JFXDialog d) {
+	private void showPerson(JFXDialog d) {
 		nameLabel.setText(person.getName());
 		if (person.getBiography()!=null && !person.getBiography().equals("")) {
 			bioLabel.setText(person.getBiography());
@@ -208,7 +213,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 	
 	private void loadInfo() {
 		ObservableList<Node> workingKnownForCollection = FXCollections.observableArrayList();
-		if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
+		if (ControllerMaster.userData.hasKnownFor(person.getId())) {
 			List<PersonCredit> knownCredits = ControllerMaster.userData.getKnowForCredits(person.getId());
 			for (int i = 0; i < knownCredits.size(); ++i) {
 
@@ -274,11 +279,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 						if ((!knownDep.equalsIgnoreCase("Acting") || mi.getCreditPosition(person.getId()) < castPositionThreshold) && mi.isFullLength()) {
 							knownForRipplers.get(known).setItem(mi);
 							workingKnownForCollection.add(knownForRipplers.get(known));
-							if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
-								ControllerMaster.userData.knownFor.get(person.getId()).add(personCredit);
-							} else {
-								ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Arrays.asList(personCredit)));
-							}
+							ControllerMaster.userData.updateKnownFor(person.getId(), personCredit);
 							tempKnownList.add(mId);
 							++known;
 						} else {
@@ -296,11 +297,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 						if (!tempKnownList.contains(credit.getId())) {
 							knownForRipplers.get(known).setItem(lesserKnown.get(credit));
 							workingKnownForCollection.add(knownForRipplers.get(known));
-							if (ControllerMaster.userData.knownFor.containsKey(person.getId())) {
-								ControllerMaster.userData.knownFor.get(person.getId()).add(credit);
-							} else {
-								ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>(Collections.singletonList(credit)));
-							}
+							ControllerMaster.userData.updateKnownFor(person.getId(), credit);
 							tempKnownList.add(lesserKnown.get(credit).getId());
 							++known;
 							//try and get at least this many movies for person, including lesser known if they have to
@@ -315,7 +312,7 @@ public class PersonViewController extends LoadingControllerBase implements Initi
 		}
 		//add blank array for empty person if not offline
 		if (workingKnownForCollection.isEmpty() && UserData.apiLinker != null) {
-			ControllerMaster.userData.knownFor.put(person.getId(), new ArrayList<>());
+			ControllerMaster.userData.updateKnownFor(person.getId(), null);
 		}
 		famousTilePane.getChildren().setAll(workingKnownForCollection);
 		famousLabel.setVisible(famousTilePane.getChildren().size()>0);

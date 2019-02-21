@@ -1,10 +1,11 @@
-package application;
+package application.mediainfo;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.MediaListDisplayType;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 
 import info.movito.themoviedbapi.model.*;
@@ -15,7 +16,6 @@ import info.movito.themoviedbapi.model.people.PersonCrew;
 import info.movito.themoviedbapi.model.tv.Network;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class MediaItem extends RecursiveTreeObject<MediaItem> implements Serializable {
 	/**
@@ -23,11 +23,11 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	 */
 	private static final long serialVersionUID = 1L;
 	private MediaListDisplayType displayType; // can't be mixed
-	CustomTvDb tvShow;
-	CustomMovieDb cMovie;
+	public CustomTvDb tvShow;
+	public CustomMovieDb cMovie;
 	private FilePathInfo filePathInfo;
-	LocalDateTime dateAdded;
-	double rating = -1;
+	public LocalDateTime dateAdded;
+	public double rating = -1;
 	private List<CustomMovieDb> otherParts = new ArrayList<>();
 	private List<String> otherPartPaths = new ArrayList<>();
 
@@ -68,10 +68,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		if (this.isMovie() && mi.isMovie() && this.getId() == mi.getId()) {
 			return true;
 		}
-		if (this.isTvShow() && mi.isTvShow() && this.getId() == mi.getId()) {
-			return true;
-		}
-		return false;
+		return this.isTvShow() && mi.isTvShow() && this.getId() == mi.getId();
 	}
 	
 	public void setMovie(CustomMovieDb m) {
@@ -100,7 +97,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		otherPartPaths.add(path);
 	}
 
-	public int numParts() {
+	private int numParts() {
 		return otherParts.size();
 	}
 
@@ -124,7 +121,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		return (isMovie() || tvShow == null)? filePathInfo.fPath : tvShow.getFilePath();
 	}
 
-	void setFilePathInfo(FilePathInfo fpi) {
+	public void setFilePathInfo(FilePathInfo fpi) {
 		this.filePathInfo = fpi;
 	}
 
@@ -261,7 +258,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		return getCreditPosition(personId, true);
 	}
 
-	public int getCreditPosition(int personId, boolean useEpisode) {
+	private int getCreditPosition(int personId, boolean useEpisode) {
 		List<PersonCrew> crew;
 		List<PersonCast> cast;
 		if (isMovie()) {
@@ -321,7 +318,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		return getCredits(true);
 	}
 	
-	public List<Person> getCredits(boolean useEpisode) {
+	private List<Person> getCredits(boolean useEpisode) {
 		if (isMovie()) {
 			return cMovie.getCredits().getAll();
 		} else {
@@ -456,7 +453,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 	}
 
 	// used for manual lookup controller so it can still be a MediaItem type
-	public TvEpisode getFirstAvailableEpisode() {
+	private TvEpisode getFirstAvailableEpisode() {
 		if (isMovie()) {
 			return null;
 		} else {
@@ -464,7 +461,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		}
 	}
 	
-	public TvSeason getFirstAvailableSeason() {
+	private TvSeason getFirstAvailableSeason() {
 		if (isMovie()) {
 			return null;
 		} else {
@@ -500,7 +497,7 @@ public class MediaItem extends RecursiveTreeObject<MediaItem> implements Seriali
 		return getVoteAverage(false);
 	}
 	
-	public float getVoteAverage(boolean useEpisode) {
+	private float getVoteAverage(boolean useEpisode) {
 		if (isMovie()) {
 			return cMovie.getVoteAverage();
 		} else {

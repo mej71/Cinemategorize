@@ -2,6 +2,7 @@ package application;
 
 import java.util.function.Function;
 
+import application.controls.JFXMediaRippler;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

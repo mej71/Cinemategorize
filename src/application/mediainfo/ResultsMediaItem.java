@@ -1,4 +1,4 @@
-package application;
+package application.mediainfo;
 
 public class ResultsMediaItem extends MediaItem {
 	

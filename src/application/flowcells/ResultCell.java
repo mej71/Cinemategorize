@@ -1,16 +1,10 @@
-package application;
+package application.flowcells;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import application.ControllerMaster;
+import application.MediaSearchHandler;
+import application.mediainfo.ResultsMediaItem;
 import com.jfoenix.controls.JFXComboBox;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -19,9 +13,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 
-public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
-	
-	static int prefCellHeight = 139;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T> {
+
+	public static int prefCellHeight = 139;
 	private Label titleLabel;
 	private Label descLabel;
 	//private Label directorLabel;
@@ -30,7 +29,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	private JFXComboBox<Integer> episodeBox;
 	
 	
-	ResultCell(T item) {
+	private ResultCell(T item) {
 		super(item);
 	}
 	
@@ -40,7 +39,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	}
 	
 	@Override
-	public void updateItem() {
+    protected void updateItem() {
 		super.updateItem();
 		if (getItem() != null) {
 			GridPane gridPane = new GridPane();
@@ -69,7 +68,7 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 	        for (int i = 0; i < numRows; i++) {
 	        	
 	            RowConstraints rowConst = new RowConstraints();
-				rowConst.setPercentHeight(100 / numRows);
+				rowConst.setPercentHeight(100.0 / numRows);
 	            gridPane.getRowConstraints().add(rowConst);         
 	        }
 	        descLabel.setWrapText(true);
@@ -156,21 +155,21 @@ public class ResultCell<T extends ResultsMediaItem> extends FlowCell<T>{
 		}
     	ControllerMaster.manualController.confirmMediaItem();
 	}
-	
 
-	static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results) {
+
+	public static <T extends ResultsMediaItem> List<ResultCell<T>> createCells(List<T> results) {
 		List<ResultCell<T>> cells = new ArrayList<>();
 		for (T result : results) {
 			cells.add(new ResultCell<>(result));
 		}
 		return cells;
 	}
-	
-	int getSeason() {
+
+	public int getSeason() {
 		return seasonBox.getValue();
 	}
-	
-	int getEpisode() {
+
+	public int getEpisode() {
 		return episodeBox.getValue();
 	}
 
