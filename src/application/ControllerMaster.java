@@ -25,7 +25,7 @@ public class ControllerMaster {
 
 	public static CinemaController mainController;
 	public static UserData userData;
-	private static ManualLookupController manualController;
+	public static ManualLookupController manualController;
 	private static SelectionViewController selectionViewController;
 	private static AddMediaDialogController addMediaDialogController;
 	private static SettingsController settingsController;
@@ -82,6 +82,7 @@ public class ControllerMaster {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		tryLoadFile();
 	}
 
 	public static void showPlaylistDialog() {

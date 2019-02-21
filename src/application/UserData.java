@@ -811,10 +811,13 @@ public class UserData implements Serializable {
     public void setTheme(ThemeSelection theme) {
         if (themeSelection != null) {
             //remove last stylesheet so small modifications aren't overridden by it
-            ControllerMaster.mainController.cinemaScene.getStylesheets().remove(Objects.requireNonNull(theme.getClass().getClassLoader().getResource(themeSelection.getFileName())).toExternalForm());
+            ControllerMaster.mainController.cinemaScene.getStylesheets().remove(themeSelection.getClass().getClassLoader().getResource(themeSelection.getFileName()).toExternalForm());
+        }
+        if (theme == null) {
+            theme = ThemeSelection.themes.get(0);
         }
         themeSelection = theme;
-        ControllerMaster.mainController.cinemaScene.getStylesheets().add(Objects.requireNonNull(ControllerMaster.userData.getClass().getClassLoader().getResource(themeSelection.getFileName())).toExternalForm());
+        ControllerMaster.mainController.cinemaScene.getStylesheets().add(ControllerMaster.userData.getClass().getClassLoader().getResource(themeSelection.getFileName()).toExternalForm());
     }
 
     public void setUseAutoLookup(Boolean newVal) {

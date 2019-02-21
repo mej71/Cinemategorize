@@ -226,7 +226,7 @@ public class AddMediaDialogController extends EscapableBase implements Initializ
 				skippedResults.add(rootFile);
 			}
 		}
-	}
+	}sy
 	
 	//minimalistic layout handler based on the enum UIMode
 	private void updateLayout() {

@@ -81,6 +81,7 @@ public class CinemaController implements Initializable {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
+		ControllerMaster.init(getBackgroundStackPane());
 		ControllerMaster.mainController = this;
 		
 		getMainGrid().prefWidthProperty().bind(backgroundStackPane.widthProperty());
@@ -232,8 +233,6 @@ public class CinemaController implements Initializable {
 				}
 			}
 		});
-	    
-	   ControllerMaster.init(getBackgroundStackPane());
 
 		createAllRipplers();
 		refreshSearch();

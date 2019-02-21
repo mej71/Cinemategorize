@@ -19,7 +19,8 @@ public class Main extends Application {
 	    @Override
 	    public void start(Stage primaryStage) {
 	        try {
-	            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("CinemaMainController.fxml")));
+
+	            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("CinemaMainController.fxml"));
 	            Scene scene = new Scene(root, 1110, 720);
 	            primaryStage.setTitle("Cinemategorize");
 	            //add a listener that prevents the window from being resized smaller than the initial value

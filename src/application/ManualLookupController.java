@@ -86,8 +86,6 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		}
 		fileFlowPane.setPrefHeight(fileFlowPane.getChildren().size() * FileCell.prefCellHeight);
 		fileFlowPane.selectCell(0);
-
-		System.out.println(fileFlowPane.getCells());
 	}
 	
 	@Override 
@@ -282,7 +280,6 @@ public class ManualLookupController extends LoadingControllerBase implements Ini
 		} else if (mediaTypeComboBox.getValue()==MediaTypeOptions.TV_SHOW) { //tv show
 			mRes = new MediaResultsPage(MediaSearchHandler.getTvResults(title));
 		}
-		System.out.println(fileFlowPane.getSelectedCell());
 		fileFlowPane.getSelectedCell().mediaResultsPage.setResults(mRes);
 		fileFlowPane.getSelectedCell().resultCells = ResultCell.createCells(mRes.getResults());
 		Platform.runLater(() -> {
